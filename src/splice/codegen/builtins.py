@@ -44,7 +44,14 @@ def is_builtin_with_kwargs(fullname: str) -> bool:
     return fullname in BUILTINS
 
 
-OP_MAP = {"is": "__is", "/": "fdiv", "//": "idiv", "%": "mod", "**": "pow"}
+OP_MAP = {
+    "is": "__is",
+    "is not": "!__is",
+    "/": "fdiv",
+    "//": "idiv",
+    "%": "mod",
+    "**": "pow",
+}
 
 # Python method names that collide with C++ keywords.
 METHOD_RENAMES = {"union": "union_"}

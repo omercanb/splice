@@ -32,7 +32,6 @@ excluded_files = {
     "callables",
     "dataclasses",
     "instances",
-    "binary_trees",
     "bm_deltablue",
     "bm_hexiom",
     "bm_nqueens",
@@ -41,6 +40,23 @@ excluded_files = {
     "bm_spectral_norm",
     "bm_float",
 }
+
+# excluded_files = {
+#     "bytes",
+#     "enums",
+#     "callables",
+#     "dataclasses",
+#     "instances",
+#     "binary_trees",
+#     "bm_deltablue",
+#     "bm_hexiom",
+#     "bm_nqueens",
+#     "bm_raytrace",
+#     "bm_richards",
+#     "bm_spectral_norm",
+#     "bm_float",
+# }
+#
 
 
 def main():

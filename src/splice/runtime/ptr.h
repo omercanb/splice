@@ -5,6 +5,7 @@
 #include "str.h"
 #include "truthy.h"
 #include <iostream>
+#include <optional>
 #include <utility>
 constexpr bool debug_ptr = false;
 namespace py {
@@ -121,19 +122,35 @@ inline bool to_bool(const ptr<T> &p) {
 
 // Python's == compares values (list.__eq__ etc.), unlike `is`/__is below -
 // dereference both sides rather than comparing addresses.
-template <typename T1, typename T2>
-bool operator==(const ptr<T1> &p1, const ptr<T2> &p2) {
+template <typename T1>
+bool operator==(const ptr<T1> &p1, const ptr<T1> &p2) {
     return *p1.object == *p2.object;
 }
 
-template <typename T1, typename T2>
-bool operator!=(const ptr<T1> &p1, const ptr<T2> &p2) {
+template <typename T1>
+bool operator!=(const ptr<T1> &p1, const ptr<T1> &p2) {
     return !(p1 == p2);
 }
 
-template <typename T1, typename T2>
-bool __is(const ptr<T1> &p1, const ptr<T2> &p2) {
+template <typename T1>
+bool __is(const ptr<T1> &p1, const ptr<T1> &p2) {
     return (void *)p1.object == (void *)p2.object;
+}
+
+template <typename T1>
+bool __is(const std::optional<ptr<T1>> &p1, const std::optional<ptr<T1>> &p2) {
+    if (p1.has_value() != p2.has_value())
+        return false;
+    return !p1.has_value() || __is(*p1, *p2);
+}
+
+template <typename T1>
+bool __is(const std::optional<ptr<T1>> &p1, std::nullopt_t) {
+    return !p1.has_value();
+}
+template <typename T1>
+bool __is(std::nullopt_t, const std::optional<ptr<T1>> &p2) {
+    return !p2.has_value();
 }
 
 } // namespace py

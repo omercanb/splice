@@ -1,12 +1,25 @@
 from tests.benchmarks.benchmarking import benchmark
 
+_DIGIT_BYTES = [b"0", b"1", b"2", b"3", b"4", b"5", b"6", b"7", b"8", b"9"]
+
+
+def _int_bytes(n: int) -> bytes:
+    """n's decimal digits as bytes - no %-formatting or str<->bytes conversion."""
+    if n == 0:
+        return b"0"
+    out = b""
+    while n > 0:
+        out = _DIGIT_BYTES[n % 10] + out
+        n = n // 10
+    return out
+
 
 @benchmark()
 def bytes_concat() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'  %d str' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(b'  ' + _int_bytes(i) + b' str')
 
     n = 0
     for i in range(1000):
@@ -25,8 +38,8 @@ def bytes_methods() -> None:
     """Use a mix of bytes methods (but not split/join)."""
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'  %d str' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(b'  ' + _int_bytes(i) + b' str')
 
     n = 0
     for i in range(100):
@@ -50,15 +63,15 @@ def bytes_methods() -> None:
 def bytes_format() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'%d str' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(_int_bytes(i) + b' str')
 
     n = 0
     for i in range(100):
         for s in a:
-            n += len(b"foobar %s stuff" % s)
-            ss = b"foobar %s stuff" % s
-            n += len(b"%s-%s" % (s, ss))
+            n += len(b"foobar " + s + b" stuff")
+            ss = b"foobar " + s + b" stuff"
+            n += len(s + b"-" + ss)
     assert n == 10434000, n
 
 
@@ -66,8 +79,8 @@ def bytes_format() -> None:
 def bytes_slicing() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'%d str' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(_int_bytes(i) + b' str')
 
     n = 0
     for i in range(1000):
@@ -84,8 +97,8 @@ def bytes_slicing() -> None:
 def bytes_split_and_join() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'%d-ab-asdfsdf-asdf' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(_int_bytes(i) + b'-ab-asdfsdf-asdf')
         a.append(b'yeah')
     n = 0
     for i in range(100):
@@ -100,8 +113,8 @@ def bytes_split_and_join() -> None:
 def bytes_searching() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'%d-ab-asdfsdf-asdf' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(_int_bytes(i) + b'-ab-asdfsdf-asdf')
         a.append(b'yeah')
     n = 0
     for i in range(100):
@@ -135,8 +148,8 @@ def bytes_call() -> None:
 def bytes_indexing() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar-%d' % i)
-        a.append(b'%d-ab-asdfsdf-asdf' % i)
+        a.append(b'Foobar-' + _int_bytes(i))
+        a.append(_int_bytes(i) + b'-ab-asdfsdf-asdf')
         a.append(b'yeah')
     n = 0
     for i in range(100):
@@ -151,8 +164,8 @@ def bytes_indexing() -> None:
 def bytes_normalize() -> None:
     a = []
     for i in range(1000):
-        a.append(b'Foobar  %d' % i)
-        a.append(b'%d-ab\tasdfsdf-asdf\n' % i)
+        a.append(b'Foobar  ' + _int_bytes(i))
+        a.append(_int_bytes(i) + b'-ab\tasdfsdf-asdf\n')
         a.append(b'yeah')
     n = 0
     for i in range(1000):

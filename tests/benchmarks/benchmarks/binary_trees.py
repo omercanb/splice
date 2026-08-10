@@ -6,13 +6,15 @@ https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/binarytr
 
 import gc
 
-from tests.benchmarks.benchmarking import benchmark
 from mypy_extensions import mypyc_attr
+
+from tests.benchmarks.benchmarking import benchmark
 
 
 @mypyc_attr(acyclic=True)
 class Tree:
     def __init__(self, depth: int) -> None:
+        self.tree = Tree(0)
         if depth == 0:
             self.left = None
             self.right = None

@@ -97,7 +97,7 @@ def cpp_type_name(t: Type) -> str:
                 non_none = next(
                     item for item in items if not isinstance(item, NoneType)
                 )
-                inner = cpp_type_name(non_none)
+                inner = cpp_type(non_none)
                 return f"std::optional<{inner}>"
 
             # A literal is just its underlying type: `x = 3` infers Literal[3].
