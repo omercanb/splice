@@ -3,6 +3,8 @@ Base class for AST-level transforms
 Also supports hoisting statements in the function or global scope
 """
 
+from typing import TypeVar
+
 from mypy.nodes import (
     AssertStmt,
     AssignmentExpr,
@@ -13,6 +15,7 @@ from mypy.nodes import (
     ClassDef,
     ComparisonExpr,
     ConditionalExpr,
+    Context,
     Decorator,
     DelStmt,
     DictExpr,
@@ -45,6 +48,17 @@ from mypy.nodes import (
 )
 
 from splice.visitor import Visitor
+
+_ContextT = TypeVar("_ContextT", bound=Context)
+
+
+def copy_position(node: _ContextT, source: Context) -> _ContextT:
+    """A freshly constructed node has no position (-1) until stamped with one."""
+    node.line = source.line
+    node.column = source.column
+    node.end_line = source.end_line
+    node.end_column = source.end_column
+    return node
 
 
 class Transformer(Visitor[Node]):

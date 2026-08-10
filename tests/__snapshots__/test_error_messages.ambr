@@ -76,6 +76,28 @@
   
   '''
 # ---
+# name: test_error_message[error_after_tree_transform.py]
+  '''
+  error_after_tree_transform.py:5:5: error: position-check marker found here
+  
+    5 |     a[marker(0)] = 1
+      |     ^^^^^^^^^^^^^^^^
+  
+    help: test marker - remove once the position check has run
+  
+  '''
+# ---
+# name: test_error_message[error_after_tree_transform_comprehension.py]
+  '''
+  error_after_tree_transform_comprehension.py:5:12: error: position-check marker found here
+  
+    5 |     return [marker(x) for x in xs]
+      |            ^^^^^^^^^^^^^^^^^^^^^^^
+  
+    help: test marker - remove once the position check has run
+  
+  '''
+# ---
 # name: test_error_message[except_star.py]
   '''
   except_star.py:4:13: error: `except*` groups are not supported

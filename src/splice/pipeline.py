@@ -16,6 +16,7 @@ type TypeTable = dict[Expression, Type]
 
 from splice.frontend.mypy_fixes import get_resolved_types
 from splice.frontend.validate import validate, UnsupportedProgram, render
+from splice.frontend.validate_semantics import validate_semantics
 from splice.codegen.statement_codegen import StatementCodegen
 from splice.transform.comprehension_transformer import (
     apply_comprehension_transforms,
@@ -101,6 +102,11 @@ def analyse(path: str | None, source: str) -> AnalysisResult:
         raise UnsupportedProgram(diagnostics)
 
     _apply_transforms(tree, types)
+
+    semantics_diagnostics = validate_semantics(tree)
+    if semantics_diagnostics:
+        print(render(semantics_diagnostics, source, path))
+        raise UnsupportedProgram(semantics_diagnostics)
 
     return AnalysisResult(result.files["main"], types, source, path)
 

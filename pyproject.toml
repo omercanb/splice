@@ -25,4 +25,4 @@ test = [
 ]
 
 [tool.setuptools.package-data]
-splice = ["runtime/*.h"]
+splice = ["runtime/*.h", "py.typed"]

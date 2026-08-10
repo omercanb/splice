@@ -9,6 +9,7 @@ from mypy.nodes import (
     ArgKind,
     AssignmentStmt,
     CallExpr,
+    Context,
     Expression,
     ExpressionStmt,
     IndexExpr,
@@ -22,22 +23,21 @@ from mypy.nodes import (
 )
 from mypy.types import TupleType, Type, get_proper_type
 
-from splice.transform.tree_transformer import Transformer
+from splice.transform.tree_transformer import Transformer, copy_position
 
 
-def _none_expr() -> NameExpr:
+def _none_expr(source: Context) -> NameExpr:
     none = NameExpr("None")
     none.fullname = "builtins.None"
-    return none
+    return copy_position(none, source)
 
 
-def _method_call(base: Expression, name: str, args: list[Expression]) -> CallExpr:
-    return CallExpr(
-        MemberExpr(base, name),
-        args,
-        [ArgKind.ARG_POS for _ in args],
-        [None] * len(args),
-    )
+def _method_call(
+    base: Expression, name: str, args: list[Expression], source: Context
+) -> CallExpr:
+    member = copy_position(MemberExpr(base, name), source)
+    call = CallExpr(member, args, [ArgKind.ARG_POS for _ in args], [None] * len(args))
+    return copy_position(call, source)
 
 
 def _is_last_index(index: Expression) -> bool:
@@ -64,10 +64,12 @@ class IndexTransformer(Transformer):
 
     def _slice_call(self, o: SliceExpr) -> CallExpr:
         bounds = [
-            self.visit(bound) if bound is not None else _none_expr()
+            self.visit(bound) if bound is not None else _none_expr(o)
             for bound in (o.begin_index, o.end_index, o.stride)
         ]
-        return CallExpr(NameExpr("slice"), bounds, [ArgKind.ARG_POS] * 3, [None] * 3)
+        name = copy_position(NameExpr("slice"), o)
+        call = CallExpr(name, bounds, [ArgKind.ARG_POS] * 3, [None] * 3)
+        return copy_position(call, o)
 
     def visit_index_expr(self, o: IndexExpr) -> Node:
         # A subscript in type position (eg. `Matrix = List[List[float]]`)
@@ -81,11 +83,11 @@ class IndexTransformer(Transformer):
             o.index = self.visit(o.index)
             return o
         if _is_last_index(o.index):
-            result = _method_call(o.base, "back", [])
+            result = _method_call(o.base, "back", [], o)
         elif isinstance(o.index, SliceExpr):
-            result = _method_call(o.base, "__getitem__", [self._slice_call(o.index)])
+            result = _method_call(o.base, "__getitem__", [self._slice_call(o.index)], o)
         else:
-            result = _method_call(o.base, "__getitem__", [self.visit(o.index)])
+            result = _method_call(o.base, "__getitem__", [self.visit(o.index)], o)
         self.types[result] = self.types[o]
         return result
 
@@ -96,11 +98,11 @@ class IndexTransformer(Transformer):
             target.base = self.visit(target.base)
             if not self._is_tuple(target.base):
                 if _is_last_index(target.index):
-                    o.lvalues[0] = _method_call(target.base, "back", [])
+                    o.lvalues[0] = _method_call(target.base, "back", [], target)
                     return o
                 index = self.visit(target.index)
-                call = _method_call(target.base, "__setitem__", [index, o.rvalue])
-                return ExpressionStmt(call)
+                call = _method_call(target.base, "__setitem__", [index, o.rvalue], o)
+                return copy_position(ExpressionStmt(call), o)
             target.index = self.visit(target.index)
             return o
         o.lvalues = [self.visit(lvalue) for lvalue in o.lvalues]
@@ -116,10 +118,10 @@ class IndexTransformer(Transformer):
             target.base = self.visit(target.base)
             if not self._is_tuple(target.base):
                 if _is_last_index(target.index):
-                    o.lvalue = _method_call(target.base, "back", [])
+                    o.lvalue = _method_call(target.base, "back", [], target)
                 else:
                     index = self.visit(target.index)
-                    o.lvalue = _method_call(target.base, "__getitem__", [index])
+                    o.lvalue = _method_call(target.base, "__getitem__", [index], target)
             else:
                 target.index = self.visit(target.index)
             return o

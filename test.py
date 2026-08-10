@@ -12,3 +12,9 @@ def mutate(p: Pair):
 
 
 mutate(Pair(10, 20))
+
+items = [1, 2, 3]
+
+for x in items:
+    print(items)
+    items.append(x)

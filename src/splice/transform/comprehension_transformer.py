@@ -8,6 +8,7 @@ from mypy.nodes import (
     AssignmentStmt,
     Block,
     CallExpr,
+    Context,
     DictExpr,
     DictionaryComprehension,
     Expression,
@@ -32,28 +33,30 @@ from mypy.types import CallableType, Type
 from splice import pipeline
 from splice.analysis.free_variables import get_free_variables
 from splice.namer import TempNameGenerator
-from splice.transform.tree_transformer import Transformer
+from splice.transform.tree_transformer import Transformer, copy_position
 
 
 def method_expr(
-    base: Expression, method_name: str, method_params: list[Expression]
+    base: Expression,
+    method_name: str,
+    method_params: list[Expression],
+    source: Context,
 ) -> CallExpr:
     method_arg_kinds = [ArgKind.ARG_POS for _ in method_params]
     method_arg_names = [None for _ in method_params]
-    return CallExpr(
-        MemberExpr(base, method_name), method_params, method_arg_kinds, method_arg_names
-    )
+    member = copy_position(MemberExpr(base, method_name), source)
+    call = CallExpr(member, method_params, method_arg_kinds, method_arg_names)
+    return copy_position(call, source)
 
 
-def call_expr(function_name: str, function_params: list[Expression]) -> CallExpr:
+def call_expr(
+    function_name: str, function_params: list[Expression], source: Context
+) -> CallExpr:
     function_arg_kinds = [ArgKind.ARG_POS for _ in function_params]
     function_arg_names = [None for _ in function_params]
-    return CallExpr(
-        NameExpr(function_name),
-        function_params,
-        function_arg_kinds,
-        function_arg_names,
-    )
+    name = copy_position(NameExpr(function_name), source)
+    call = CallExpr(name, function_params, function_arg_kinds, function_arg_names)
+    return copy_position(call, source)
 
 
 class ComprehensionRemover(Transformer):
@@ -75,7 +78,7 @@ class ComprehensionRemover(Transformer):
         self.transform_done = True
 
         def typed_name(name: str) -> NameExpr:
-            e = NameExpr(name)
+            e = copy_position(NameExpr(name), o)
             self.types[e] = comprehension_type
             return e
 
@@ -84,18 +87,25 @@ class ComprehensionRemover(Transformer):
         declaration_name = typed_name(tmp_name)
         declaration_name.is_new_def = True
 
-        initialize_tmp = AssignmentStmt([declaration_name], empty_container)
+        copy_position(empty_container, o)
+        initialize_tmp = copy_position(
+            AssignmentStmt([declaration_name], empty_container), o
+        )
         self.types[empty_container] = comprehension_type
 
-        # Inner statement that gros the tmp variable
-        grow_tmp_call = method_expr(typed_name(tmp_name), method_name, method_params)
+        # Inner statement that grows the tmp variable
+        grow_tmp_call = method_expr(typed_name(tmp_name), method_name, method_params, o)
 
-        loop_body = self.expand_comprehension(o, ExpressionStmt(grow_tmp_call))
+        loop_body = self.expand_comprehension(
+            o, copy_position(ExpressionStmt(grow_tmp_call), o)
+        )
 
         # Return the temp variable
-        return_tmp = ReturnStmt(typed_name(tmp_name))
+        return_tmp = copy_position(ReturnStmt(typed_name(tmp_name)), o)
 
-        function_body = Block([initialize_tmp, loop_body, return_tmp])
+        function_body = copy_position(
+            Block([initialize_tmp, loop_body, return_tmp]), o
+        )
 
         # Create a function with the appropriate type
         free_variables = get_free_variables(o)
@@ -117,13 +127,15 @@ class ComprehensionRemover(Transformer):
             fallback=pipeline.function_fallback,
         )
 
-        function_definition = FuncDef(new_name, args, function_body, func_type)
+        function_definition = copy_position(
+            FuncDef(new_name, args, function_body, func_type), o
+        )
         self.hoist_global([function_definition])
 
         replacing_call_arguments = [
-            NameExpr(free_var.name) for free_var in free_variables
+            copy_position(NameExpr(free_var.name), o) for free_var in free_variables
         ]
-        replacing_call = call_expr(new_name, replacing_call_arguments)
+        replacing_call = call_expr(new_name, replacing_call_arguments, o)
 
         return replacing_call
 
@@ -144,10 +156,23 @@ class ComprehensionRemover(Transformer):
             reversed(o.indices), reversed(o.sequences), reversed(o.condlists)
         ):
             for condition in conditions:
-                inner = IfStmt([condition], [Block([inner])], else_body=None)
+                inner = copy_position(
+                    IfStmt(
+                        [condition],
+                        [copy_position(Block([inner]), o)],
+                        else_body=None,
+                    ),
+                    o,
+                )
             # for index_variable in iterated_sequence: if condition[0]: if condition[1]: ...
-            inner = ForStmt(
-                index_variable, iterated_sequence, Block([inner]), else_body=None
+            inner = copy_position(
+                ForStmt(
+                    index_variable,
+                    iterated_sequence,
+                    copy_position(Block([inner]), o),
+                    else_body=None,
+                ),
+                o,
             )
         return inner
 

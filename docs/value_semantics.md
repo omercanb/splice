@@ -1,5 +1,32 @@
 # Value semantics design
 
+**Purpose: Stay close to Python's semantics but provide native C++ performance by limiting the programs that you can write**
+
+Main Goal: Prevent aliasing.
+```python
+def f(a: list[int], b: list[int]):
+    a.append(1)
+    print(b[0])
+a = [1, 2, 3]
+b = a
+f(a, b)
+```
+Then if `a.append()` causes a to reallocate, `b[0]` will be pointing to garbage.
+By preventing any way in which this sort of aliasing can happen, we can use C++ like values in classes instead of Python like pointers. This enables us to have directly C++ like performance. 
+
+## Core Rules
+**Note: These are all checked by the Splice compiler**
+- Whenever you assign or return an lvalue (`a`, `a.field`, `a.items[i]`, etc, but not a literal `0`, `function()`, or `a.method()`) you have to assign or return it inside `copy()`. So `return copy(a)` or `b = copy(a.field)`. This return or reassign is called a 'hand-off'.
+- When passing in arguments to a function, they cannot be structural aliases. 
+    Examples of banned function calls: 
+    - `function(self, self.items)` is not allowed because `self.items` contains `self` 
+    - `function(array, array[i])` is not allowed because `array[i]` contains `array`
+    - `function(array[i], array[j])` is not allowed because `i` and `j` could be the same number (but `function(array[0], array[1]` is allowed and its also allowed if `i` and `j` are known at compile time)
+    All other calls are allowed.
+- Global variables can only be `int`s or `float`s and cannot be reassigned.
+- Function parameters cannot be reassigned. 
+- Classes cannot contain themselves as members.
+
 ## Core model
 
 - All types are **value types** by default. Assignment always conceptually copies; there is no first-class reference type in ordinary code.
@@ -14,6 +41,7 @@
 - Parameters are references **scoped strictly to the call** — never copies. This matches Python's own semantics (mutating a passed mutable object is visible to the caller) at zero cost.
 - A parameter reference can **never be named** (bound to a variable), **never returned bare**, and **never passed onward** to another function's parameter unless it passes the exclusivity check below. This is what keeps it from ever outliving the call it belongs to.
 - A **prvalue argument** is just constructed/moved directly into the parameter's storage — no reference machinery needed, since there's nothing to alias. Falls out of the lvalue/prvalue distinction for free; no separate rule.
+- **Reassigning a parameter's own name (`x = new_value`) is not allowed.** In Python this only rebinds the local name — the caller's object is untouched. Since a parameter compiles to a C++ reference, the same line there would assign *through* the reference and mutate the caller's object — the opposite of what the Python source means. Rather than detect or reconcile that mismatch, the rebind is simply rejected. Mutating *through* the parameter (`x.field = 5`) is unaffected and remains the correct, intended way to mutate the caller's object.
 
 ## The exclusivity check (the core safety mechanism)
 
@@ -35,6 +63,7 @@
 - A reference bound to a variable, returned bare, or forwarded to another parameter without passing the exclusivity check.
 - Two arguments (`self` included) to one call sharing a structural base, unless provably disjoint.
 - Any non-int/float mutable state at module scope.
+- Reassigning a parameter's own name inside the function body.
 
 ## Genuinely won't be implemented (not open, not deferred — out of scope)
 

@@ -1,44 +1,44 @@
 # serializer version: 1
 # name: test_comprehension_transform_snapshot
   '''
-  def __list_comprehension_12() -> list[int]:
-      __tmp_14 = []
+  def __list_comprehension_0() -> list[int]:
+      __tmp_0 = []
       for n in range(10):
-          __tmp_14.append(n)
-      return __tmp_14
-  def __list_comprehension_13(x: int) -> list[int]:
-      __tmp_15 = []
+          __tmp_0.append(n)
+      return __tmp_0
+  def __list_comprehension_1(x: int) -> list[int]:
+      __tmp_1 = []
       for x in range(x):
-          __tmp_15.append(x)
-      return __tmp_15
-  def __dict_comprehension_1(x: int) -> dict[int, int]:
-      __tmp_16 = {}
+          __tmp_1.append(x)
+      return __tmp_1
+  def __dict_comprehension_0(x: int) -> dict[int, int]:
+      __tmp_2 = {}
       for x in range(x):
           if (x % 2) == 0:
-              __tmp_16.__setitem__(x, x)
-      return __tmp_16
-  def __list_comprehension_14(x: int) -> list[int]:
-      __tmp_17 = []
+              __tmp_2.__setitem__(x, x)
+      return __tmp_2
+  def __list_comprehension_2(x: int) -> list[int]:
+      __tmp_3 = []
       for x in range(x):
           if (x % 2):
               for y in range(x):
                   if (y % 2):
-                      __tmp_17.append(x)
-      return __tmp_17
-  def __list_comprehension_15(z: list[int], x: int) -> list[tuple[int, int]]:
-      __tmp_18 = []
+                      __tmp_3.append(x)
+      return __tmp_3
+  def __list_comprehension_3(z: list[int], x: int) -> list[tuple[int, int]]:
+      __tmp_4 = []
       for x in zip(z, range(x)):
-          __tmp_18.append(x)
-      return __tmp_18
+          __tmp_4.append(x)
+      return __tmp_4
   def main() -> int:
-      __list_comprehension_12()
+      __list_comprehension_0()
       x = 20
-      __list_comprehension_13(x)
-      __dict_comprehension_1(x)
-      __list_comprehension_14(x)
+      __list_comprehension_1(x)
+      __dict_comprehension_0(x)
+      __list_comprehension_2(x)
       y = 10
       z = [1, 2, 3]
-      __list_comprehension_15(z, x)
+      __list_comprehension_3(z, x)
       return 0
   '''
 # ---
