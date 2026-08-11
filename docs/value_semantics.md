@@ -37,7 +37,7 @@ By preventing any way in which this sort of aliasing can happen, we can use C++ 
 
 ## Function parameters
 
-- **No visible annotation.** For now, every parameter is passed as a mutable reference in the generated C++ — no inference of read-only vs. mutable yet (that's a future refinement, not part of the current plan).
+- **No visible annotation.** Mutability is inferred per parameter by the mutation analysis (see below) — direct writes, or forwarding to another mutable parameter, transitively. Codegen may still emit `T&` uniformly regardless; the inferred fact is what the exclusivity check and loop-claim check actually rely on.
 - Parameters are references **scoped strictly to the call** — never copies. This matches Python's own semantics (mutating a passed mutable object is visible to the caller) at zero cost.
 - A parameter reference can **never be named** (bound to a variable), **never returned bare**, and **never passed onward** to another function's parameter unless it passes the exclusivity check below. This is what keeps it from ever outliving the call it belongs to.
 - A **prvalue argument** is just constructed/moved directly into the parameter's storage — no reference machinery needed, since there's nothing to alias. Falls out of the lvalue/prvalue distinction for free; no separate rule.
@@ -45,12 +45,39 @@ By preventing any way in which this sort of aliasing can happen, we can use C++ 
 
 ## The exclusivity check (the core safety mechanism)
 
-- **Purely structural and syntactic. No dataflow analysis, no call-graph analysis, anywhere.**
-- At every call: compare all arguments — including the implicit `self` on a method — pairwise. Reject the call if any two share a structural base that isn't *provably* distinct.
+- **Purely structural and syntactic. No dataflow analysis, no call-graph analysis needed to run the check itself** (though it now consults one precomputed fact — see "Mutation and allocation analysis" below).
+- At every call: compare all arguments — including the implicit `self` on a method — pairwise. Reject if any two share a structural base that isn't *provably* distinct **and** at least one of them binds to a mutable parameter. Two overlapping read-only accesses are fine — only a mutable one conflicts with anything.
 - `a.items[i]` alone as an argument is completely fine.
-- `a.items[i]` and `a.items[j]` as two arguments in the *same* call is only fine if `i` and `j` are provably distinct — both sides must be compile-time constants (literals or `constexpr` globals) **and** unequal. A variable or a function-call index is conservatively assumed to possibly overlap, and the call is rejected.
+- `a.items[i]` and `a.items[j]` as two arguments in the *same* call is only fine if `i` and `j` are provably distinct — both sides must be compile-time constants (literals or `constexpr` globals) **and** unequal. A variable or a function-call index is conservatively assumed to possibly overlap.
 - Field access (`a.b.c`) is always a fixed, distinguishable path — never confused with a different field path.
 - This composes across nested/recursive calls by induction: every call site is checked, so a function's own parameters are guaranteed non-aliased on entry, and it never has to re-derive that guarantee when passing them onward.
+- **A `for` loop adds its iterated container to the comparison set for every call inside the loop body**, as if it were one more claim alongside the call's own arguments — not a separate mechanism, the same structural comparison with a wider input set. The loop's claim is itself mutable or read-only depending on whether the loop variable is ever written to inside the body (see below) — a read-only iteration doesn't conflict with another read-only call on the same container, only with something mutable.
+- Only applies when the iterated expression is a named base (an lvalue). A fresh temporary (`for x in get_list():`) needs no claim — nothing else could have a name for it to alias.
+
+## Mutation and allocation analysis
+
+Two facts, computed together in one pass, that the checks above and codegen both consult:
+
+- **Per function, per parameter: `mutable` (bool).** Does this parameter ever get written to directly, or passed onward to another function's parameter that's mutable.
+- **Per function: `allocates` (bool) + a location trace.** Does this function, or anything it calls transitively, touch the allocator. Powers a `@hotpath` decorator that warns (not rejects) on allocation.
+
+Computed by: seeding a fixed table of builtin facts (`append`/`extend`/etc. → mutable + allocates; `__setitem__` at an existing index → mutable only; reads → neither), walking each user function once for its direct facts, building the call graph (argument-to-parameter binding, not an argument-reordering transform — reordering would risk changing evaluation order), then propagating both facts to a fixed point.
+
+### Implementation steps for this stage
+
+Scoped to just this analysis — structural path comparison and the exclusivity/copy/globals/parameter-reassignment checks are a separate step that consumes what's built here.
+
+1. Builtin seed table: `(mutates, allocates)` per known operation. All flat entries — no pass-through shape needed, since lambda-parameter-mutation is banned (step 5), so a callback can never make `sorted`/`map`/`filter` mutate their container argument.
+2. `analyze_statement(stmt) -> list[Finding]`, where `Finding = (node, OperationEffect)` — the single, unified recognizer for direct, immediately-knowable facts, covering all three sources: the builtin `(type, method)` table; `OperatorAssignmentStmt` (`+=`/`*=` survive `frontend.validate`'s `OP_MAP` rejection already, so any that reach here compile to a real C++ compound assignment — `mutates=True` unconditional, `allocates` from a small `{list, str, bytes}` set of types whose compound op can grow); and constructor/literal nodes (`ListExpr`/`DictExpr`/`SetExpr`, plus calls `should_wrap_call_in_pointer` already recognizes in `expression_codegen.py` — always `allocates`, never `mutates`, tuple excluded since it isn't `ptr`-wrapped). Deliberately does *not* resolve calls to user-defined functions — their effect isn't known yet, that's what the fixed point computes. Walk each user-defined function once, calling this per statement, to seed direct facts.
+3. Argument-to-parameter binding resolver — a lookup, not a transform. Used both by step 2's walker to record call-graph edges for user-defined calls (separate from `analyze_statement` itself) and by the fixed point in step 4.
+4. Build the call graph and propagate both facts to a fixed point. Converges on its own since both facts are monotonic.
+5. Lambdas: reject at definition if the body writes into its own parameter (reuses steps 1–2's recognition logic). Never joins the call graph for the mutable trait. Its allocates fact is still computed on demand, recomputed not cached, consulting step 4's already-finished results for whatever named functions it calls.
+6. `loop_variable_is_mutated(loop) -> bool`: local, recomputed-not-cached walk of one loop body, same recognition logic, feeding codegen's `const auto&`/`auto&` choice and the other step's loop-claim mutability.
+
+Query functions built on top:
+
+- `call_touches_base(call, base) -> bool` — does any argument (including `self`) structurally match `base` and bind to a mutable parameter. The thing the exclusivity check and the loop-claim check both actually run.
+- `loop_variable_is_mutated(loop) -> bool` — a local, recomputed-not-cached walk of one loop's body, asking whether the loop variable itself is ever written to. Drives both the loop's claim (mutable vs. read-only) and codegen's `const auto&` vs `auto&` choice for the loop variable. Not cached: a loop is visited a small, fixed number of times (validator, codegen), unlike a function that might be called from many sites, so there's no repeated work to amortize.
 
 ## Globals
 
@@ -68,13 +95,21 @@ By preventing any way in which this sort of aliasing can happen, we can use C++ 
 ## Genuinely won't be implemented (not open, not deferred — out of scope)
 
 - **Recursive/self-referential types** (e.g. a `Node` containing itself). No indirection mechanism exists in this design, so these have unbounded size and are rejected outright.
-- **Closures/lambdas capturing outer mutable state.**
 - **Generics/templates.**
+
+## Lambdas
+
+Supported, with capture-by-value: a captured variable is copied at the point the lambda is created, becoming an independent value from then on — never a live reference to the outer binding. Once resolved that way, a lambda is just an ordinary function to the rest of the analysis: captures act like pre-bound parameters, its body gets walked the same way for mutation/allocation facts, it joins the call graph the same way if passed around and called.
+
+Capture-by-reference is banned for the same reason globals are: it's exactly the "reachable without appearing in a signature" hazard this whole design closes off elsewhere.
+
+**A lambda may never mutate its own parameters** — checked locally when the lambda is defined (does its body write into a parameter, same shape as the parameter-reassignment ban), not tracked through the fixed-point analysis. This means a lambda's mutable fact for every parameter is always "no" by rule, so it never needs to join the call graph for that trait, and builtins that take a callback (`sorted`'s `key=`, `map`, `filter`) get a flat "never mutates its container argument" seed fact rather than needing a rule parameterized by whatever callback they're given. Low-cost in practice: mutating each element of something already has a natural, fully-supported form (`for x in items: x.reset()`); a mutating lambda mainly shows up in the side-effecting-key-function pattern, which is questionable style regardless, since sort key functions aren't expected to have call-count- or order-dependent side effects. (Allocation tracking still walks lambda bodies regardless — that trait is unaffected by this rule.)
+
+**Real cost, not swept under the rug:** this diverges from actual Python closures, which are late-binding by reference. `[lambda: i for i in range(3)]` returns three closures all seeing `i`'s final value in real Python (`2, 2, 2`); copy-at-creation gives `0, 1, 2` instead. Not fixable without reintroducing a live, escaping reference to the outer variable — structurally incompatible with everything else here, not a gap to patch later. Lands specifically on Python's own well-known closure-in-a-loop footgun, not a pattern anyone relies on intentionally, which makes it a more acceptable divergence than most — but it is a real, observable difference between interpreted and compiled behavior, worth documenting rather than discovering later.
 
 ## Deferred for v1 (safe to defer — costs precision, never soundness)
 
 - **Last-use analysis / move elision.** Ship with none at first — every `copy()` is a real copy, always correct regardless of how much gets elided later.
-- **Read-only vs. mutable parameter distinction.** Everything is a mutable reference for now; narrowing this later only removes some spurious rejections, never changes what's accepted.
 
 ## Python-side requirement
 
