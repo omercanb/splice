@@ -11,6 +11,7 @@ from typing import TypedDict
 from mypy.nodes import (
     Block,
     CallExpr,
+    ClassDef,
     DictExpr,
     Expression,
     FuncDef,
@@ -30,6 +31,7 @@ from splice.analysis.builtin_effects import (
     builtin_operation_effect,
     compound_assignment_effect,
 )
+from splice.codegen.class_def import methods as class_methods
 from splice.pipeline import TypeTable
 from splice.visitor import Traverser
 
@@ -104,10 +106,16 @@ def compute_statment_effects(
 def compute_function_effects(
     tree: MypyFile, types: TypeTable
 ) -> dict[FuncDef, list[ExpressionEffect]]:
-    effects = {}
+    funcdefs: list[FuncDef] = []
     for definition in tree.defs:
         if isinstance(definition, FuncDef):
-            visitor = _StatementWalker(types)
-            visitor.visit(definition)
-            effects[definition] = visitor.findings
+            funcdefs.append(definition)
+        elif isinstance(definition, ClassDef):
+            funcdefs.extend(class_methods(definition))
+
+    effects = {}
+    for funcdef in funcdefs:
+        visitor = _StatementWalker(types)
+        visitor.visit(funcdef)
+        effects[funcdef] = visitor.findings
     return effects

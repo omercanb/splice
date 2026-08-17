@@ -1,0 +1,100 @@
+# serializer version: 1
+# name: test_mutating_parameters
+  '''
+  def mutates_directly(items: list[int]) -> None:
+      items.append(1)
+  mutates_directly(items):
+    direct: items.append
+  
+  def calls_mutating(items: list[int]) -> None:
+      mutates_directly(items)
+  calls_mutating(items):
+    transitive: mutates_directly(items)
+  
+  def calls_transitively(items: list[int]) -> None:
+      calls_mutating(items)
+  calls_transitively(items):
+    transitive: calls_mutating(items)
+  
+  def pure(a: int, b: int) -> int:
+      return (a + b)
+  
+  def recursive_pure(n: int) -> int:
+      if n <= 1:
+          return 1
+      return (n * recursive_pure((n - 1)))
+  
+  def recursive_mutating(items: list[int], n: int) -> None:
+      if n <= 0:
+          return
+      items.append(n)
+      recursive_mutating(items, (n - 1))
+  recursive_mutating(items):
+    direct: items.append
+    transitive: recursive_mutating(items, (n - 1))
+  
+  def mutates_via_compound_assign(items: list[int]) -> None:
+      items += [1]
+  mutates_via_compound_assign(items):
+    direct: items
+  
+  def mutates_via_index(matrix: list[list[int]]) -> None:
+      matrix.__getitem__(0).append(1)
+  mutates_via_index(matrix):
+    direct: matrix.__getitem__(0).append
+  
+  def mutates_via_tuple_index(pair: tuple[list[int], int]) -> None:
+      pair[0].append(1)
+  mutates_via_tuple_index(pair):
+    direct: pair[0].append
+  
+  def mutates_via_back(items: list[list[int]]) -> None:
+      items.back().append(1)
+  mutates_via_back(items):
+    direct: items.back().append
+  
+  def mutate_row(row: list[int]) -> None:
+      row.append(1)
+  mutate_row(row):
+    direct: row.append
+  
+  def mutates_element_indirectly(matrix: list[list[int]]) -> None:
+      mutate_row(matrix.__getitem__(0))
+  mutates_element_indirectly(matrix):
+    transitive: mutate_row(matrix.__getitem__(0))
+  
+  def mutates_via_index_assign(items: list[int]) -> None:
+      items.__setitem__(0, 5)
+  mutates_via_index_assign(items):
+    direct: items.__setitem__
+  
+  def mutates_via_index_compound_assign(items: list[int]) -> None:
+      items.__getitem__(0) *= 2
+  mutates_via_index_compound_assign(items):
+    direct: items.__getitem__(0)
+  
+  def mixed_mutability(mutated: list[int], untouched: list[int]) -> None:
+      mutated.append(1)
+  mixed_mutability(mutated):
+    direct: mutated.append
+  
+  def calls_mixed_mutability(a: list[int], b: list[int]) -> None:
+      mixed_mutability(a, b)
+  calls_mixed_mutability(a):
+    transitive: mixed_mutability(a, b)
+  
+  class Box:
+      items: list[int]
+      def __init__(self: main.Box) -> None:
+          self.items = []
+      def fill(self: main.Box, x: int) -> None:
+          self.items.append(x)
+      def relay(self: main.Box, x: int) -> None:
+          self.fill(x)
+  Box.fill(self):
+    direct: self.items.append
+  Box.relay(self):
+    transitive: self.fill(x)
+  
+  '''
+# ---
