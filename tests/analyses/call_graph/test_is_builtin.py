@@ -3,7 +3,7 @@ from pathlib import Path
 from mypy.nodes import CallExpr, FuncDef
 
 from splice.analysis.call_graph import is_call_builtin
-from splice.analysis.statement_effects import analyze_statement
+from splice.analysis.statement_effects import compute_statment_effects
 from splice.convert_to_python import convert_to_python
 from splice.pipeline import TypeTable, analyse
 from splice.visitor import Traverser

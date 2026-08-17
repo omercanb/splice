@@ -1,11 +1,6 @@
 """Build a call graph"""
 
-# Walk the whole tree
-# Create a graph of funcdefs to funcdefs with parameter bindings as the edges
-
-
 from dataclasses import dataclass, field
-from re import match
 from typing import Optional
 
 from mypy.nodes import (
@@ -13,6 +8,7 @@ from mypy.nodes import (
     Expression,
     FuncDef,
     MemberExpr,
+    MypyFile,
     NameExpr,
     TypeInfo,
     Var,
@@ -24,7 +20,7 @@ from splice.visitor import Traverser
 
 
 @dataclass
-class Edge:
+class CallEdge:
     call: CallExpr
     caller: FuncDef
     callee: FuncDef
@@ -33,7 +29,7 @@ class Edge:
 
 @dataclass
 class CallGraph:
-    edges: list[Edge] = field(default_factory=list)
+    edges: list[CallEdge] = field(default_factory=list)
 
 
 class CallGraphProducer(Traverser):
@@ -52,10 +48,16 @@ class CallGraphProducer(Traverser):
             callee = resolve_funcdef(o, self.types)
             bindings = match_call_arguments(o, self.types)
             assert self.current_function
-            edge = Edge(o, self.current_function, callee, bindings)
+            edge = CallEdge(o, self.current_function, callee, bindings)
             self.call_graph.edges.append(edge)
 
         super().visit_call_expr(o)
+
+
+def compute_call_graph(tree: MypyFile, types: TypeTable):
+    visitor = CallGraphProducer(types)
+    visitor.visit(tree)
+    return visitor.call_graph
 
 
 def match_call_arguments(o: CallExpr, types: TypeTable) -> list[tuple[Expression, Var]]:

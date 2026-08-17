@@ -16,13 +16,9 @@ class OperationEffect:
 READS = OperationEffect(mutates=False, allocates=False)
 MUTATES_ONLY = OperationEffect(mutates=True, allocates=False)
 MUTATES_AND_ALLOCATES = OperationEffect(mutates=True, allocates=True)
-ALLOCATES_ONLY = OperationEffect(
-    mutates=False, allocates=True
-)  # builds a new value; receiver/scope untouched
+ALLOCATES_ONLY = OperationEffect(mutates=False, allocates=True)
 
-# str and bytes have no mutating methods at all - every one is const and
-# returns a new value. Checked ahead of the per-method table rather than
-# listing all ~40 of them individually.
+# str and bytes have no mutating methods at all
 STRUCTURALLY_IMMUTABLE_TYPES = {"str", "bytes"}
 
 BUILTIN_OPERATION_EFFECTS: dict[tuple[str, str], OperationEffect] = {

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from mypy.nodes import FuncDef
 
-from splice.analysis.statement_effects import analyze_statement
+from splice.analysis.statement_effects import compute_statment_effects
 from splice.convert_to_python import convert_to_python
 from splice.pipeline import analyse
 
@@ -16,7 +16,7 @@ def test_statement_effects_snapshot(snapshot):
         if not isinstance(d, FuncDef):
             continue
         stmt = d.body.body[0]
-        findings = analyze_statement(stmt, program.types)
+        findings = compute_statment_effects(stmt, program.types)
         lines.append(f"{d.name}:")
         if not findings:
             lines.append("  (no findings)")

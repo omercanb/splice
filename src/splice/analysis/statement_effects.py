@@ -6,14 +6,17 @@ Used for seeding the call graph based mutation and allocation analysis
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TypedDict
 
 from mypy.nodes import (
     Block,
     CallExpr,
     DictExpr,
     Expression,
+    FuncDef,
     ListExpr,
     MemberExpr,
+    MypyFile,
     NameExpr,
     OperatorAssignmentStmt,
     SetExpr,
@@ -27,13 +30,14 @@ from splice.analysis.builtin_effects import (
     builtin_operation_effect,
     compound_assignment_effect,
 )
+from splice.pipeline import TypeTable
 from splice.visitor import Traverser
 
 _ALLOCATING_CONSTRUCTORS = {"list", "dict", "set"}
 
 
 @dataclass(frozen=True)
-class Finding:
+class ExpressionEffect:
     node: Expression
     effect: OperationEffect
 
@@ -51,10 +55,7 @@ class _StatementWalker(Traverser):
 
     def __init__(self, types: dict[Expression, Type]):
         self.types = types
-        self.findings: list[Finding] = []
-
-    def visit_block(self, o: Block) -> None:
-        pass  # nested blocks are the outer walker's job, not this one's
+        self.findings: list[ExpressionEffect] = []
 
     def visit_call_expr(self, o: CallExpr) -> None:
         if isinstance(o.callee, MemberExpr):
@@ -65,34 +66,48 @@ class _StatementWalker(Traverser):
                 else None
             )
             if effect is not None:
-                self.findings.append(Finding(o.callee.expr, effect))
+                self.findings.append(ExpressionEffect(o.callee, effect))
         elif (
             isinstance(o.callee, NameExpr) and o.callee.name in _ALLOCATING_CONSTRUCTORS
         ):
-            self.findings.append(Finding(o, ALLOCATES_ONLY))
+            self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
         super().visit_call_expr(o)
 
     def visit_operator_assignment_stmt(self, o: OperatorAssignmentStmt) -> None:
         lvalue_type = _type_name(self.types.get(o.lvalue))
         self.findings.append(
-            Finding(o.lvalue, compound_assignment_effect(lvalue_type or ""))
+            ExpressionEffect(o.lvalue, compound_assignment_effect(lvalue_type or ""))
         )
         super().visit_operator_assignment_stmt(o)
 
     def visit_list_expr(self, o: ListExpr) -> None:
-        self.findings.append(Finding(o, ALLOCATES_ONLY))
+        self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
         super().visit_list_expr(o)
 
     def visit_dict_expr(self, o: DictExpr) -> None:
-        self.findings.append(Finding(o, ALLOCATES_ONLY))
+        self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
         super().visit_dict_expr(o)
 
     def visit_set_expr(self, o: SetExpr) -> None:
-        self.findings.append(Finding(o, ALLOCATES_ONLY))
+        self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
         super().visit_set_expr(o)
 
 
-def analyze_statement(stmt: Statement, types: dict[Expression, Type]) -> list[Finding]:
+def compute_statment_effects(
+    stmt: Statement, types: dict[Expression, Type]
+) -> list[ExpressionEffect]:
     walker = _StatementWalker(types)
     walker.visit(stmt)
     return walker.findings
+
+
+def compute_function_effects(
+    tree: MypyFile, types: TypeTable
+) -> dict[FuncDef, list[ExpressionEffect]]:
+    effects = {}
+    for definition in tree.defs:
+        if isinstance(definition, FuncDef):
+            visitor = _StatementWalker(types)
+            visitor.visit(definition)
+            effects[definition] = visitor.findings
+    return effects

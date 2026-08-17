@@ -1,0 +1,166 @@
+# serializer version: 1
+# name: test_allocating_functions
+  '''
+  
+  def allocates_directly(a: int, b: int) -> int:
+      c = [a, b]
+      return c[0] + c[1]
+  
+  
+  def calls_allocating(a: int, b: int) -> int:
+      return allocates_directly(a, b)
+  
+  
+  def calls_transitively(a: int, b: int) -> int:
+      return calls_allocating(a, b)
+  
+  
+  def pure(a: int, b: int) -> int:
+      return a + b
+  
+  
+  def recursive(n: int) -> int:
+      if n <= 1:
+          return 1
+      return n * recursive(n - 1)
+  
+  
+  def main() -> int:
+      x = pure(1, 2)
+      y = calls_transitively(1, 2)
+      z = recursive(5)
+      return x + y + z
+  
+  --- allocations ---
+  def allocates_directly(a: int, b: int) -> int:
+      c = [a, b]
+      return (c.__getitem__(0) + c.__getitem__(1))
+  
+  direct: [a, b]
+  
+  def calls_allocating(a: int, b: int) -> int:
+      return allocates_directly(a, b)
+  
+  transitive: allocates_directly(a, b)
+  
+  def calls_transitively(a: int, b: int) -> int:
+      return calls_allocating(a, b)
+  
+  transitive: calls_allocating(a, b)
+  
+  def main() -> int:
+      x = pure(1, 2)
+      y = calls_transitively(1, 2)
+      z = recursive(5)
+      return ((x + y) + z)
+  
+  transitive: calls_transitively(1, 2)
+  
+      
+  '''
+# ---
+# name: test_call_graph
+  '''
+  
+  # class D:
+  #     def __init__(self) -> None:
+  #         pass
+  #
+  #     def wave(self) -> None:
+  #         print("wave")
+  #
+  #
+  # class C:
+  #     items: list[int]
+  #     d: D
+  #
+  #     def __init__(self, x: int) -> None:
+  #         self.items = [x]
+  #         self.d = D()
+  #
+  #     def bye(self) -> None:
+  #         print("bye")
+  #
+  #     def add(self, x: int) -> None:
+  #         self.items.append(x)
+  #
+  #     def greet(self) -> None:
+  #         self.bye()
+  #         self.d.wave()
+  #
+  #
+  # def hi() -> None:
+  #     print("hi")
+  #
+  #
+  # def add(a: int, b: int) -> int:
+  #     return a + b
+  #
+  #
+  # def mul(a: int, b: int = 2) -> int:
+  #     return a * b
+  #
+  #
+  # def fact(n: int) -> int:
+  #     if n <= 1:
+  #         return 1
+  #     return n * fact(n - 1)
+  #
+  
+  
+  def allocating(a: int, b: int) -> int:
+      c = [a, b]
+      return sum(c)
+  
+  
+  def main() -> int:
+      a: list[int] = list()
+      a.append(1)
+      a.remove(2)
+      b: list[list[int]] = list()
+      b.append(list())
+      i = 10
+      a.append(i)
+      # c = C(i)
+      #
+      # c.bye()
+      # c.add(i)
+      # c.greet()
+  
+      num1 = 10
+      num2 = 20
+  
+      allocating(num1, num2)
+  
+      return 0
+  
+  --- allocations ---
+  def allocating(a: int, b: int) -> int:
+      c = [a, b]
+      return sum(c)
+  
+  direct: [a, b]
+  
+  def main() -> int:
+      a: list[int] = list()
+      a.append(1)
+      a.remove(2)
+      b: list[list[int]] = list()
+      b.append(list())
+      i = 10
+      a.append(i)
+      num1 = 10
+      num2 = 20
+      allocating(num1, num2)
+      return 0
+  
+  direct: list()
+  direct: a.append
+  direct: list()
+  direct: b.append
+  direct: list()
+  direct: a.append
+  
+      
+  '''
+# ---
