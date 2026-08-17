@@ -5,6 +5,7 @@
 
 
 from dataclasses import dataclass, field
+from re import match
 from typing import Optional
 
 from mypy.nodes import (
@@ -24,19 +25,22 @@ from splice.visitor import Traverser
 
 @dataclass
 class Edge:
+    call: CallExpr
+    caller: FuncDef
     callee: FuncDef
     bindings: list[tuple[Expression, Var]] = field(default_factory=list)
 
 
 @dataclass
 class CallGraph:
-    calls: dict[FuncDef, Edge] = field(default_factory=dict)
+    edges: list[Edge] = field(default_factory=list)
 
 
 class CallGraphProducer(Traverser):
     def __init__(self, types: TypeTable):
         self.current_function: Optional[FuncDef] = None
         self.types = types
+        self.call_graph = CallGraph()
 
     def visit_func_def(self, o: FuncDef):
         self.current_function = o
@@ -44,22 +48,22 @@ class CallGraphProducer(Traverser):
         self.current_function = None
 
     def visit_call_expr(self, o: CallExpr):
-        if is_call_builtin(o, self.types):
-            super().visit_call_expr(o)
-            return
+        if not is_call_builtin(o, self.types):
+            callee = resolve_funcdef(o, self.types)
+            bindings = match_call_arguments(o, self.types)
+            assert self.current_function
+            edge = Edge(o, self.current_function, callee, bindings)
+            self.call_graph.edges.append(edge)
 
-        param_bindings = []
-
-        # If current function add edge to call graph
-        # Note: The function needs to be a node in the graph
-        return super().visit_call_expr(o)
+        super().visit_call_expr(o)
 
 
 def match_call_arguments(o: CallExpr, types: TypeTable) -> list[tuple[Expression, Var]]:
     funcdef = resolve_funcdef(o, types)
     params = [arg.variable for arg in funcdef.arguments]
 
-    if isinstance(o.callee, MemberExpr):  # Method Call
+    if isinstance(o.callee, MemberExpr):
+        # Method Call
         self_binding = (o.callee.expr, params[0])
         return [self_binding] + list(zip(o.args, params[1:]))
 
@@ -80,7 +84,11 @@ def resolve_funcdef(o: CallExpr, types: TypeTable) -> FuncDef:
 
         assert isinstance(node, TypeInfo)
         init = node.get("__init__")
-        assert init is not None and isinstance(init.node, FuncDef)
+        assert (
+            init is not None
+            and isinstance(init.node, FuncDef)
+            and not init.node.fullname.startswith("builtins.")
+        ), "every class must define __init__"
         return init.node
 
     assert isinstance(o.callee, MemberExpr)

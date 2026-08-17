@@ -1,14 +1,28 @@
+class D:
+    def __init__(self) -> None:
+        pass
+
+    def wave(self) -> None:
+        print("wave")
+
+
 class C:
     items: list[int]
+    d: D
 
     def __init__(self, x: int) -> None:
         self.items = [x]
+        self.d = D()
 
     def bye(self) -> None:
         print("bye")
 
     def add(self, x: int) -> None:
         self.items.append(x)
+
+    def greet(self) -> None:
+        self.bye()
+        self.d.wave()
 
 
 def hi() -> None:
@@ -23,6 +37,12 @@ def mul(a: int, b: int = 2) -> int:
     return a * b
 
 
+def fact(n: int) -> int:
+    if n <= 1:
+        return 1
+    return n * fact(n - 1)
+
+
 def main() -> int:
     a: list[int] = list()
     i = ord("a")
@@ -32,6 +52,7 @@ def main() -> int:
     c = C(i)
     c.bye()
     c.add(i)
+    c.greet()
 
     num1 = 10
     num2 = 20
@@ -39,5 +60,6 @@ def main() -> int:
 
     mul(num1)
     mul(num2, num3)
+    fact(num1)
 
     return 0

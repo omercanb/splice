@@ -1,17 +1,31 @@
 # serializer version: 1
 # name: test_is_builtin
   '''
+  class D:
+      def __init__(self) -> None:
+          pass
+  
+      def wave(self) -> None:
+          print("wave")
+  
+  
   class C:
       items: list[int]
+      d: D
   
       def __init__(self, x: int) -> None:
           self.items = [x]
+          self.d = D()
   
       def bye(self) -> None:
           print("bye")
   
       def add(self, x: int) -> None:
           self.items.append(x)
+  
+      def greet(self) -> None:
+          self.bye()
+          self.d.wave()
   
   
   def hi() -> None:
@@ -20,6 +34,16 @@
   
   def add(a: int, b: int) -> int:
       return a + b
+  
+  
+  def mul(a: int, b: int = 2) -> int:
+      return a * b
+  
+  
+  def fact(n: int) -> int:
+      if n <= 1:
+          return 1
+      return n * fact(n - 1)
   
   
   def main() -> int:
@@ -31,14 +55,26 @@
       c = C(i)
       c.bye()
       c.add(i)
+      c.greet()
   
       num1 = 10
       num2 = 20
-      return add(num1, num2)
+      num3 = add(num1, num2)
   
+      mul(num1)
+      mul(num2, num3)
+      fact(num1)
+  
+      return 0
+  
+  ("print('wave')", 'builtin')
+  ('D()', 'user-defined')
   ("print('bye')", 'builtin')
   ('self.items.append(x)', 'builtin')
+  ('self.bye()', 'user-defined')
+  ('self.d.wave()', 'user-defined')
   ("print('hi')", 'builtin')
+  ('fact((n - 1))', 'user-defined')
   ('list()', 'builtin')
   ("ord('a')", 'builtin')
   ('print(i)', 'builtin')
@@ -47,6 +83,10 @@
   ('C(i)', 'user-defined')
   ('c.bye()', 'user-defined')
   ('c.add(i)', 'user-defined')
+  ('c.greet()', 'user-defined')
   ('add(num1, num2)', 'user-defined')
+  ('mul(num1)', 'user-defined')
+  ('mul(num2, num3)', 'user-defined')
+  ('fact(num1)', 'user-defined')
   '''
 # ---

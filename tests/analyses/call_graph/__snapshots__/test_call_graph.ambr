@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_parameter_match
+# name: test_call_graph
   '''
   class D:
       def __init__(self) -> None:
@@ -67,18 +67,18 @@
   
       return 0
   
-  ('D()', [])
-  ('self.bye()', [self -> self])
-  ('self.d.wave()', [self.d -> self])
-  ('fact((n - 1))', [(n - 1) -> n])
-  ('hi()', [])
-  ('C(i)', [i -> x])
-  ('c.bye()', [c -> self])
-  ('c.add(i)', [c -> self, i -> x])
-  ('c.greet()', [c -> self])
-  ('add(num1, num2)', [num1 -> a, num2 -> b])
-  ('mul(num1)', [num1 -> a])
-  ('mul(num2, num3)', [num2 -> a, num3 -> b])
-  ('fact(num1)', [num1 -> n])
+  __init__ -> __init__: D() []
+  greet -> bye: self.bye() [self -> self]
+  greet -> wave: self.d.wave() [self.d -> self]
+  fact -> fact: fact((n - 1)) [(n - 1) -> n]
+  main -> hi: hi() []
+  main -> __init__: C(i) [i -> x]
+  main -> bye: c.bye() [c -> self]
+  main -> add: c.add(i) [c -> self, i -> x]
+  main -> greet: c.greet() [c -> self]
+  main -> add: add(num1, num2) [num1 -> a, num2 -> b]
+  main -> mul: mul(num1) [num1 -> a]
+  main -> mul: mul(num2, num3) [num2 -> a, num3 -> b]
+  main -> fact: fact(num1) [num1 -> n]
   '''
 # ---
