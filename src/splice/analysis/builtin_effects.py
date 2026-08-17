@@ -28,7 +28,7 @@ STRUCTURALLY_IMMUTABLE_TYPES = {"str", "bytes"}
 BUILTIN_OPERATION_EFFECTS: dict[tuple[str, str], OperationEffect] = {
     # list
     ("list", "__getitem__"): READS,
-    ("list", "back"): READS,
+    ("list", "back"): READS,  # A function we define for efficient negative index access
     ("list", "index"): READS,
     ("list", "count"): READS,
     ("list", "__contains__"): READS,

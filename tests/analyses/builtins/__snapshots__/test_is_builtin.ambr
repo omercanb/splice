@@ -1,0 +1,41 @@
+# serializer version: 1
+# name: test_is_builtin
+  '''
+  class C:
+      items: list[int]
+  
+      def bye(self) -> None:
+          print("bye")
+  
+      def add(self, x: int) -> None:
+          self.items.append(x)
+  
+  
+  def hi() -> None:
+      print("hi")
+  
+  
+  def main() -> int:
+      a: list[int] = list()
+      i = ord("a")
+      print(i)
+      hi()
+      a.append(i)
+      c = C()
+      c.bye()
+      c.add(i)
+      return 0
+  
+  ("print('bye')", 'builtin')
+  ('self.items.append(x)', 'builtin')
+  ("print('hi')", 'builtin')
+  ('list()', 'builtin')
+  ("ord('a')", 'builtin')
+  ('print(i)', 'builtin')
+  ('hi()', 'user-defined')
+  ('a.append(i)', 'builtin')
+  ('C()', 'user-defined')
+  ('c.bye()', 'user-defined')
+  ('c.add(i)', 'user-defined')
+  '''
+# ---
