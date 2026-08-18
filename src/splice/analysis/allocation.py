@@ -7,7 +7,6 @@ from mypy.nodes import FuncDef
 
 from splice.analysis.call_graph import CallEdge, CallGraph
 from splice.analysis.statement_effects import ExpressionEffect
-from splice.convert_to_python import convert_to_python
 
 
 @dataclass

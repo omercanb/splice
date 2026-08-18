@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING, Callable
 
 from mypy.nodes import CallExpr
 from mypy.nodes import Expression as MypyExpression
-from mypy.nodes import ForStmt, IntExpr, NameExpr, OpExpr
+from mypy.nodes import ForStmt, NameExpr
 
+from splice.ast_utils import get_int_literal
 from splice.codegen.typegen import cpp_type
 from splice.namer import temp_name
 
@@ -102,19 +103,6 @@ def for_range_len(
     return LoopHeader(f"for ({target} = 0; {target} < {stop}; ++{target})")
 
 
-def _extract_int_constant(expr: MypyExpression) -> int | None:
-    """Extract compile-time int from a literal, incl. unary +/-."""
-    if isinstance(expr, IntExpr):
-        return expr.value
-    if isinstance(expr, OpExpr):
-        # Handle unary minus: -5
-        if expr.op == "-" and isinstance(expr.left, IntExpr):
-            return -expr.left.value
-        if expr.op == "+" and isinstance(expr.left, IntExpr):
-            return expr.left.value
-    return None
-
-
 def for_range(
     codegen: StatementCodegen, index: MypyExpression, args: list[MypyExpression]
 ) -> LoopHeader:
@@ -122,7 +110,7 @@ def for_range(
     if len(args) in (1, 2):
         return for_range_no_step(codegen, index, args)
 
-    step = _extract_int_constant(args[2])
+    step = get_int_literal(args[2])
     if step is not None:
         return for_range_constant_step(codegen, index, args, step)
     return for_range_unknown_step(codegen, index, args)

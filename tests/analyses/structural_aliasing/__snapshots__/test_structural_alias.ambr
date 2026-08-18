@@ -1,0 +1,29 @@
+# serializer version: 1
+# name: test_structural_alias
+  '''
+  c, c
+  alias_same_root: root: c
+  c.items, c
+  alias_field_vs_root: root: c
+  c.items, c.items.__getitem__(0)
+  alias_list_vs_index: root: c, c.items
+  c.items.__getitem__(0).value, c.items.__getitem__(0).value
+  alias_identical_nested: root: c, c.items.__getitem__(0).value
+  items.__getitem__(i), items.__getitem__(j)
+  alias_dynamic_indices: root: items, items.__getitem__(i)
+  items.__getitem__(0), items.__getitem__(0)
+  alias_same_literal_index: root: items, items.__getitem__(0)
+  items.back(), items.back()
+  alias_back_vs_back: root: items, items.back()
+  items.back(), items.__getitem__(0)
+  alias_back_vs_getitem: root: items, items.back()
+  w.pair.x, w.pair.y
+  no_alias_diverge_nested: no alias
+  p.x, p.y
+  no_alias_different_fields: no alias
+  a.items, b.items
+  no_alias_different_roots: no alias
+  items.__getitem__(0), items.__getitem__(1)
+  no_alias_literal_indices: no alias
+  '''
+# ---

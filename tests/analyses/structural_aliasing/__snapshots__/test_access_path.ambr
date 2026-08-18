@@ -1,0 +1,104 @@
+# serializer version: 1
+# name: test_access_path
+  '''
+  def plain_name(c: main.Container) -> main.Container:
+      return c
+  plain_name:
+    root: c
+  
+  def field_access(c: main.Container) -> list[main.Item]:
+      return c.items
+  field_access:
+    root: c
+    c.items
+  
+  def index_access(c: main.Container) -> main.Item:
+      return c.items.__getitem__(0)
+  index_access:
+    root: c
+    c.items
+    c.items.__getitem__(0)
+  
+  def nested_field(c: main.Container) -> int:
+      return c.items.__getitem__(0).value
+  nested_field:
+    root: c
+    c.items
+    c.items.__getitem__(0)
+    c.items.__getitem__(0).value
+  
+  def last_index_field(c: main.Container) -> int:
+      return c.items.back().value
+  last_index_field:
+    root: c
+    c.items
+    c.items.back()
+    c.items.back().value
+  
+  def not_a_place(c: main.Container) -> int:
+      return len(c.items)
+  not_a_place:
+    not an access path
+  
+  def alias_same_root(c: main.Container) -> tuple[main.Container, main.Container]:
+      return (c, c)
+  alias_same_root:
+    not an access path
+  
+  def alias_field_vs_root(c: main.Container) -> tuple[list[main.Item], main.Container]:
+      return (c.items, c)
+  alias_field_vs_root:
+    not an access path
+  
+  def alias_list_vs_index(c: main.Container) -> tuple[list[main.Item], main.Item]:
+      return (c.items, c.items.__getitem__(0))
+  alias_list_vs_index:
+    not an access path
+  
+  def alias_identical_nested(c: main.Container) -> tuple[int, int]:
+      return (c.items.__getitem__(0).value, c.items.__getitem__(0).value)
+  alias_identical_nested:
+    not an access path
+  
+  def no_alias_diverge_nested(w: main.Wrapper) -> tuple[int, int]:
+      return (w.pair.x, w.pair.y)
+  no_alias_diverge_nested:
+    not an access path
+  
+  def no_alias_different_fields(p: main.Pair) -> tuple[int, int]:
+      return (p.x, p.y)
+  no_alias_different_fields:
+    not an access path
+  
+  def no_alias_different_roots(a: main.Container, b: main.Container) -> tuple[list[main.Item], list[main.Item]]:
+      return (a.items, b.items)
+  no_alias_different_roots:
+    not an access path
+  
+  def alias_dynamic_indices(items: list[int], i: int, j: int) -> tuple[int, int]:
+      return (items.__getitem__(i), items.__getitem__(j))
+  alias_dynamic_indices:
+    not an access path
+  
+  def alias_same_literal_index(items: list[int]) -> tuple[int, int]:
+      return (items.__getitem__(0), items.__getitem__(0))
+  alias_same_literal_index:
+    not an access path
+  
+  def no_alias_literal_indices(items: list[int]) -> tuple[int, int]:
+      return (items.__getitem__(0), items.__getitem__(1))
+  no_alias_literal_indices:
+    not an access path
+  
+  def alias_back_vs_back(items: list[int]) -> tuple[int, int]:
+      return (items.back(), items.back())
+  alias_back_vs_back:
+    not an access path
+  
+  def alias_back_vs_getitem(items: list[int]) -> tuple[int, int]:
+      return (items.back(), items.__getitem__(0))
+  alias_back_vs_getitem:
+    not an access path
+  
+  '''
+# ---
