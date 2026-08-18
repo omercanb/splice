@@ -28,12 +28,12 @@
     c.items.__getitem__(0).value
   
   def last_index_field(c: main.Container) -> int:
-      return c.items.back().value
+      return c.items.__getitem__(-1).value
   last_index_field:
     root: c
     c.items
-    c.items.back()
-    c.items.back().value
+    c.items.__getitem__(-1)
+    c.items.__getitem__(-1).value
   
   def not_a_place(c: main.Container) -> int:
       return len(c.items)
@@ -90,14 +90,14 @@
   no_alias_literal_indices:
     not an access path
   
-  def alias_back_vs_back(items: list[int]) -> tuple[int, int]:
-      return (items.back(), items.back())
-  alias_back_vs_back:
+  def alias_negative_index_vs_itself(items: list[int]) -> tuple[int, int]:
+      return (items.__getitem__(-1), items.__getitem__(-1))
+  alias_negative_index_vs_itself:
     not an access path
   
-  def alias_back_vs_getitem(items: list[int]) -> tuple[int, int]:
-      return (items.back(), items.__getitem__(0))
-  alias_back_vs_getitem:
+  def alias_negative_index_vs_positive(items: list[int]) -> tuple[int, int]:
+      return (items.__getitem__(-1), items.__getitem__(0))
+  alias_negative_index_vs_positive:
     not an access path
   
   '''

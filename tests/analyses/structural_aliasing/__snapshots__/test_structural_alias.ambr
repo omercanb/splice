@@ -13,10 +13,10 @@
   alias_dynamic_indices: root: items, items.__getitem__(i)
   items.__getitem__(0), items.__getitem__(0)
   alias_same_literal_index: root: items, items.__getitem__(0)
-  items.back(), items.back()
-  alias_back_vs_back: root: items, items.back()
-  items.back(), items.__getitem__(0)
-  alias_back_vs_getitem: root: items, items.back()
+  items.__getitem__(-1), items.__getitem__(-1)
+  alias_negative_index_vs_itself: root: items, items.__getitem__(-1)
+  items.__getitem__(-1), items.__getitem__(0)
+  alias_negative_index_vs_positive: root: items, items.__getitem__(-1)
   w.pair.x, w.pair.y
   no_alias_diverge_nested: no alias
   p.x, p.y

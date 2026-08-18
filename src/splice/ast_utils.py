@@ -1,16 +1,19 @@
 """Small stand-alone helpers for working with mypy AST nodes."""
 
-from mypy.nodes import Expression, IntExpr, OpExpr
+from mypy.nodes import Expression, IntExpr, UnaryExpr
 
 
 def get_int_literal(expr: Expression) -> int | None:
-    """Extract a compile-time int from a literal, incl. unary +/-."""
+    """Extract a compile-time int from a literal, incl. unary +/-.
+
+    `-1` parses as UnaryExpr(op="-", expr=IntExpr(1)), not a negative
+    IntExpr or a binary OpExpr.
+    """
     if isinstance(expr, IntExpr):
         return expr.value
-    if isinstance(expr, OpExpr):
-        # Handle unary minus: -5
-        if expr.op == "-" and isinstance(expr.left, IntExpr):
-            return -expr.left.value
-        if expr.op == "+" and isinstance(expr.left, IntExpr):
-            return expr.left.value
+    if isinstance(expr, UnaryExpr) and isinstance(expr.expr, IntExpr):
+        if expr.op == "-":
+            return -expr.expr.value
+        if expr.op == "+":
+            return expr.expr.value
     return None

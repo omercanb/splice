@@ -1,18 +1,6 @@
 from pathlib import Path
 
-import pytest
-from mypy.nodes import (
-    ArgKind,
-    CallExpr,
-    Expression,
-    FuncDef,
-    IntExpr,
-    MemberExpr,
-    NameExpr,
-    ReturnStmt,
-    TupleExpr,
-    Var,
-)
+from mypy.nodes import Expression, FuncDef, ReturnStmt, TupleExpr
 
 from splice.analysis.structural_aliasing import (
     AccessPath,
@@ -32,8 +20,8 @@ ALIAS_CASES = [
     "alias_identical_nested",
     "alias_dynamic_indices",
     "alias_same_literal_index",
-    "alias_back_vs_back",
-    "alias_back_vs_getitem",
+    "alias_negative_index_vs_itself",
+    "alias_negative_index_vs_positive",
 ]
 NO_ALIAS_CASES = [
     "no_alias_diverge_nested",
@@ -103,38 +91,3 @@ def test_structural_alias(snapshot):
     snap = "\n".join(lines)
 
     assert snap == snapshot
-
-
-def test_different_projection_kinds_never_alias():
-    """A named field and a getitem/back call can never denote the same
-    storage, even at the same chain position with the same root - unlike
-    back() vs __getitem__, there's no type-level reason they could collide.
-    """
-    root = Var("x")
-    field_path = AccessPath(root, [MemberExpr(NameExpr("x"), "field")])
-    call_path = AccessPath(
-        root,
-        [
-            CallExpr(
-                MemberExpr(NameExpr("x"), "__getitem__"),
-                [IntExpr(0)],
-                [ArgKind.ARG_POS],
-                [None],
-            )
-        ],
-    )
-    assert is_access_path_structural_alias(field_path, call_path) is None
-
-
-def test_unrecognized_aliasing_method_combination_asserts():
-    """_ALIASING_METHODS is only ever {"back", "__getitem__"} today, so this
-    can't happen via get_access_path - this proves it fails loudly rather
-    than silently doing nothing if a third aliasing method is ever added.
-    """
-    root = Var("x")
-    path1 = AccessPath(
-        root, [CallExpr(MemberExpr(NameExpr("x"), "pop_front"), [], [], [])]
-    )
-    path2 = AccessPath(root, [CallExpr(MemberExpr(NameExpr("x"), "back"), [], [], [])])
-    with pytest.raises(AssertionError):
-        is_access_path_structural_alias(path1, path2)

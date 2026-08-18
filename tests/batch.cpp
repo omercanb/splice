@@ -1118,23 +1118,21 @@ int run() {
         print(str("third"), i);
     }
     _int __stop_7 = (x - 7LL);
-    _int __step_0 = (-2LL);
-    for (i = x;; i += __step_0) {
-        if ((__step_0 > 0 && i >= __stop_7) || (__step_0 < 0 && i <= __stop_7)) break;
+    for (i = x; i > __stop_7; i += -2) {
         print(str("fourth"), i);
     }
     step = x;
     _int __stop_8 = (10LL * x);
-    _int __step_1 = step;
-    for (i = x;; i += __step_1) {
-        if ((__step_1 > 0 && i >= __stop_8) || (__step_1 < 0 && i <= __stop_8)) break;
+    _int __step_0 = step;
+    for (i = x;; i += __step_0) {
+        if ((__step_0 > 0 && i >= __stop_8) || (__step_0 < 0 && i <= __stop_8)) break;
         print(str("fifth"), i);
     }
     step = (-2LL);
     _int __stop_9 = (10LL * x);
-    _int __step_2 = step;
-    for (i = (5LL * x);; i += __step_2) {
-        if ((__step_2 > 0 && i >= __stop_9) || (__step_2 < 0 && i <= __stop_9)) break;
+    _int __step_1 = step;
+    for (i = (5LL * x);; i += __step_1) {
+        if ((__step_1 > 0 && i >= __stop_9) || (__step_1 < 0 && i <= __stop_9)) break;
         print(str("sixth"), i);
     }
     for (auto __iter_18 = iter(l); !__iter_18.done();) {

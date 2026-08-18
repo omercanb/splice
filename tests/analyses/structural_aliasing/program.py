@@ -92,9 +92,9 @@ def no_alias_literal_indices(items: list[int]) -> tuple[int, int]:
     return (items[0], items[1])
 
 
-def alias_back_vs_back(items: list[int]) -> tuple[int, int]:
+def alias_negative_index_vs_itself(items: list[int]) -> tuple[int, int]:
     return (items[-1], items[-1])
 
 
-def alias_back_vs_getitem(items: list[int]) -> tuple[int, int]:
+def alias_negative_index_vs_positive(items: list[int]) -> tuple[int, int]:
     return (items[-1], items[0])

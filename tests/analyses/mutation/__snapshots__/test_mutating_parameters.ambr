@@ -49,9 +49,9 @@
     direct: pair[0].append
   
   def mutates_via_back(items: list[list[int]]) -> None:
-      items.back().append(1)
+      items.__getitem__(-1).append(1)
   mutates_via_back(items):
-    direct: items.back().append
+    direct: items.__getitem__(-1).append
   
   def mutate_row(row: list[int]) -> None:
       row.append(1)

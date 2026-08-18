@@ -11,7 +11,7 @@ Eg: a.list[i].field has access path (Root: a, (Member: list, Method: getitem(i),
 """
 
 # Core idea first split an expression into an access path which is a root var + a list of projections
-# Projections are a Field(name), Method(name) where the Method is an aliasing method, __getitem__ or back()
+# Projections are a Field(name) or a Method(name) where the Method is __getitem__, the only aliasing method.
 
 from dataclasses import dataclass
 from typing import Optional
@@ -45,7 +45,7 @@ def get_access_path(expr: Expression) -> Optional[AccessPath]:
             isinstance(expr.callee, MemberExpr)
             and expr.callee.name in _ALIASING_METHODS
         ):
-            # We only care about a call if its back() or getitem() which alias the element
+            # We only care about a call if it's __getitem__, which aliases the element
             base = get_access_path(expr.callee.expr)
             if base is None:
                 return None
@@ -80,36 +80,25 @@ def is_access_path_structural_alias(
         elif isinstance(projection1, CallExpr) and isinstance(projection2, CallExpr):
             assert isinstance(projection1.callee, MemberExpr)
             assert isinstance(projection2.callee, MemberExpr)
+            assert projection1.callee.name == "__getitem__"
+            assert projection2.callee.name == "__getitem__"
 
-            # The functions are either back() or __getitem__(index)
-            f1_name = projection1.callee.name
-            f2_name = projection2.callee.name
-
-            back = "back"
-            getitem = "__getitem__"
-
-            if f1_name == f2_name == back:  # Both directly alias to the last element
+            # If the indices are different literals no aliasing, otherwise aliasing.
+            index1 = projection1.args[0]
+            index2 = projection2.args[0]
+            index_literal1 = get_int_literal(index1)
+            index_literal2 = get_int_literal(index2)
+            if index_literal1 is None or index_literal2 is None:
+                # Can't prove indexes are distinct
                 common_path.projections.append(projection1)
-            elif (f1_name == back and f2_name == getitem) or (
-                f1_name == getitem and f2_name == back
-            ):  # Back can alias getitem eg: l = [0, 1], l[-1] -> l.back(), l[1] -> l.getitem(1) both the same element
+            elif index_literal1 == index_literal2:
                 common_path.projections.append(projection1)
-            elif f1_name == getitem and f2_name == getitem:
-                # If the indices are different literals no aliasing, otherwise aliasing
-                index1 = projection1.args[0]
-                index2 = projection2.args[0]
-                index_literal1 = get_int_literal(index1)
-                index_literal2 = get_int_literal(index2)
-                if index_literal1 is None or index_literal2 is None:
-                    # Can't prove indexes are distinct
-                    common_path.projections.append(projection1)
-                elif index_literal1 == index_literal2:
-                    common_path.projections.append(projection1)
-                else:
-                    # Index literals are confirmed distinct
-                    return None
+            elif index_literal1 == -1 or index_literal2 == -1:
+                # Can't prove -1 (len - 1) is distinct from another literal
+                common_path.projections.append(projection1)
             else:
-                assert False, f"unhandled aliasing method combination: {f1_name}/{f2_name}"
+                # Index literals are confirmed distinct
+                return None
         else:
             assert False
     return common_path

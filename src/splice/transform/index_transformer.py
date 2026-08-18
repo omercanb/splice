@@ -2,7 +2,8 @@
 
 `a[i]` becomes `a.__getitem__(i)`, `a[i] = v` becomes `a.__setitem__(i, v)`,
 and a slice index `a[i:j:k]` becomes `a.__getitem__(slice(i, j, k))`, with a
-missing bound passed as `None`
+missing bound passed as `None`. `-1` gets no special casing here; codegen
+swaps it for back() right before emitting C++.
 """
 
 from mypy.nodes import (
@@ -13,13 +14,11 @@ from mypy.nodes import (
     Expression,
     ExpressionStmt,
     IndexExpr,
-    IntExpr,
     MemberExpr,
     NameExpr,
     Node,
     OperatorAssignmentStmt,
     SliceExpr,
-    UnaryExpr,
 )
 from mypy.types import TupleType, Type, get_proper_type
 
@@ -38,20 +37,6 @@ def _method_call(
     member = copy_position(MemberExpr(base, name), source)
     call = CallExpr(member, args, [ArgKind.ARG_POS for _ in args], [None] * len(args))
     return copy_position(call, source)
-
-
-def _is_last_index(index: Expression) -> bool:
-    """`-1` is the only negative index validate.py allows through - route it
-    to a dedicated back() method instead of __getitem__/__setitem__, so the
-    runtime container methods no longer need to special-case a negative
-    index at all.
-    """
-    return (
-        isinstance(index, UnaryExpr)
-        and index.op == "-"
-        and isinstance(index.expr, IntExpr)
-        and index.expr.value == 1
-    )
 
 
 class IndexTransformer(Transformer):
@@ -82,9 +67,7 @@ class IndexTransformer(Transformer):
         if self._is_tuple(o.base):
             o.index = self.visit(o.index)
             return o
-        if _is_last_index(o.index):
-            result = _method_call(o.base, "back", [], o)
-        elif isinstance(o.index, SliceExpr):
+        if isinstance(o.index, SliceExpr):
             result = _method_call(o.base, "__getitem__", [self._slice_call(o.index)], o)
         else:
             result = _method_call(o.base, "__getitem__", [self.visit(o.index)], o)
@@ -97,9 +80,6 @@ class IndexTransformer(Transformer):
             target = o.lvalues[0]
             target.base = self.visit(target.base)
             if not self._is_tuple(target.base):
-                if _is_last_index(target.index):
-                    o.lvalues[0] = _method_call(target.base, "back", [], target)
-                    return o
                 index = self.visit(target.index)
                 call = _method_call(target.base, "__setitem__", [index, o.rvalue], o)
                 return copy_position(ExpressionStmt(call), o)
@@ -110,18 +90,15 @@ class IndexTransformer(Transformer):
 
     def visit_operator_assignment_stmt(self, o: OperatorAssignmentStmt) -> Node:
         # a[i] += v needs a reference to mutate in place, not __setitem__
-        # (which takes the whole new value at once) - __getitem__/back()
-        # already return one, same as for a plain read.
+        # (which takes the whole new value at once) - __getitem__ already
+        # returns one, same as for a plain read.
         o.rvalue = self.visit(o.rvalue)
         if isinstance(o.lvalue, IndexExpr):
             target = o.lvalue
             target.base = self.visit(target.base)
             if not self._is_tuple(target.base):
-                if _is_last_index(target.index):
-                    o.lvalue = _method_call(target.base, "back", [], target)
-                else:
-                    index = self.visit(target.index)
-                    o.lvalue = _method_call(target.base, "__getitem__", [index], target)
+                index = self.visit(target.index)
+                o.lvalue = _method_call(target.base, "__getitem__", [index], target)
             else:
                 target.index = self.visit(target.index)
             return o

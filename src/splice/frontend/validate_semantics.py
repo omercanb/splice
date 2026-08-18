@@ -10,6 +10,7 @@ from mypy.nodes import CallExpr, MypyFile
 from splice.frontend.validate import Diagnostic, diagnostic
 from splice.visitor import Traverser
 
+# Marker used raise a diagnostic to check if positions in the transformed ast match the original positions
 _MARKER_FULLNAME = "splice.stdlib._error_after_tree_transform"
 
 

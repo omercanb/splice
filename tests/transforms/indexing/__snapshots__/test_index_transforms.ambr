@@ -6,9 +6,9 @@
   def write(a: list[int], i: int, v: int) -> None:
       a.__setitem__(i, v)
   def last(a: list[int]) -> int:
-      return a.back()
+      return a.__getitem__(-1)
   def set_last(a: list[int], v: int) -> None:
-      a.back() = v
+      a.__setitem__(-1, v)
   def slice_full(a: list[int]) -> list[int]:
       return a.__getitem__(slice(1, 3, None))
   def slice_open(a: list[int]) -> list[int]:

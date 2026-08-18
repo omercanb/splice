@@ -43,6 +43,7 @@ from splice.codegen.translation_utils import (
     translate_qualified_builtin,
     translate_tuple_access,
 )
+from splice.ast_utils import get_int_literal
 from splice.codegen.typegen import cpp_type_name, is_pointer
 from splice.visitor import Visitor
 
@@ -120,6 +121,21 @@ class ExpressionCodegen(Visitor[str]):
         return member_access(obj, self.types[o.expr], name)
 
     def visit_call_expr(self, o: CallExpr) -> str:
+        # __getitem__(-1)/__setitem__(-1, v) mean "the last element" - swap to back().
+        if (
+            isinstance(o.callee, MemberExpr)
+            and o.callee.name in ("__getitem__", "__setitem__")
+            and o.args
+            and get_int_literal(o.args[0]) == -1
+        ):
+            base = self.visit(o.callee.expr)
+            base_type = self.types[o.callee.expr]
+            back_call = call_method(base, base_type, "back")
+            if o.callee.name == "__setitem__":
+                value = self.visit(o.args[1])
+                return f"{back_call} = {value}"
+            return back_call
+
         callee = self.visit(o.callee)
 
         # Handle special case for builtins with kwargs (like print)

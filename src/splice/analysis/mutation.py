@@ -31,7 +31,7 @@ class MutatesFact:
 # Vars are parameters
 type MutationTable = dict[Var, MutatesFact]
 
-_ALIASING_METHODS = {"__getitem__", "back"}
+_ALIASING_METHODS = {"__getitem__"}
 
 
 def get_structural_base(expr: Expression) -> Var | None:
