@@ -1,4 +1,16 @@
 # serializer version: 1
+# name: test_error_message[aliasing_arguments.py]
+  '''
+  aliasing_arguments.py:6:5: error: `matrix[0]` and `matrix[0][0]` could alias, and aliasing is not permitted for mutable parameters
+  
+    6 |     mutate(matrix[0], matrix[0][0])
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy instead so they can't alias:
+            matrix[0][0] = copy(matrix[0][0])
+  
+  '''
+# ---
 # name: test_error_message[chained_assignment.py]
   '''
   chained_assignment.py:2:5: error: assigning to multiple targets in one statement is not supported

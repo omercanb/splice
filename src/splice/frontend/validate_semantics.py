@@ -16,7 +16,7 @@ from splice.analysis.structural_aliasing import (
     get_access_path,
     is_access_path_structural_alias,
 )
-from splice.convert_to_python import convert_to_python
+from splice.ast_utils import source_text
 from splice.frontend.validate import Diagnostic, diagnostic
 from splice.visitor import Traverser
 
@@ -25,9 +25,12 @@ _MARKER_FULLNAME = "splice.stdlib._error_after_tree_transform"
 
 
 class _SemanticsValidator(Traverser):
-    def __init__(self, mutations: MutationTable, types: dict[Expression, Type]) -> None:
+    def __init__(
+        self, mutations: MutationTable, types: dict[Expression, Type], source: str
+    ) -> None:
         self.mutations = mutations
         self.types = types
+        self.source = source
         self.diagnostics: list[Diagnostic] = []
         self._enclosing_calls: list[CallExpr] = []
 
@@ -65,20 +68,21 @@ class _SemanticsValidator(Traverser):
             if not (mut1 or mut2):
                 continue
             if is_access_path_structural_alias(path1, path2) is not None:
+                text1 = source_text(expr1, self.source)
+                text2 = source_text(expr2, self.source)
                 self.report(
                     o,
                     "aliasing-arguments",
-                    f"`{convert_to_python(expr1)}` and `{convert_to_python(expr2)}` "
-                    "could be the same value, and at least one is mutated here",
+                    f"`{text1}` and `{text2}` could alias, and aliasing is not permitted for mutable parameters",
                     "pass a copy instead so they can't alias:\n"
-                    f"{convert_to_python(expr2)} = copy({convert_to_python(expr2)})",
+                    f"{text2} = copy({text2})",
                 )
                 return
 
 
 def validate_semantics(
-    tree: MypyFile, mutations: MutationTable, types: dict[Expression, Type]
+    tree: MypyFile, mutations: MutationTable, types: dict[Expression, Type], source: str
 ) -> list[Diagnostic]:
-    validator = _SemanticsValidator(mutations, types)
+    validator = _SemanticsValidator(mutations, types, source)
     validator.visit(tree)
     return sorted(validator.diagnostics, key=lambda d: d.position)

@@ -38,9 +38,9 @@
       list_literal()
   
   append_call:
-    a -> mutates=True allocates=True
+    a.append -> mutates=True allocates=True
   read_only_call:
-    a -> mutates=False allocates=False
+    a.__getitem__ -> mutates=False allocates=False
   constructor_call:
     list() -> mutates=False allocates=True
   list_literal:
@@ -50,10 +50,11 @@
   compound_assign_list:
     a -> mutates=True allocates=True
   multiple_findings:
-    a -> mutates=True allocates=True
-    b -> mutates=True allocates=False
+    a.append -> mutates=True allocates=True
+    b.pop -> mutates=True allocates=False
   nested_block:
-    a -> mutates=True allocates=False
+    a.pop -> mutates=True allocates=False
+    b.append -> mutates=True allocates=True
   transitive_alloc:
     (no findings)
   '''

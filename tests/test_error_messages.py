@@ -16,7 +16,10 @@ from splice.frontend.validate import UnsupportedProgram, render
 error_programs_path = "tests/error_programs"
 paths = sorted(glob.glob(f"{error_programs_path}/*.py"))
 
-validator_path = "src/splice/frontend/validate.py"
+validator_paths = [
+    "src/splice/frontend/validate.py",
+    "src/splice/frontend/validate_semantics.py",
+]
 
 
 def _diagnostics_for(path: str):
@@ -34,11 +37,11 @@ def test_error_message(path: str, snapshot):
 
 
 def reportable_kinds() -> set[str]:
-    """Every kind the validator can report, read off its self.report calls."""
-    tree = ast.parse(Path(validator_path).read_text())
+    """Every kind the validators can report, read off their self.report calls."""
     return {
         node.args[1].value
-        for node in ast.walk(tree)
+        for validator_path in validator_paths
+        for node in ast.walk(ast.parse(Path(validator_path).read_text()))
         if isinstance(node, ast.Call)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "report"

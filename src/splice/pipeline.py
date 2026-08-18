@@ -109,7 +109,7 @@ def analyse(path: str | None, source: str) -> AnalysisResult:
     call_graph = compute_call_graph(tree, types)
     mutations = compute_mutating_parameters(function_effects, call_graph)
 
-    semantics_diagnostics = validate_semantics(tree, mutations, types)
+    semantics_diagnostics = validate_semantics(tree, mutations, types, source)
     if semantics_diagnostics:
         print(render(semantics_diagnostics, source, path))
         raise UnsupportedProgram(semantics_diagnostics)

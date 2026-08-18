@@ -1,6 +1,6 @@
 """Small stand-alone helpers for working with mypy AST nodes."""
 
-from mypy.nodes import Expression, IntExpr, UnaryExpr
+from mypy.nodes import Context, Expression, IntExpr, UnaryExpr
 from mypy.types import Type
 
 type TypeTable = dict[Expression, Type]
@@ -20,3 +20,24 @@ def get_int_literal(expr: Expression) -> int | None:
         if expr.op == "+":
             return expr.expr.value
     return None
+
+
+def source_text(node: Context, source: str) -> str:
+    """The original source text a node's position covers.
+
+    Use this instead of convert_to_python for a node that may have been
+    changed by an AST transform - convert_to_python rebuilds text from the
+    node itself, so it would print the transformed code (eg. `a.__getitem__(0)`
+    instead of `a[0]`). A transform keeps the position pointing at the
+    original text even when it changes the node, so reading the source
+    directly gives back what the user actually wrote.
+    """
+    lines = source.splitlines()
+    end_line = node.end_line if node.end_line is not None else node.line
+    end_column = node.end_column if node.end_column is not None else node.column
+    if node.line == end_line:
+        return lines[node.line - 1][node.column : end_column]
+    first = lines[node.line - 1][node.column :]
+    middle = lines[node.line : end_line - 1]
+    last = lines[end_line - 1][:end_column]
+    return "\n".join([first, *middle, last])
