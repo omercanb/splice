@@ -3,7 +3,7 @@ from mypy.nodes import MypyFile, Expression, TempNode, RefExpr, Var, FuncDef, As
     DictExpr, SetExpr
 from mypy.types import Type, get_proper_type
 
-from splice.pipeline import TypeTable
+from splice.ast_utils import TypeTable
 from splice.visitor import Traverser
 
 

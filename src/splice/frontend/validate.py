@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from splice.pipeline import TypeTable
+    from splice.ast_utils import TypeTable
 
 from mypy.nodes import (
     AssignmentStmt,

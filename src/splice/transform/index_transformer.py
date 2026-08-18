@@ -53,6 +53,7 @@ class IndexTransformer(Transformer):
             for bound in (o.begin_index, o.end_index, o.stride)
         ]
         name = copy_position(NameExpr("slice"), o)
+        name.fullname = "builtins.slice"
         call = CallExpr(name, bounds, [ArgKind.ARG_POS] * 3, [None] * 3)
         return copy_position(call, o)
 

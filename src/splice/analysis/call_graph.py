@@ -10,12 +10,13 @@ from mypy.nodes import (
     MemberExpr,
     MypyFile,
     NameExpr,
+    OverloadedFuncDef,
     TypeInfo,
     Var,
 )
 from mypy.types import Instance, get_proper_type
 
-from splice.pipeline import TypeTable
+from splice.ast_utils import TypeTable
 from splice.visitor import Traverser
 
 
@@ -46,10 +47,11 @@ class CallGraphProducer(Traverser):
     def visit_call_expr(self, o: CallExpr):
         if not is_call_builtin(o, self.types):
             callee = resolve_funcdef(o, self.types)
-            bindings = match_call_arguments(o, self.types)
-            assert self.current_function
-            edge = CallEdge(o, self.current_function, callee, bindings)
-            self.call_graph.edges.append(edge)
+            if callee is not None:
+                bindings = match_call_arguments(o, self.types)
+                assert self.current_function
+                edge = CallEdge(o, self.current_function, callee, bindings)
+                self.call_graph.edges.append(edge)
 
         super().visit_call_expr(o)
 
@@ -62,6 +64,9 @@ def compute_call_graph(tree: MypyFile, types: TypeTable):
 
 def match_call_arguments(o: CallExpr, types: TypeTable) -> list[tuple[Expression, Var]]:
     funcdef = resolve_funcdef(o, types)
+    if funcdef is None:
+        # No user-defined __init__
+        return []
     params = [arg.variable for arg in funcdef.arguments]
 
     if isinstance(o.callee, MemberExpr):
@@ -76,29 +81,50 @@ def match_call_arguments(o: CallExpr, types: TypeTable) -> list[tuple[Expression
     return list(zip(o.args, params))
 
 
-def resolve_funcdef(o: CallExpr, types: TypeTable) -> FuncDef:
+def _usable_funcdef(node) -> Optional[FuncDef]:
+    """A FuncDef with a real argument list, or None if it doesn't have one.
+
+    Two cases have no argument list: an overloaded function, and a
+    stub-only FuncDef (eg. IO.read, from a .pyi file). We check by trying
+    to read .arguments instead of checking the node's type, since that's
+    the only way that covers both cases.
+    """
+    if not isinstance(node, FuncDef) or isinstance(node, OverloadedFuncDef):
+        return None
+    if getattr(node, "arguments", None) is None:
+        return None
+    return node
+
+
+def resolve_funcdef(o: CallExpr, types: TypeTable) -> Optional[FuncDef]:
+    """The function being called, or None if there's no argument list to
+    bind against. This happens for a class with no __init__ (its
+    constructor takes zero arguments), or for anything _usable_funcdef
+    rejects.
+    """
     assert not is_call_builtin(o, types)
 
     if isinstance(o.callee, NameExpr):
         node = o.callee.node
         if isinstance(node, FuncDef):
-            return node
+            return _usable_funcdef(node)
 
         assert isinstance(node, TypeInfo)
         init = node.get("__init__")
-        assert (
-            init is not None
-            and isinstance(init.node, FuncDef)
-            and not init.node.fullname.startswith("builtins.")
-        ), "every class must define __init__"
-        return init.node
+        if init is None:
+            return None
+        resolved = _usable_funcdef(init.node)
+        if resolved is not None and resolved.fullname.startswith("builtins."):
+            return None
+        return resolved
 
     assert isinstance(o.callee, MemberExpr)
     receiver_type = get_proper_type(types[o.callee.expr])
     assert isinstance(receiver_type, Instance)
     method = receiver_type.type.get(o.callee.name)
-    assert method is not None and isinstance(method.node, FuncDef)
-    return method.node
+    if method is None:
+        return None
+    return _usable_funcdef(method.node)
 
 
 def is_call_builtin(o: CallExpr, types: TypeTable):

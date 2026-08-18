@@ -4,7 +4,8 @@ from mypy.nodes import CallExpr, Expression, Var
 
 from splice.analysis.call_graph import is_call_builtin, match_call_arguments
 from splice.convert_to_python import convert_to_python
-from splice.pipeline import TypeTable, analyse
+from splice.ast_utils import TypeTable
+from splice.pipeline import analyse
 from splice.visitor import Traverser
 
 test_file = Path(__file__).parent / "program.py"

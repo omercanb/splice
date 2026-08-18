@@ -1,6 +1,9 @@
 """Small stand-alone helpers for working with mypy AST nodes."""
 
 from mypy.nodes import Expression, IntExpr, UnaryExpr
+from mypy.types import Type
+
+type TypeTable = dict[Expression, Type]
 
 
 def get_int_literal(expr: Expression) -> int | None:

@@ -12,8 +12,10 @@ from mypy.nodes import (
 from mypy.options import Options
 from mypy.types import Instance, Type
 
-type TypeTable = dict[Expression, Type]
-
+from splice.ast_utils import TypeTable
+from splice.analysis.call_graph import compute_call_graph
+from splice.analysis.mutation import compute_mutating_parameters
+from splice.analysis.statement_effects import compute_function_effects
 from splice.frontend.mypy_fixes import get_resolved_types
 from splice.frontend.validate import validate, UnsupportedProgram, render
 from splice.frontend.validate_semantics import validate_semantics
@@ -103,7 +105,11 @@ def analyse(path: str | None, source: str) -> AnalysisResult:
 
     _apply_transforms(tree, types)
 
-    semantics_diagnostics = validate_semantics(tree)
+    function_effects = compute_function_effects(tree, types)
+    call_graph = compute_call_graph(tree, types)
+    mutations = compute_mutating_parameters(function_effects, call_graph)
+
+    semantics_diagnostics = validate_semantics(tree, mutations, types)
     if semantics_diagnostics:
         print(render(semantics_diagnostics, source, path))
         raise UnsupportedProgram(semantics_diagnostics)

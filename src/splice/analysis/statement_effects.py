@@ -32,7 +32,7 @@ from splice.analysis.builtin_effects import (
     compound_assignment_effect,
 )
 from splice.codegen.class_def import methods as class_methods
-from splice.pipeline import TypeTable
+from splice.ast_utils import TypeTable
 from splice.visitor import Traverser
 
 _ALLOCATING_CONSTRUCTORS = {"list", "dict", "set"}

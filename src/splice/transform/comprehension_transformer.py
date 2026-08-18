@@ -3,6 +3,7 @@ Transforms comprehensions into function calls
 """
 
 from mypy.nodes import (
+    GDEF,
     ArgKind,
     Argument,
     AssignmentStmt,
@@ -20,12 +21,14 @@ from mypy.nodes import (
     ListComprehension,
     ListExpr,
     MemberExpr,
+    MypyFile,
     NameExpr,
     Node,
     ReturnStmt,
     SetComprehension,
     SetExpr,
     Statement,
+    SymbolTableNode,
     Var,
 )
 from mypy.types import CallableType, Type
@@ -64,6 +67,7 @@ class ComprehensionRemover(Transformer):
         super().__init__()
         self.types = types
         self.transform_done = False
+        self.new_funcdefs: list[FuncDef] = []
 
     def transform_comprehension(
         self,
@@ -130,12 +134,18 @@ class ComprehensionRemover(Transformer):
         function_definition = copy_position(
             FuncDef(new_name, args, function_body, func_type), o
         )
+        # mypy never sees this function, since we just created it, so we
+        # have to set its name by hand instead of mypy doing it for us.
+        function_definition._fullname = f"main.{new_name}"
         self.hoist_global([function_definition])
+        self.new_funcdefs.append(function_definition)
 
         replacing_call_arguments = [
             copy_position(NameExpr(free_var.name), o) for free_var in free_variables
         ]
         replacing_call = call_expr(new_name, replacing_call_arguments, o)
+        replacing_call.callee.fullname = function_definition.fullname
+        replacing_call.callee.node = function_definition
 
         return replacing_call
 
@@ -205,9 +215,14 @@ class ComprehensionRemover(Transformer):
         )
 
 
-def apply_comprehension_transforms(tree: Node, types):
+def apply_comprehension_transforms(tree: MypyFile, types):
     while True:
         t = ComprehensionRemover(types)
         t.visit(tree)
+        # hoist_global() already put these in tree.defs, so codegen can find
+        # them. They also need to be in tree.names, so code that looks up
+        # functions by name (resolve_funcdef and friends) can find them too.
+        for funcdef in t.new_funcdefs:
+            tree.names[funcdef.name] = SymbolTableNode(GDEF, funcdef)
         if not t.transform_done:
             break
