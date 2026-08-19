@@ -8,9 +8,12 @@ version = "0.1.0"
 description = "Compiles a typed subset of Python straight to native C++"
 requires-python = ">=3.13"
 dependencies = [
-    # Must be the mypyc-compiled wheel, not pure-Python or a run may be 4x slower
-    # pip install --force-reinstall --only-binary :all: mypy==2.3.0
-    "mypy==2.3.0",
+    # A fork of mypy 2.3.0 that supports more fixed-width int types
+    # Normaly mypy can be compiled with mypyc but this uses the Python version by default (2x speed difference between compiled and interpreted but 5 minute compile time)
+    # For the mypyc-compiled version reinstall with MYPY_USE_MYPYC=1 set:
+    # MYPY_USE_MYPYC=1 pip install --force-reinstall --no-deps \
+    #   "mypy @ git+https://github.com/omercanb/mypy-splice-fork.git@splice-fixed-width-promotion-clean"
+    "mypy @ git+https://github.com/omercanb/mypy-splice-fork.git@splice-fixed-width-promotion-clean",
     "tabulate>=0.10",
 ]
 

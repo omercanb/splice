@@ -19,28 +19,28 @@
 using namespace py;
 
 namespace prog_boolops {
-_int side(_int v);
+int64_t side(int64_t v);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-_int side(_int v) {
+int64_t side(int64_t v) {
     print(str("SIDE"));
     return v;
 }
 
 int run() {
-    _int a;
-    _int b;
-    _int zero;
+    int64_t a;
+    int64_t b;
+    int64_t zero;
     str empty;
     str text;
-    list<_int> no_items;
-    _float f;
-    _float g;
-    _int n;
+    list<int64_t> no_items;
+    double f;
+    double g;
+    int64_t n;
     __init_module__();
     a = 1LL;
     b = 2LL;
@@ -57,11 +57,11 @@ int run() {
     print(_and(text, empty));
     print(_or(text, empty));
     print(_and(empty, text));
-    no_items = list<_int>();
-    print(_or(no_items, list<_int>({1LL, 2LL})));
-    print(_and(list<_int>({3LL}), no_items));
-    print(_or(list<_int>({3LL}), list<_int>({4LL})));
-    print(_and(no_items, list<_int>({4LL})));
+    no_items = list<int64_t>();
+    print(_or(no_items, list<int64_t>({1LL, 2LL})));
+    print(_and(list<int64_t>({3LL}), no_items));
+    print(_or(list<int64_t>({3LL}), list<int64_t>({4LL})));
+    print(_and(no_items, list<int64_t>({4LL})));
     f = 0.0;
     g = 2.5;
     print(_or(f, g));
@@ -107,17 +107,17 @@ int run() {
 }
 
 namespace prog_builtin_functions {
-list<_int> __list_comprehension_0(list<_int> numbers);
+list<int64_t> __list_comprehension_0(list<int64_t> numbers);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-list<_int> __list_comprehension_0(list<_int> numbers) {
-    list<_int> __tmp_0;
-    _int v;
-    __tmp_0 = list<_int>();
+list<int64_t> __list_comprehension_0(list<int64_t> numbers) {
+    list<int64_t> __tmp_0;
+    int64_t v;
+    __tmp_0 = list<int64_t>();
     auto && __range_0 = numbers;
     for (auto __iter_0 = iter(__range_0); !__iter_0.done();) {
         v = next(__iter_0);
@@ -127,22 +127,22 @@ list<_int> __list_comprehension_0(list<_int> numbers) {
 }
 
 int run() {
-    list<_int> numbers;
-    list<_int> empty;
-    list<_int> zeros;
-    list<_int> with_zero;
+    list<int64_t> numbers;
+    list<int64_t> empty;
+    list<int64_t> zeros;
+    list<int64_t> with_zero;
     __init_module__();
-    numbers = list<_int>({4LL, 1LL, 7LL, 3LL});
-    empty = list<_int>();
+    numbers = list<int64_t>({4LL, 1LL, 7LL, 3LL});
+    empty = list<int64_t>();
     print(sum(numbers), sum(empty));
     print(min(numbers), max(numbers));
     print(min(3LL, 8LL), max(3LL, 8LL), min(2.5, 1.5));
-    zeros = list<_int>({0LL, 0LL});
-    with_zero = list<_int>({1LL, 0LL, 2LL});
+    zeros = list<int64_t>({0LL, 0LL});
+    with_zero = list<int64_t>({1LL, 0LL, 2LL});
     print(any(numbers), any(zeros), any(empty));
     print(all(numbers), all(with_zero), all(empty));
     print(sum(range(5LL)), max(range(5LL)));
-    print(sum(set<_int>({1LL, 2LL, 3LL})));
+    print(sum(set<int64_t>({1LL, 2LL, 3LL})));
     print(min(str("hello")), max(str("hello")));
     print(divmod(7LL, 2LL), divmod((-7LL), 2LL));
     print(py::round(2.5), py::round(3.5), py::round((-2.5)));
@@ -167,8 +167,8 @@ int run() {
     bytes padded;
     bytes a;
     bytes c;
-    _int total;
-    _int byte;
+    int64_t total;
+    int64_t byte;
     bytes joined;
     __init_module__();
     b = bytes(std::string("Hello World", 11));
@@ -225,7 +225,7 @@ int run() {
     print((b.__contains__(87LL)));
     print((b.__contains__(90LL)));
     print(bytes(3LL));
-    print(bytes(list<_int>({65LL, 66LL, 67LL})));
+    print(bytes(list<int64_t>({65LL, 66LL, 67LL})));
     total = 0LL;
     auto && __range_1 = bytes(std::string("abc", 3));
     for (auto __iter_1 = iter(__range_1); !__iter_1.done();) {
@@ -237,7 +237,7 @@ int run() {
     auto && __range_2 = bytes(std::string("abc", 3));
     for (auto __iter_2 = iter(__range_2); !__iter_2.done();) {
         byte = next(__iter_2);
-        joined = ((joined + bytes(list<_int>({byte}))) + bytes(std::string(".", 1)));
+        joined = ((joined + bytes(list<int64_t>({byte}))) + bytes(std::string(".", 1)));
     }
     print(joined);
     return 0LL;
@@ -252,14 +252,14 @@ void __init_module__() {
 }
 
 int run() {
-    _float a;
-    _int b;
-    _float c;
+    double a;
+    int64_t b;
+    double c;
     str float_str;
-    _float f1;
+    double f1;
     str int_str;
-    _int i1;
-    _int i2;
+    int64_t i1;
+    int64_t i2;
     __init_module__();
     a = 2.0;
     b = to_int(a);
@@ -284,31 +284,31 @@ void __init_module__();
 
 class Counter {
   public:
-    _int count;
+    int64_t count;
 
-    Counter(_int start) { __init__(start); }
+    Counter(int64_t start) { __init__(start); }
 
     Counter() = default;
 
-    void __init__(_int start);
-    void bump(_int by);
-    _int doubled();
+    void __init__(int64_t start);
+    void bump(int64_t by);
+    int64_t doubled();
 };
 
 class Point {
   public:
-    _int x;
-    _int y;
+    int64_t x;
+    int64_t y;
 
-    Point(_int x, _int y) { __init__(x, y); }
+    Point(int64_t x, int64_t y) { __init__(x, y); }
 
     Point() = default;
 
-    void __init__(_int x, _int y);
-    _int norm();
-    Point moved(_int dx, _int dy);
+    void __init__(int64_t x, int64_t y);
+    int64_t norm();
+    Point moved(int64_t dx, int64_t dy);
     str __str__();
-    _int __len__();
+    int64_t __len__();
     bool __bool__();
 };
 
@@ -316,28 +316,28 @@ class Empty {
   public:
 };
 
-void Counter::__init__(_int start) {
+void Counter::__init__(int64_t start) {
     this->count = start;
 }
 
-void Counter::bump(_int by) {
+void Counter::bump(int64_t by) {
     this->count = (this->count + by);
 }
 
-_int Counter::doubled() {
+int64_t Counter::doubled() {
     return (this->count * 2LL);
 }
 
-void Point::__init__(_int x, _int y) {
+void Point::__init__(int64_t x, int64_t y) {
     this->x = x;
     this->y = y;
 }
 
-_int Point::norm() {
+int64_t Point::norm() {
     return ((this->x * this->x) + (this->y * this->y));
 }
 
-Point Point::moved(_int dx, _int dy) {
+Point Point::moved(int64_t dx, int64_t dy) {
     return Point((this->x + dx), (this->y + dy));
 }
 
@@ -345,7 +345,7 @@ str Point::__str__() {
     return ((((str("Point(") + to_str(this->x)) + str(", ")) + to_str(this->y)) + str(")"));
 }
 
-_int Point::__len__() {
+int64_t Point::__len__() {
     return 2LL;
 }
 
@@ -396,10 +396,10 @@ void __init_module__() {
 }
 
 int run() {
-    _int a;
-    _int b;
-    _int c;
-    _int d;
+    int64_t a;
+    int64_t b;
+    int64_t c;
+    int64_t d;
     __init_module__();
     a = 1LL;
     b = 2LL;
@@ -416,30 +416,30 @@ int run() {
 }
 
 namespace prog_comprehensions {
-list<_int> __list_comprehension_1(list<_int> values, _int factor, _int offset);
-list<_int> scaled(list<_int> values, _int factor);
-list<_int> __list_comprehension_2(list<_int> numbers);
-list<_int> __list_comprehension_3(list<_int> numbers);
-list<_int> __list_comprehension_4();
-list<_int> __list_comprehension_5();
-list<_int> __list_comprehension_6(list<_int> numbers);
-set<_int> __set_comprehension_0(list<_int> numbers);
-dict<_int, _int> __dict_comprehension_0(list<_int> numbers);
-list<_int> __list_comprehension_7(list<_int> numbers);
-list<_int> __list_comprehension_11(_int v);
-list<_int> __list_comprehension_8(list<_int> numbers);
-list<_int> __list_comprehension_9(list<_int> numbers);
-list<_int> __list_comprehension_10(list<_int> doubled);
+list<int64_t> __list_comprehension_1(list<int64_t> values, int64_t factor, int64_t offset);
+list<int64_t> scaled(list<int64_t> values, int64_t factor);
+list<int64_t> __list_comprehension_2(list<int64_t> numbers);
+list<int64_t> __list_comprehension_3(list<int64_t> numbers);
+list<int64_t> __list_comprehension_4();
+list<int64_t> __list_comprehension_5();
+list<int64_t> __list_comprehension_6(list<int64_t> numbers);
+set<int64_t> __set_comprehension_0(list<int64_t> numbers);
+dict<int64_t, int64_t> __dict_comprehension_0(list<int64_t> numbers);
+list<int64_t> __list_comprehension_7(list<int64_t> numbers);
+list<int64_t> __list_comprehension_11(int64_t v);
+list<int64_t> __list_comprehension_8(list<int64_t> numbers);
+list<int64_t> __list_comprehension_9(list<int64_t> numbers);
+list<int64_t> __list_comprehension_10(list<int64_t> doubled);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-list<_int> __list_comprehension_1(list<_int> values, _int factor, _int offset) {
-    list<_int> __tmp_1;
-    _int v;
-    __tmp_1 = list<_int>();
+list<int64_t> __list_comprehension_1(list<int64_t> values, int64_t factor, int64_t offset) {
+    list<int64_t> __tmp_1;
+    int64_t v;
+    __tmp_1 = list<int64_t>();
     auto && __range_4 = values;
     for (auto __iter_4 = iter(__range_4); !__iter_4.done();) {
         v = next(__iter_4);
@@ -448,16 +448,16 @@ list<_int> __list_comprehension_1(list<_int> values, _int factor, _int offset) {
     return __tmp_1;
 }
 
-list<_int> scaled(list<_int> values, _int factor) {
-    _int offset;
+list<int64_t> scaled(list<int64_t> values, int64_t factor) {
+    int64_t offset;
     offset = 1LL;
     return __list_comprehension_1(values, factor, offset);
 }
 
-list<_int> __list_comprehension_2(list<_int> numbers) {
-    list<_int> __tmp_2;
-    _int v;
-    __tmp_2 = list<_int>();
+list<int64_t> __list_comprehension_2(list<int64_t> numbers) {
+    list<int64_t> __tmp_2;
+    int64_t v;
+    __tmp_2 = list<int64_t>();
     auto && __range_5 = numbers;
     for (auto __iter_5 = iter(__range_5); !__iter_5.done();) {
         v = next(__iter_5);
@@ -466,10 +466,10 @@ list<_int> __list_comprehension_2(list<_int> numbers) {
     return __tmp_2;
 }
 
-list<_int> __list_comprehension_3(list<_int> numbers) {
-    list<_int> __tmp_3;
-    _int v;
-    __tmp_3 = list<_int>();
+list<int64_t> __list_comprehension_3(list<int64_t> numbers) {
+    list<int64_t> __tmp_3;
+    int64_t v;
+    __tmp_3 = list<int64_t>();
     auto && __range_6 = numbers;
     for (auto __iter_6 = iter(__range_6); !__iter_6.done();) {
         v = next(__iter_6);
@@ -480,43 +480,43 @@ list<_int> __list_comprehension_3(list<_int> numbers) {
     return __tmp_3;
 }
 
-list<_int> __list_comprehension_4() {
-    list<_int> __tmp_4;
-    _int i;
-    __tmp_4 = list<_int>();
-    _int __stop_0 = 4LL;
+list<int64_t> __list_comprehension_4() {
+    list<int64_t> __tmp_4;
+    int64_t i;
+    __tmp_4 = list<int64_t>();
+    int64_t __stop_0 = 4LL;
     for (i = 0; i < __stop_0; ++i) {
         __tmp_4.append(i);
     }
     return __tmp_4;
 }
 
-list<_int> __list_comprehension_5() {
-    list<_int> __tmp_5;
-    _int i;
-    __tmp_5 = list<_int>();
-    _int __stop_1 = 8LL;
+list<int64_t> __list_comprehension_5() {
+    list<int64_t> __tmp_5;
+    int64_t i;
+    __tmp_5 = list<int64_t>();
+    int64_t __stop_1 = 8LL;
     for (i = 1LL; i < __stop_1; i += 2) {
         __tmp_5.append(i);
     }
     return __tmp_5;
 }
 
-list<_int> __list_comprehension_6(list<_int> numbers) {
-    list<_int> __tmp_6;
-    _int i;
-    __tmp_6 = list<_int>();
-    _int __len_0 = len(numbers);
+list<int64_t> __list_comprehension_6(list<int64_t> numbers) {
+    list<int64_t> __tmp_6;
+    int64_t i;
+    __tmp_6 = list<int64_t>();
+    int64_t __len_0 = len(numbers);
     for (i = 0; i < __len_0; ++i) {
         __tmp_6.append(numbers.__getitem__(i));
     }
     return __tmp_6;
 }
 
-set<_int> __set_comprehension_0(list<_int> numbers) {
-    set<_int> __tmp_7;
-    _int v;
-    __tmp_7 = set<_int>();
+set<int64_t> __set_comprehension_0(list<int64_t> numbers) {
+    set<int64_t> __tmp_7;
+    int64_t v;
+    __tmp_7 = set<int64_t>();
     auto && __range_7 = numbers;
     for (auto __iter_7 = iter(__range_7); !__iter_7.done();) {
         v = next(__iter_7);
@@ -525,10 +525,10 @@ set<_int> __set_comprehension_0(list<_int> numbers) {
     return __tmp_7;
 }
 
-dict<_int, _int> __dict_comprehension_0(list<_int> numbers) {
-    dict<_int, _int> __tmp_8;
-    _int v;
-    __tmp_8 = dict<_int, _int>();
+dict<int64_t, int64_t> __dict_comprehension_0(list<int64_t> numbers) {
+    dict<int64_t, int64_t> __tmp_8;
+    int64_t v;
+    __tmp_8 = dict<int64_t, int64_t>();
     auto && __range_8 = numbers;
     for (auto __iter_8 = iter(__range_8); !__iter_8.done();) {
         v = next(__iter_8);
@@ -539,11 +539,11 @@ dict<_int, _int> __dict_comprehension_0(list<_int> numbers) {
     return __tmp_8;
 }
 
-list<_int> __list_comprehension_7(list<_int> numbers) {
-    list<_int> __tmp_9;
-    _int x;
-    _int y;
-    __tmp_9 = list<_int>();
+list<int64_t> __list_comprehension_7(list<int64_t> numbers) {
+    list<int64_t> __tmp_9;
+    int64_t x;
+    int64_t y;
+    __tmp_9 = list<int64_t>();
     auto && __range_9 = numbers;
     for (auto __iter_9 = iter(__range_9); !__iter_9.done();) {
         x = next(__iter_9);
@@ -558,21 +558,21 @@ list<_int> __list_comprehension_7(list<_int> numbers) {
     return __tmp_9;
 }
 
-list<_int> __list_comprehension_11(_int v) {
-    list<_int> __tmp_13;
-    _int w;
-    __tmp_13 = list<_int>();
-    _int __stop_2 = v;
+list<int64_t> __list_comprehension_11(int64_t v) {
+    list<int64_t> __tmp_13;
+    int64_t w;
+    __tmp_13 = list<int64_t>();
+    int64_t __stop_2 = v;
     for (w = 0; w < __stop_2; ++w) {
         __tmp_13.append(w);
     }
     return __tmp_13;
 }
 
-list<_int> __list_comprehension_8(list<_int> numbers) {
-    list<_int> __tmp_10;
-    _int v;
-    __tmp_10 = list<_int>();
+list<int64_t> __list_comprehension_8(list<int64_t> numbers) {
+    list<int64_t> __tmp_10;
+    int64_t v;
+    __tmp_10 = list<int64_t>();
     auto && __range_11 = numbers;
     for (auto __iter_11 = iter(__range_11); !__iter_11.done();) {
         v = next(__iter_11);
@@ -581,10 +581,10 @@ list<_int> __list_comprehension_8(list<_int> numbers) {
     return __tmp_10;
 }
 
-list<_int> __list_comprehension_9(list<_int> numbers) {
-    list<_int> __tmp_11;
-    _int v;
-    __tmp_11 = list<_int>();
+list<int64_t> __list_comprehension_9(list<int64_t> numbers) {
+    list<int64_t> __tmp_11;
+    int64_t v;
+    __tmp_11 = list<int64_t>();
     auto && __range_12 = numbers;
     for (auto __iter_12 = iter(__range_12); !__iter_12.done();) {
         v = next(__iter_12);
@@ -593,10 +593,10 @@ list<_int> __list_comprehension_9(list<_int> numbers) {
     return __tmp_11;
 }
 
-list<_int> __list_comprehension_10(list<_int> doubled) {
-    list<_int> __tmp_12;
-    _int v;
-    __tmp_12 = list<_int>();
+list<int64_t> __list_comprehension_10(list<int64_t> doubled) {
+    list<int64_t> __tmp_12;
+    int64_t v;
+    __tmp_12 = list<int64_t>();
     auto && __range_13 = doubled;
     for (auto __iter_13 = iter(__range_13); !__iter_13.done();) {
         v = next(__iter_13);
@@ -606,12 +606,12 @@ list<_int> __list_comprehension_10(list<_int> doubled) {
 }
 
 int run() {
-    list<_int> numbers;
-    set<_int> squares;
-    dict<_int, _int> lookup;
-    list<_int> doubled;
+    list<int64_t> numbers;
+    set<int64_t> squares;
+    dict<int64_t, int64_t> lookup;
+    list<int64_t> doubled;
     __init_module__();
-    numbers = list<_int>({1LL, 2LL, 3LL, 4LL});
+    numbers = list<int64_t>({1LL, 2LL, 3LL, 4LL});
     print(__list_comprehension_2(numbers));
     print(__list_comprehension_3(numbers));
     print(__list_comprehension_4());
@@ -639,12 +639,12 @@ void __init_module__() {
 }
 
 int run() {
-    dict<_int, _int> d;
-    dict<_int, _int> e;
-    dict<_int, _int> c;
-    dict<str, _int> s;
+    dict<int64_t, int64_t> d;
+    dict<int64_t, int64_t> e;
+    dict<int64_t, int64_t> c;
+    dict<str, int64_t> s;
     __init_module__();
-    d = dict<_int, _int>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});
+    d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});
     print(len(d));
     print(d.__getitem__(1LL), d.__getitem__(2LL), d.__getitem__(3LL));
     print(sorted(d));
@@ -663,14 +663,14 @@ int run() {
     print(sorted(d));
     print(sorted(d.keys()));
     print(sorted(d.values()));
-    e = dict<_int, _int>({{5LL, 50LL}});
+    e = dict<int64_t, int64_t>({{5LL, 50LL}});
     d.update(e);
     print(sorted(d));
     c = d.copy();
     print(len(c));
     c.clear();
     print(len(c), len(d));
-    s = dict<str, _int>({{str("b"), 2LL}, {str("a"), 1LL}});
+    s = dict<str, int64_t>({{str("b"), 2LL}, {str("a"), 1LL}});
     print(sorted(s));
     print(s.__getitem__(str("a")), s.__getitem__(str("b")));
     return 0LL;
@@ -678,22 +678,22 @@ int run() {
 }
 
 namespace prog_exceptions {
-_int guarded_parse(str text);
-_int parse_or(str text, _int fallback);
-_int nested();
-_int handler_raises();
-_int check_positive(_int n);
-_int reraise(_int n);
-_int raise_bare_class(str key);
-_int siblings(str first, str second);
-_int relay();
+int64_t guarded_parse(str text);
+int64_t parse_or(str text, int64_t fallback);
+int64_t nested();
+int64_t handler_raises();
+int64_t check_positive(int64_t n);
+int64_t reraise(int64_t n);
+int64_t raise_bare_class(str key);
+int64_t siblings(str first, str second);
+int64_t relay();
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-_int guarded_parse(str text) {
+int64_t guarded_parse(str text) {
     {
         Finally __finally([&] {
             print(str("cleanup"), text);
@@ -702,8 +702,8 @@ _int guarded_parse(str text) {
     }
 }
 
-_int parse_or(str text, _int fallback) {
-    _int value;
+int64_t parse_or(str text, int64_t fallback) {
+    int64_t value;
     {
         bool __thrown = false;
         try {
@@ -720,7 +720,7 @@ _int parse_or(str text, _int fallback) {
     }
 }
 
-_int nested() {
+int64_t nested() {
     {
         Finally __finally([&] {
             print(str("outer finally"));
@@ -739,7 +739,7 @@ _int nested() {
     }
 }
 
-_int handler_raises() {
+int64_t handler_raises() {
     try {
         {
             Finally __finally([&] {
@@ -763,14 +763,14 @@ _int handler_raises() {
     return 0LL;
 }
 
-_int check_positive(_int n) {
+int64_t check_positive(int64_t n) {
     if (to_bool(((n < 0LL)))) {
         throw ValueError(str("negative"));
     }
     return n;
 }
 
-_int reraise(_int n) {
+int64_t reraise(int64_t n) {
     {
         Finally __finally([&] {
             print(str("reraise finally"));
@@ -784,11 +784,11 @@ _int reraise(_int n) {
     }
 }
 
-_int raise_bare_class(str key) {
+int64_t raise_bare_class(str key) {
     throw KeyError("");
 }
 
-_int siblings(str first, str second) {
+int64_t siblings(str first, str second) {
     {
         bool __thrown = false;
         try {
@@ -816,7 +816,7 @@ _int siblings(str first, str second) {
     return 0LL;
 }
 
-_int relay() {
+int64_t relay() {
     try {
         throw ValueError(str("original"));
     } catch (PyException &e) {
@@ -826,9 +826,9 @@ _int relay() {
 }
 
 int run() {
-    list<_int> numbers;
-    dict<str, _int> counts;
-    _int i;
+    list<int64_t> numbers;
+    dict<str, int64_t> counts;
+    int64_t i;
     __init_module__();
     print(guarded_parse(str("41")));
     try {
@@ -867,7 +867,7 @@ int run() {
     } catch (PyException &) {
         print(str("base handler took the subclass"));
     }
-    numbers = list<_int>({1LL, 2LL, 3LL});
+    numbers = list<int64_t>({1LL, 2LL, 3LL});
     try {
         print(numbers.__getitem__(10LL));
     } catch (IndexError &) {
@@ -875,7 +875,7 @@ int run() {
     } catch (PyException &) {
         print(str("not reached"));
     }
-    counts = dict<str, _int>({{str("a"), 1LL}});
+    counts = dict<str, int64_t>({{str("a"), 1LL}});
     try {
         print(counts.__getitem__(str("b")));
     } catch (PyException &) {
@@ -886,7 +886,7 @@ int run() {
     } catch (ValueError &e) {
         print(str("float refused it"));
     }
-    _int __stop_3 = 3LL;
+    int64_t __stop_3 = 3LL;
     for (i = 0; i < __stop_3; ++i) {
         {
             Finally __finally([&] {
@@ -954,6 +954,100 @@ int run() {
 }
 }
 
+namespace prog_fixed_width_int_promotion {
+uint16_t scale(uint16_t value, uint16_t factor);
+int32_t clamp(int32_t value, int32_t low, int32_t high);
+int run();
+void __init_module__();
+
+void __init_module__() {
+}
+
+uint16_t scale(uint16_t value, uint16_t factor) {
+    return (value * factor);
+}
+
+int32_t clamp(int32_t value, int32_t low, int32_t high) {
+    if (to_bool(((value < low)))) {
+        return low;
+    }
+    if (to_bool(((value > high)))) {
+        return high;
+    }
+    return value;
+}
+
+int run() {
+    uint16_t n;
+    uint8_t m;
+    uint16_t doubled;
+    uint16_t total;
+    __init_module__();
+    n = 10LL;
+    m = 200LL;
+    print(n, m);
+    doubled = scale(n, 2LL);
+    print(doubled);
+    total = (scale(n, 2LL) + n);
+    print(total);
+    print(clamp(500LL, 0LL, 100LL));
+    print(clamp((-5LL), 0LL, 100LL));
+    print(clamp(50LL, 0LL, 100LL));
+    return 0LL;
+}
+}
+
+namespace prog_fixed_width_ints {
+uint16_t add_u16(uint16_t a, uint16_t b);
+int run();
+void __init_module__();
+
+void __init_module__() {
+}
+
+uint16_t add_u16(uint16_t a, uint16_t b) {
+    return uint16_t((a + b));
+}
+
+int run() {
+    uint8_t a;
+    int8_t b;
+    uint16_t c;
+    uint16_t d;
+    int32_t e;
+    uint32_t f;
+    int64_t g;
+    uint64_t h;
+    list<uint16_t> values;
+    dict<uint8_t, str> counts;
+    set<int32_t> seen;
+    __init_module__();
+    a = uint8_t(200LL);
+    b = int8_t((-100LL));
+    print(a, b);
+    c = uint16_t(1000LL);
+    d = add_u16(c, uint16_t(234LL));
+    print(d);
+    e = int32_t((-70000LL));
+    f = uint32_t(70000LL);
+    print(e, f);
+    g = int64_t((-5000000000LL));
+    h = uint64_t(5000000000LL);
+    print(g, h);
+    print(((uint16_t(5LL) == uint16_t(5LL))));
+    print(((uint16_t(5LL) < uint16_t(10LL))));
+    values = list<uint16_t>({uint16_t(3LL), uint16_t(1LL), uint16_t(2LL)});
+    print(values);
+    counts = dict<uint8_t, str>();
+    counts.__setitem__(uint8_t(1LL), str("one"));
+    counts.__setitem__(uint8_t(2LL), str("two"));
+    print(counts.__getitem__(uint8_t(1LL)), counts.__getitem__(uint8_t(2LL)));
+    seen = set<int32_t>({int32_t(1LL), int32_t(2LL), int32_t(2LL)});
+    print(len(seen));
+    return 0LL;
+}
+}
+
 namespace prog_iter {
 int run();
 void __init_module__();
@@ -962,24 +1056,24 @@ void __init_module__() {
 }
 
 int run() {
-    list<_int> nums;
-    list<_int> a;
+    list<int64_t> nums;
+    list<int64_t> a;
     str s;
-    list<_int> filtered;
-    _int x;
-    _int y;
-    _int i;
-    _int n;
+    list<int64_t> filtered;
+    int64_t x;
+    int64_t y;
+    int64_t i;
+    int64_t n;
     __init_module__();
-    nums = list<_int>({1LL, 2LL, 3LL, 4LL, 5LL});
-    a = list<_int>(map([](auto x) { return (x * 2LL); }, nums));
+    nums = list<int64_t>({1LL, 2LL, 3LL, 4LL, 5LL});
+    a = list<int64_t>(map([](auto x) { return (x * 2LL); }, nums));
     print(a);
     auto && __range_15 = map([](auto x) { return to_str(x); }, nums);
     for (auto __iter_15 = iter(__range_15); !__iter_15.done();) {
         s = next(__iter_15);
         print(s);
     }
-    filtered = list<_int>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));
+    filtered = list<int64_t>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));
     print(filtered);
     auto && __range_16 = zip(nums, a);
     for (auto __iter_16 = iter(__range_16); !__iter_16.done();) {
@@ -997,14 +1091,14 @@ int run() {
 }
 
 namespace prog_list {
-list<_int> give_list(list<_int> l);
+list<int64_t> give_list(list<int64_t> l);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-list<_int> give_list(list<_int> l) {
+list<int64_t> give_list(list<int64_t> l) {
     print(l);
     l.append(2LL);
     print(l);
@@ -1012,21 +1106,21 @@ list<_int> give_list(list<_int> l) {
 }
 
 int run() {
-    list<_int> l;
-    _int a;
-    list<_int> l2;
-    _int x;
-    _int y;
-    _int z;
-    list<_int> l3;
-    _int n;
-    list<_int> l4;
-    list<_int> l5;
+    list<int64_t> l;
+    int64_t a;
+    list<int64_t> l2;
+    int64_t x;
+    int64_t y;
+    int64_t z;
+    list<int64_t> l3;
+    int64_t n;
+    list<int64_t> l4;
+    list<int64_t> l5;
     __init_module__();
-    print(list<_int>(list<_int>({1LL, 2LL, 3LL})));
-    l = list<_int>({1LL, 2LL, 3LL});
+    print(list<int64_t>(list<int64_t>({1LL, 2LL, 3LL})));
+    l = list<int64_t>({1LL, 2LL, 3LL});
     print(l);
-    l = list<_int>({1LL, 2LL, 3LL});
+    l = list<int64_t>({1LL, 2LL, 3LL});
     print(l);
     l.append(4LL);
     print(l);
@@ -1059,13 +1153,13 @@ int run() {
     print(y, l);
     z = l.pop((-2LL));
     print(z, l);
-    l.extend(list<_int>({7LL, 8LL}));
+    l.extend(list<int64_t>({7LL, 8LL}));
     print(l);
     l3 = l.copy();
     print(l3);
     l.clear();
     print(l);
-    l2 = list<_int>({5LL, 3LL, 1LL, 3LL, 9LL});
+    l2 = list<int64_t>({5LL, 3LL, 1LL, 3LL, 9LL});
     print(l2.index(3LL));
     print(l2.index(3LL, 3LL));
     print(l2.index(3LL, 0LL, 2LL));
@@ -1084,16 +1178,16 @@ int run() {
     print(n);
     print(l2.__getitem__(0LL), l2.back());
     if (!(to_bool(((l2.back() == l2.__getitem__((n - 1LL))))))) throw AssertionError("");
-    l4 = list<_int>({1LL, 2LL, 3LL});
+    l4 = list<int64_t>({1LL, 2LL, 3LL});
     print(l4.back());
     l4.back() += 10LL;
     if (!(to_bool(((l4.back() == 13LL))))) throw AssertionError("");
     print(l4);
-    l5 = (list<_int>({1LL, 2LL}) * 3LL);
+    l5 = (list<int64_t>({1LL, 2LL}) * 3LL);
     print(l5);
-    l5 = (3LL * list<_int>({1LL, 2LL}));
+    l5 = (3LL * list<int64_t>({1LL, 2LL}));
     print(l5);
-    if (!(to_bool(((l5 == (list<_int>({1LL, 2LL}) * 3LL)))))) throw AssertionError("");
+    if (!(to_bool(((l5 == (list<int64_t>({1LL, 2LL}) * 3LL)))))) throw AssertionError("");
     l5 *= 2LL;
     print(l5);
     return 0LL;
@@ -1108,44 +1202,44 @@ void __init_module__() {
 }
 
 int run() {
-    _int x;
-    list<_int> l;
-    _int i;
-    _int step;
-    _int n;
+    int64_t x;
+    list<int64_t> l;
+    int64_t i;
+    int64_t step;
+    int64_t n;
     __init_module__();
     x = 2LL;
-    l = list<_int>({2LL, 3LL, 4LL});
-    _int __len_1 = len(l);
+    l = list<int64_t>({2LL, 3LL, 4LL});
+    int64_t __len_1 = len(l);
     for (i = 0; i < __len_1; ++i) {
         print(l);
     }
-    _int __stop_4 = x;
+    int64_t __stop_4 = x;
     for (i = 0; i < __stop_4; ++i) {
         print(str("first"), i);
     }
-    _int __stop_5 = (x + 5LL);
+    int64_t __stop_5 = (x + 5LL);
     for (i = x; i < __stop_5; ++i) {
         print(str("second"), i);
     }
-    _int __stop_6 = (x + 10LL);
+    int64_t __stop_6 = (x + 10LL);
     for (i = x; i < __stop_6; i += 2) {
         print(str("third"), i);
     }
-    _int __stop_7 = (x - 7LL);
+    int64_t __stop_7 = (x - 7LL);
     for (i = x; i > __stop_7; i += -2) {
         print(str("fourth"), i);
     }
     step = x;
-    _int __stop_8 = (10LL * x);
-    _int __step_0 = step;
+    int64_t __stop_8 = (10LL * x);
+    int64_t __step_0 = step;
     for (i = x;; i += __step_0) {
         if ((__step_0 > 0 && i >= __stop_8) || (__step_0 < 0 && i <= __stop_8)) break;
         print(str("fifth"), i);
     }
     step = (-2LL);
-    _int __stop_9 = (10LL * x);
-    _int __step_1 = step;
+    int64_t __stop_9 = (10LL * x);
+    int64_t __step_1 = step;
     for (i = (5LL * x);; i += __step_1) {
         if ((__step_1 > 0 && i >= __stop_9) || (__step_1 < 0 && i <= __stop_9)) break;
         print(str("sixth"), i);
@@ -1172,7 +1266,7 @@ void __init_module__() {
 }
 
 int run() {
-    _int a;
+    int64_t a;
     __init_module__();
     print(pow(10LL, 10LL));
     print(idiv((-10LL), 3LL));
@@ -1196,28 +1290,28 @@ void __init_module__() {
 }
 
 int run() {
-    list<_int> l;
-    dict<_int, _int> d;
-    set<_int> s;
+    list<int64_t> l;
+    dict<int64_t, int64_t> d;
+    set<int64_t> s;
     str text;
-    tuple<_int, _int, _int> t;
-    list<tuple<_int, _int>> pairs;
-    set<tuple<_int, _int>> pair_set;
-    dict<tuple<_int, _int>, str> pair_dict;
-    tuple<tuple<_int, _int>, tuple<_int, _int>> nested;
-    list<tuple<str, _int>> mixed;
+    tuple<int64_t, int64_t, int64_t> t;
+    list<tuple<int64_t, int64_t>> pairs;
+    set<tuple<int64_t, int64_t>> pair_set;
+    dict<tuple<int64_t, int64_t>, str> pair_dict;
+    tuple<tuple<int64_t, int64_t>, tuple<int64_t, int64_t>> nested;
+    list<tuple<str, int64_t>> mixed;
     list<str> strs;
-    _int count;
-    _int x;
+    int64_t count;
+    int64_t x;
     __init_module__();
-    l = list<_int>({1LL, 2LL, 3LL});
+    l = list<int64_t>({1LL, 2LL, 3LL});
     print((l.__contains__(2LL)), (l.__contains__(9LL)));
     print((!l.__contains__(2LL)), (!l.__contains__(9LL)));
-    d = dict<_int, _int>({{1LL, 10LL}, {2LL, 20LL}});
+    d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}});
     print((d.__contains__(1LL)), (d.__contains__(9LL)));
     print((d.values().__contains__(10LL)));
     print((!d.__contains__(1LL)), (!d.__contains__(9LL)));
-    s = set<_int>({1LL, 2LL, 3LL});
+    s = set<int64_t>({1LL, 2LL, 3LL});
     print((s.__contains__(2LL)), (s.__contains__(9LL)));
     print((!s.__contains__(2LL)), (!s.__contains__(9LL)));
     text = str("hello world");
@@ -1226,18 +1320,18 @@ int run() {
     print((!text.__contains__(str("hello"))), (!text.__contains__(str("zz"))));
     t = tuple(1LL, 2LL, 3LL);
     print((t.__contains__(2LL)), (t.__contains__(9LL)));
-    pairs = list<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
+    pairs = list<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
     print((pairs.__contains__(tuple(1LL, 2LL))), (pairs.__contains__(tuple(9LL, 9LL))));
     print((!pairs.__contains__(tuple(1LL, 2LL))), (!pairs.__contains__(tuple(9LL, 9LL))));
     print((pairs.__contains__(tuple(2LL, 1LL))));
-    pair_set = set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
+    pair_set = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
     print((pair_set.__contains__(tuple(1LL, 2LL))), (pair_set.__contains__(tuple(9LL, 9LL))));
     print((pair_set.__contains__(tuple(2LL, 1LL))));
-    pair_dict = dict<tuple<_int, _int>, str>({{tuple(1LL, 2LL), str("a")}, {tuple(3LL, 4LL), str("b")}});
+    pair_dict = dict<tuple<int64_t, int64_t>, str>({{tuple(1LL, 2LL), str("a")}, {tuple(3LL, 4LL), str("b")}});
     print((pair_dict.__contains__(tuple(1LL, 2LL))), (pair_dict.__contains__(tuple(9LL, 9LL))));
     nested = tuple(tuple(1LL, 2LL), tuple(3LL, 4LL));
     print((nested.__contains__(tuple(1LL, 2LL))), (nested.__contains__(tuple(9LL, 9LL))));
-    mixed = list<tuple<str, _int>>({tuple(str("a"), 1LL), tuple(str("b"), 2LL)});
+    mixed = list<tuple<str, int64_t>>({tuple(str("a"), 1LL), tuple(str("b"), 2LL)});
     print((mixed.__contains__(tuple(str("a"), 1LL))), (mixed.__contains__(tuple(str("a"), 2LL))));
     strs = list<str>({str("a"), str("b")});
     print((strs.__contains__(str("a"))), (strs.__contains__(str("z"))));
@@ -1247,7 +1341,7 @@ int run() {
         print(str("missing"));
     }
     count = 0LL;
-    auto && __range_20 = list<_int>({1LL, 2LL, 3LL, 4LL});
+    auto && __range_20 = list<int64_t>({1LL, 2LL, 3LL, 4LL});
     for (auto __iter_20 = iter(__range_20); !__iter_20.done();) {
         x = next(__iter_20);
         if (to_bool((s.__contains__(x)))) {
@@ -1267,9 +1361,9 @@ void __init_module__() {
 }
 
 int run() {
-    _int a;
-    _int b;
-    _int c;
+    int64_t a;
+    int64_t b;
+    int64_t c;
     __init_module__();
     a = 1LL;
     b = 2LL;
@@ -1296,23 +1390,23 @@ void __init_module__() {
 }
 
 int run() {
-    set<_int> s;
-    set<_int> a;
-    set<_int> b;
-    set<_int> small;
-    set<_int> big;
-    set<_int> nine;
-    set<_int> c;
-    set<_int> d;
-    set<_int> keep;
-    set<_int> drop;
-    _int total;
-    _int x;
-    set<tuple<_int, _int>> s1;
-    set<tuple<_int, _int>> s2;
+    set<int64_t> s;
+    set<int64_t> a;
+    set<int64_t> b;
+    set<int64_t> small;
+    set<int64_t> big;
+    set<int64_t> nine;
+    set<int64_t> c;
+    set<int64_t> d;
+    set<int64_t> keep;
+    set<int64_t> drop;
+    int64_t total;
+    int64_t x;
+    set<tuple<int64_t, int64_t>> s1;
+    set<tuple<int64_t, int64_t>> s2;
     set<str> s3;
     __init_module__();
-    s = set<_int>({3LL, 1LL, 2LL, 1LL});
+    s = set<int64_t>({3LL, 1LL, 2LL, 1LL});
     print(len(s));
     print(sorted(s));
     print(_sorted_kwargs(true, s));
@@ -1324,8 +1418,8 @@ int run() {
     print(sorted(s));
     s.discard(99LL);
     print(sorted(s));
-    a = set<_int>({1LL, 2LL, 3LL});
-    b = set<_int>({3LL, 4LL});
+    a = set<int64_t>({1LL, 2LL, 3LL});
+    b = set<int64_t>({3LL, 4LL});
     print(sorted((a | b)));
     print(sorted((a & b)));
     print(sorted((a - b)));
@@ -1335,43 +1429,43 @@ int run() {
     print(sorted(a.difference(b)));
     print(sorted(a.symmetric_difference(b)));
     print(sorted(a), sorted(b));
-    small = set<_int>({1LL, 2LL});
-    big = set<_int>({1LL, 2LL, 3LL});
+    small = set<int64_t>({1LL, 2LL});
+    big = set<int64_t>({1LL, 2LL, 3LL});
     print(small.issubset(big));
     print(big.issuperset(small));
-    nine = set<_int>({9LL});
+    nine = set<int64_t>({9LL});
     print(small.isdisjoint(nine));
     print(small.isdisjoint(big));
     print(((small <= big)), ((small < big)));
     print(((big >= small)), ((big > small)));
-    print(((set<_int>({1LL, 2LL}) == set<_int>({2LL, 1LL}))));
+    print(((set<int64_t>({1LL, 2LL}) == set<int64_t>({2LL, 1LL}))));
     print(((small != big)));
     c = a.copy();
     c.add(99LL);
     print(sorted(a), sorted(c));
-    d = set<_int>({1LL, 2LL, 3LL});
-    d.update(set<_int>({4LL}));
+    d = set<int64_t>({1LL, 2LL, 3LL});
+    d.update(set<int64_t>({4LL}));
     print(sorted(d));
-    keep = set<_int>({2LL, 3LL, 4LL});
+    keep = set<int64_t>({2LL, 3LL, 4LL});
     d.intersection_update(keep);
     print(sorted(d));
-    drop = set<_int>({4LL});
+    drop = set<int64_t>({4LL});
     d.difference_update(drop);
     print(sorted(d));
-    d.symmetric_difference_update(set<_int>({3LL, 5LL}));
+    d.symmetric_difference_update(set<int64_t>({3LL, 5LL}));
     print(sorted(d));
     d.clear();
     print(len(d));
     total = 0LL;
-    auto && __range_21 = set<_int>({1LL, 2LL, 3LL});
+    auto && __range_21 = set<int64_t>({1LL, 2LL, 3LL});
     for (auto __iter_21 = iter(__range_21); !__iter_21.done();) {
         x = next(__iter_21);
         total = (total + x);
     }
     print(total);
-    s1 = set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(1LL, 3LL)});
+    s1 = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(1LL, 3LL)});
     print(sorted(s1));
-    s2 = set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(1LL, 2LL)});
+    s2 = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(1LL, 2LL)});
     print(sorted(s2));
     s3 = set<str>({str("Hello"), str("World")});
     print(sorted(s3));
@@ -1387,13 +1481,13 @@ void __init_module__() {
 }
 
 int run() {
-    list<_int> l;
-    list<_int> empty;
-    list<_int> original;
-    list<_int> copied;
+    list<int64_t> l;
+    list<int64_t> empty;
+    list<int64_t> original;
+    list<int64_t> copied;
     str s;
     __init_module__();
-    l = list<_int>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});
+    l = list<int64_t>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});
     print(l.__getitem__(slice(0LL, 1LL, std::nullopt)));
     print(l.__getitem__(slice(1LL, 4LL, std::nullopt)));
     print(l.__getitem__(slice(std::nullopt, 3LL, std::nullopt)));
@@ -1417,11 +1511,11 @@ int run() {
     print(l.__getitem__(slice(2LL, 2LL, std::nullopt)));
     print(l.__getitem__(slice(4LL, 1LL, std::nullopt)));
     print(l.__getitem__(slice(1LL, 4LL, (-1LL))));
-    empty = list<_int>();
+    empty = list<int64_t>();
     print(empty.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
     print(empty.__getitem__(slice(0LL, 5LL, std::nullopt)));
     print(empty.__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
-    original = list<_int>({1LL, 2LL, 3LL});
+    original = list<int64_t>({1LL, 2LL, 3LL});
     copied = copy(original.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
     copied.append(4LL);
     print(original, copied);
@@ -1539,13 +1633,13 @@ void __init_module__() {
 }
 
 int run() {
-    _int a;
-    _int b;
+    int64_t a;
+    int64_t b;
     str s1;
     str s2;
-    list<_int> empty;
-    list<_int> full;
-    _int n;
+    list<int64_t> empty;
+    list<int64_t> full;
+    int64_t n;
     __init_module__();
     a = 0LL;
     b = 5LL;
@@ -1571,8 +1665,8 @@ int run() {
     } else {
         print(str("s2 falsy"));
     }
-    empty = list<_int>();
-    full = list<_int>({1LL, 2LL, 3LL});
+    empty = list<int64_t>();
+    full = list<int64_t>({1LL, 2LL, 3LL});
     if (to_bool(empty)) {
         print(str("empty truthy"));
     } else {
@@ -1608,17 +1702,17 @@ void __init_module__() {
 }
 
 int run() {
-    _int a;
-    _int b;
-    _int x;
+    int64_t a;
+    int64_t b;
+    int64_t x;
     str s;
-    _int p;
-    _int q;
-    _int m;
-    _int n;
-    tuple<_int, _int> t;
-    tuple<_int, _int> t2;
-    _int z;
+    int64_t p;
+    int64_t q;
+    int64_t m;
+    int64_t n;
+    tuple<int64_t, int64_t> t;
+    tuple<int64_t, int64_t> t2;
+    int64_t z;
     __init_module__();
     destructure(a, b) = tuple(1LL, 2LL);
     print(str("Test 1 - Simple destructure:"), a, b);
@@ -1650,6 +1744,8 @@ int main(int argc, char** argv) {
     if (argc > 1 && std::strcmp(argv[1], "dict.py") == 0) return prog_dict::run();
     if (argc > 1 && std::strcmp(argv[1], "exceptions.py") == 0) return prog_exceptions::run();
     if (argc > 1 && std::strcmp(argv[1], "files.py") == 0) return prog_files::run();
+    if (argc > 1 && std::strcmp(argv[1], "fixed_width_int_promotion.py") == 0) return prog_fixed_width_int_promotion::run();
+    if (argc > 1 && std::strcmp(argv[1], "fixed_width_ints.py") == 0) return prog_fixed_width_ints::run();
     if (argc > 1 && std::strcmp(argv[1], "iter.py") == 0) return prog_iter::run();
     if (argc > 1 && std::strcmp(argv[1], "list.py") == 0) return prog_list::run();
     if (argc > 1 && std::strcmp(argv[1], "loops.py") == 0) return prog_loops::run();

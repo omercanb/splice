@@ -66,12 +66,31 @@ SCALAR_CONSTRUCTORS = {
     "float": "to_float",
     "bool": "to_bool",
     "str": "to_str",
+    "int8": "int8_t",
+    "uint8": "uint8_t",
+    "int16": "int16_t",
+    "uint16": "uint16_t",
+    "int32": "int32_t",
+    "uint32": "uint32_t",
+    "int64": "int64_t",
+    "uint64": "uint64_t",
 }
 
 # A constructor call with no arguments (list(), set()) gives C++ template
 # argument deduction nothing to work with, so these need their element type
 # spelled out explicitly rather than left to CTAD.
 EXPLICIT_TYPE_CONSTRUCTORS = {"list", "dict", "set"}
+
+FIXED_WIDTH_INT_TYPES = {
+    "splice.stdlib.int8": "int8_t",
+    "splice.stdlib.uint8": "uint8_t",
+    "splice.stdlib.int16": "int16_t",
+    "splice.stdlib.uint16": "uint16_t",
+    "splice.stdlib.int32": "int32_t",
+    "splice.stdlib.uint32": "uint32_t",
+    "splice.stdlib.int64": "int64_t",
+    "splice.stdlib.uint64": "uint64_t",
+}
 
 # Exceptions catchable by an except clause (runtime/exceptions.h). Flat
 # hierarchy, so a base like LookupError has no equivalent and is rejected

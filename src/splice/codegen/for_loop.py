@@ -99,7 +99,7 @@ def for_range_len(
     assert isinstance(index, NameExpr)
     target = index.name
     inner_iter_expr = codegen.get_expr(inner_iterable)
-    stop = _hoist(codegen, f"len({inner_iter_expr})", "_int", "len")
+    stop = _hoist(codegen, f"len({inner_iter_expr})", "int64_t", "len")
     return LoopHeader(f"for ({target} = 0; {target} < {stop}; ++{target})")
 
 

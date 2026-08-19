@@ -349,6 +349,11 @@ inline str to_str(bool x) { return str(x ? "True" : "False"); }
 inline str to_str(const char *s) { return str(s); }
 inline str to_str(const std::string &s) { return str(s); }
 
+template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+inline str to_str(T x) {
+    return to_str(static_cast<_int>(x));
+}
+
 inline str PyException::__str__() const { return str(what()); }
 
 // Everything else is a class of ours, and renders itself: to_str() is the

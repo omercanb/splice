@@ -45,19 +45,19 @@ class A:
 """
 
 function_signatures = {
-    "simple": "_int simple(_int x)",
-    "with_defaults": 'str with_defaults(_int a, str b = str("hello"), _float c = 3.14)',
-    "multiple_params": "str multiple_params(_int x, _float y, bool z)",
+    "simple": "int64_t simple(int64_t x)",
+    "with_defaults": 'str with_defaults(int64_t a, str b = str("hello"), double c = 3.14)',
+    "multiple_params": "str multiple_params(int64_t x, double y, bool z)",
     "no_return": "void no_return()",
-    "returns_list": "list<str> returns_list(list<_int> items)",
-    "returns_dict": "dict<_int, str> returns_dict(dict<str, _int> d)",
-    "no_params": "_int no_params()",
-    "with_optional": "str with_optional(std::optional<_int> x)",
+    "returns_list": "list<str> returns_list(list<int64_t> items)",
+    "returns_dict": "dict<int64_t, str> returns_dict(dict<str, int64_t> d)",
+    "no_params": "int64_t no_params()",
+    "with_optional": "str with_optional(std::optional<int64_t> x)",
     "with_object": "B with_object(B x)",
 }
 
 class_name = "A"
-method_signatures = {"method": "_int method(_int other)"}
+method_signatures = {"method": "int64_t method(int64_t other)"}
 
 
 class TestFunctionSignatures:

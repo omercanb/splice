@@ -43,7 +43,19 @@ _MARKER_FULLNAME = "splice.stdlib._error_after_tree_transform"
 _COPY_FULLNAME = "splice.stdlib.copy"
 # A scalar is a plain C++ value with no indirection - copying one is free
 # and there's nothing for it to alias, so copy() adds nothing here.
-_SCALAR_TYPES = {"int", "float", "bool"}
+_SCALAR_TYPES = {
+    "int",
+    "float",
+    "bool",
+    "int8",
+    "uint8",
+    "int16",
+    "uint16",
+    "int32",
+    "uint32",
+    "int64",
+    "uint64",
+}
 
 
 def _is_copy_call(expr: Expression) -> bool:

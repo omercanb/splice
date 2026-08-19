@@ -16,3 +16,4 @@ tests/benchmarks/microbenchmarks/integers
 tests/benchmarks/microbenchmarks/exceptions
 tests/benchmarks/microbenchmarks/dicts
 tests/benchmarks/microbenchmarks/builtins
+/.mypy_cache_test

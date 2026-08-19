@@ -11,6 +11,9 @@ from mypy.types import (
     get_proper_type,
 )
 
+from splice.codegen.builtins import FIXED_WIDTH_INT_TYPES
+
+
 class UnsupportedType(Exception):
     """A mypy type with no C++ equivalent.
 
@@ -40,9 +43,9 @@ def cpp_type_name(t: Type) -> str:
         match t:
             # Builtin types
             case Instance(type=type_info) if type_info.fullname == "builtins.int":
-                return "_int"
+                return "int64_t"
             case Instance(type=type_info) if type_info.fullname == "builtins.float":
-                return "_float"
+                return "double"
             case Instance(type=type_info) if type_info.fullname == "builtins.str":
                 return "str"
             case Instance(type=type_info) if type_info.fullname == "builtins.bytes":
@@ -51,9 +54,11 @@ def cpp_type_name(t: Type) -> str:
             case Instance(type=type_info) if (
                 type_info.fullname == "typing.SupportsIndex"
             ):
-                return "_int"
+                return "int64_t"
             case Instance(type=type_info) if type_info.fullname == "builtins.bool":
                 return "bool"
+            case Instance(type=type_info) if type_info.fullname in FIXED_WIDTH_INT_TYPES:
+                return FIXED_WIDTH_INT_TYPES[type_info.fullname]
 
             # Container types
             case Instance(type=type_info, args=args) if (
