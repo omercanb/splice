@@ -33,5 +33,21 @@
     help: pass a copy so they can't alias:
             items.append(copy(items[0]))
   
+  program_aliasing_errors.py:22:5: error: `items` and `items` could alias, and aliasing is not permitted for mutable parameters
+  
+    22 |     items += items
+       |     ^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            items += copy(items)
+  
+  program_aliasing_errors.py:26:5: error: `matrix` and `matrix[0:1]` could alias, and aliasing is not permitted for mutable parameters
+  
+    26 |     matrix += matrix[0:1]
+       |     ^^^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            matrix += copy(matrix[0:1])
+  
   '''
 # ---

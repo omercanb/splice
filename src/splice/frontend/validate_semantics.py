@@ -7,7 +7,14 @@ from __future__ import annotations
 
 import itertools
 
-from mypy.nodes import CallExpr, Expression, MemberExpr, MypyFile
+from mypy.nodes import (
+    CallExpr,
+    Context,
+    Expression,
+    MemberExpr,
+    MypyFile,
+    OperatorAssignmentStmt,
+)
 from mypy.types import Type
 
 from splice.analysis.builtin_effects import builtin_operation_effect
@@ -57,6 +64,22 @@ class _SemanticsValidator(Traverser):
         super().visit_call_expr(o)
         self._enclosing_calls.pop()
 
+    def visit_operator_assignment_stmt(self, o: OperatorAssignmentStmt) -> None:
+        self.check_compound_assign_exclusivity(o)
+        super().visit_operator_assignment_stmt(o)
+
+    def check_compound_assign_exclusivity(self, o: OperatorAssignmentStmt) -> None:
+        """`l += l` can't structurally alias itself - a compound assignment
+        always mutates its target, same as append/extend do."""
+        claims: list[tuple[Expression, AccessPath, bool]] = []
+        lhs_path = get_access_path(o.lvalue)
+        if lhs_path is not None:
+            claims.append((o.lvalue, lhs_path, True))
+        rhs_path = get_access_path(o.rvalue)
+        if rhs_path is not None:
+            claims.append((o.rvalue, rhs_path, False))
+        self._check_claims(o, claims)
+
     def check_exclusivity(self, o: CallExpr) -> None:
         """Two arguments to one call (self included) can't structurally
         alias if at least one binds to a mutable parameter."""
@@ -85,7 +108,7 @@ class _SemanticsValidator(Traverser):
         self._check_claims(o, claims)
 
     def _check_claims(
-        self, o: CallExpr, claims: list[tuple[Expression, AccessPath, bool]]
+        self, o: Context, claims: list[tuple[Expression, AccessPath, bool]]
     ) -> None:
         for (expr1, path1, mut1), (expr2, path2, mut2) in itertools.combinations(
             claims, 2

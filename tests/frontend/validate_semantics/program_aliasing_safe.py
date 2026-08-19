@@ -28,3 +28,7 @@ def builtin_read_only_alias_ok(items: list[int]) -> None:
 
 def no_alias_via_copy(items: list[int]) -> None:
     mutate(items.copy(), items)
+
+
+def compound_assign_no_alias(a: list[int], b: list[int]) -> None:
+    a += b

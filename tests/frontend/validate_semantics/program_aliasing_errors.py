@@ -16,3 +16,11 @@ def builtin_extend_self_alias(items: list[int]) -> None:
 
 def builtin_append_nested_alias(items: list[int]) -> None:
     items.append(items[0])
+
+
+def compound_assign_self_alias(items: list[int]) -> None:
+    items += items
+
+
+def compound_assign_nested_alias(matrix: list[list[int]]) -> None:
+    matrix += matrix[0:1]
