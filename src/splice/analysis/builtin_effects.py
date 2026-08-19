@@ -6,16 +6,25 @@ Includes handling for builtin methods, literal expressions like [1, 2, 3] and co
 
 from dataclasses import dataclass
 
+from mypy.types import Instance, Type, get_proper_type
+
 
 @dataclass(frozen=True)
 class OperationEffect:
     mutates: bool
     allocates: bool
+    # Which positional argument indices this operation mutates, self counted
+    # as index 0 for a method call. Every current entry only ever mutates
+    # self, but this is tracked by index rather than assumed, so a future
+    # operation that mutates a different argument is handled the same way.
+    mutated_args: frozenset[int] = frozenset()
 
 
 READS = OperationEffect(mutates=False, allocates=False)
-MUTATES_ONLY = OperationEffect(mutates=True, allocates=False)
-MUTATES_AND_ALLOCATES = OperationEffect(mutates=True, allocates=True)
+MUTATES_ONLY = OperationEffect(mutates=True, allocates=False, mutated_args=frozenset({0}))
+MUTATES_AND_ALLOCATES = OperationEffect(
+    mutates=True, allocates=True, mutated_args=frozenset({0})
+)
 ALLOCATES_ONLY = OperationEffect(mutates=False, allocates=True)
 
 # str and bytes have no mutating methods at all
@@ -75,9 +84,18 @@ BUILTIN_OPERATION_EFFECTS: dict[tuple[str, str], OperationEffect] = {
 }
 
 
-def builtin_operation_effect(
-    container_type: str, method_name: str
-) -> OperationEffect | None:
+def type_name(t: Type | None) -> str | None:
+    """The class name if t is an object, otherwise None."""
+    if t is None:
+        return None
+    proper = get_proper_type(t)
+    return proper.type.name if isinstance(proper, Instance) else None
+
+
+def builtin_operation_effect(t: Type | None, method_name: str) -> OperationEffect | None:
+    container_type = type_name(t)
+    if container_type is None:
+        return None
     if container_type in STRUCTURALLY_IMMUTABLE_TYPES:
         return READS
     return BUILTIN_OPERATION_EFFECTS.get((container_type, method_name))

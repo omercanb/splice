@@ -23,13 +23,14 @@ from mypy.nodes import (
     SetExpr,
     Statement,
 )
-from mypy.types import Instance, Type, get_proper_type
+from mypy.types import Type
 
 from splice.analysis.builtin_effects import (
     ALLOCATES_ONLY,
     OperationEffect,
     builtin_operation_effect,
     compound_assignment_effect,
+    type_name,
 )
 from splice.codegen.class_def import methods as class_methods
 from splice.ast_utils import TypeTable
@@ -44,14 +45,6 @@ class ExpressionEffect:
     effect: OperationEffect
 
 
-def _type_name(t: Type | None) -> str | None:
-    """Returns the name of the class if t is an object"""
-    if t is None:
-        return None
-    proper = get_proper_type(t)
-    return proper.type.name if isinstance(proper, Instance) else None
-
-
 class _StatementWalker(Traverser):
     """Finds builtins that allocate and mutate inside a statement"""
 
@@ -61,11 +54,8 @@ class _StatementWalker(Traverser):
 
     def visit_call_expr(self, o: CallExpr) -> None:
         if isinstance(o.callee, MemberExpr):
-            receiver_type = _type_name(self.types.get(o.callee.expr))
-            effect = (
-                builtin_operation_effect(receiver_type, o.callee.name)
-                if receiver_type is not None
-                else None
+            effect = builtin_operation_effect(
+                self.types.get(o.callee.expr), o.callee.name
             )
             if effect is not None:
                 self.findings.append(ExpressionEffect(o.callee, effect))
@@ -76,7 +66,7 @@ class _StatementWalker(Traverser):
         super().visit_call_expr(o)
 
     def visit_operator_assignment_stmt(self, o: OperatorAssignmentStmt) -> None:
-        lvalue_type = _type_name(self.types.get(o.lvalue))
+        lvalue_type = type_name(self.types.get(o.lvalue))
         self.findings.append(
             ExpressionEffect(o.lvalue, compound_assignment_effect(lvalue_type or ""))
         )

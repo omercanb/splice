@@ -1,0 +1,37 @@
+# serializer version: 1
+# name: test_aliasing_errors
+  '''
+  program_aliasing_errors.py:6:5: error: `items` and `items` could alias, and aliasing is not permitted for mutable parameters
+  
+    6 |     mutate(items, items)
+      |     ^^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            mutate(items, copy(items))
+  
+  program_aliasing_errors.py:10:5: error: `matrix[0]` and `matrix[0]` could alias, and aliasing is not permitted for mutable parameters
+  
+    10 |     mutate(matrix[0], matrix[0])
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            mutate(matrix[0], copy(matrix[0]))
+  
+  program_aliasing_errors.py:14:5: error: `items` and `items` could alias, and aliasing is not permitted for mutable parameters
+  
+    14 |     items.extend(items)
+       |     ^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            items.extend(copy(items))
+  
+  program_aliasing_errors.py:18:5: error: `items` and `items[0]` could alias, and aliasing is not permitted for mutable parameters
+  
+    18 |     items.append(items[0])
+       |     ^^^^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            items.append(copy(items[0]))
+  
+  '''
+# ---

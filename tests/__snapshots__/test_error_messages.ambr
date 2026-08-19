@@ -6,8 +6,20 @@
     6 |     mutate(matrix[0], matrix[0][0])
       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-    help: pass a copy instead so they can't alias:
-            matrix[0][0] = copy(matrix[0][0])
+    help: pass a copy so they can't alias:
+            mutate(matrix[0], copy(matrix[0][0]))
+  
+  '''
+# ---
+# name: test_error_message[aliasing_arguments_builtin.py]
+  '''
+  aliasing_arguments_builtin.py:2:5: error: `l` and `l[0]` could alias, and aliasing is not permitted for mutable parameters
+  
+    2 |     l.append(l[0])
+      |     ^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            l.append(copy(l[0]))
   
   '''
 # ---

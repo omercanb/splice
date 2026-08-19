@@ -1,48 +1,75 @@
+from mypy.nodes import FuncDef
+from mypy.types import Type
+
 from splice.analysis.builtin_effects import (
     builtin_operation_effect,
     compound_assignment_effect,
 )
+from splice.pipeline import analyse
+
+
+def _param_type(source: str) -> Type:
+    """The type of `x`, the first parameter of the first function in source."""
+    program = analyse("t.py", source)
+    funcdef = next(d for d in program.tree.defs if isinstance(d, FuncDef))
+    param_type = funcdef.arguments[0].variable.type
+    assert param_type is not None
+    return param_type
 
 
 def test_read_only_operation_has_no_effect():
-    effect = builtin_operation_effect("list", "__getitem__")
+    t = _param_type("def f(x: list[int]) -> None: pass\n")
+    effect = builtin_operation_effect(t, "__getitem__")
     assert effect is not None
     assert not effect.mutates
     assert not effect.allocates
 
 
 def test_in_place_write_mutates_without_allocating():
-    effect = builtin_operation_effect("list", "__setitem__")
+    t = _param_type("def f(x: list[int]) -> None: pass\n")
+    effect = builtin_operation_effect(t, "__setitem__")
     assert effect is not None
     assert effect.mutates
     assert not effect.allocates
 
 
 def test_growing_operation_mutates_and_allocates():
-    effect = builtin_operation_effect("list", "append")
+    t = _param_type("def f(x: list[int]) -> None: pass\n")
+    effect = builtin_operation_effect(t, "append")
     assert effect is not None
     assert effect.mutates
     assert effect.allocates
 
 
 def test_new_value_from_existing_allocates_without_mutating():
-    effect = builtin_operation_effect("dict", "keys")
+    t = _param_type("def f(x: dict[str, int]) -> None: pass\n")
+    effect = builtin_operation_effect(t, "keys")
     assert effect is not None
     assert not effect.mutates
     assert effect.allocates
 
 
 def test_str_and_bytes_have_no_mutating_method():
-    for container_type in ("str", "bytes"):
+    for annotation in ("str", "bytes"):
+        t = _param_type(f"def f(x: {annotation}) -> None: pass\n")
         for method_name in ("upper", "strip", "split", "anything_at_all"):
-            effect = builtin_operation_effect(container_type, method_name)
+            effect = builtin_operation_effect(t, method_name)
             assert effect is not None
             assert not effect.mutates
 
 
 def test_unknown_operation_returns_none():
-    assert builtin_operation_effect("list", "sort_by_magic") is None
-    assert builtin_operation_effect("Widget", "append") is None
+    list_type = _param_type("def f(x: list[int]) -> None: pass\n")
+    assert builtin_operation_effect(list_type, "sort_by_magic") is None
+
+    widget_type = _param_type(
+        "class Widget:\n"
+        "    def __init__(self) -> None:\n"
+        "        pass\n"
+        "\n"
+        "def f(x: Widget) -> None: pass\n"
+    )
+    assert builtin_operation_effect(widget_type, "append") is None
 
 
 def test_compound_assign_always_mutates():

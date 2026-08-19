@@ -72,7 +72,7 @@ def is_access_path_structural_alias(
 
         elif isinstance(projection1, MemberExpr) and isinstance(
             projection2, MemberExpr
-        ):
+        ):  # Both a field access
             if projection1.name != projection2.name:
                 # Different fields means no aliasing
                 return None

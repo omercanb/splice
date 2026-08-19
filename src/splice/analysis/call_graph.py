@@ -75,7 +75,7 @@ def match_call_arguments(o: CallExpr, types: TypeTable) -> list[tuple[Expression
         return [self_binding] + list(zip(o.args, params[1:]))
 
     if isinstance(o.callee, NameExpr) and isinstance(o.callee.node, TypeInfo):
-        # Constructor Call
+        # Constructor Call (remove the self param)
         params = params[1:]
 
     return list(zip(o.args, params))
