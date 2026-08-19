@@ -41,7 +41,7 @@ def _pair_expr(funcdef: FuncDef) -> tuple[Expression, Expression]:
 
 
 def test_structural_alias(snapshot):
-    program = analyse(str(test_file), open(test_file).read())
+    program = analyse(str(test_file), open(test_file).read(), check_semantics=False)
     functions = {d.name: d for d in program.tree.defs if isinstance(d, FuncDef)}
 
     def paths(name: str) -> tuple[AccessPath, AccessPath]:

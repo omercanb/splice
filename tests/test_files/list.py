@@ -1,8 +1,11 @@
+from splice.stdlib import copy
+
+
 def give_list(l: list[int]) -> list[int]:
     print(l)
     l.append(2)
     print(l)
-    return l
+    return copy(l)
 
 
 def main() -> int:
@@ -24,7 +27,7 @@ def main() -> int:
     l[0] = 2
     print(l)
 
-    l2 = l[0:1]
+    l2 = copy(l[0:1])
     print(l2)
 
     l.insert(0, 100)

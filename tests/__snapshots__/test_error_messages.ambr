@@ -185,6 +185,18 @@
   
   '''
 # ---
+# name: test_error_message[missing_copy.py]
+  '''
+  missing_copy.py:2:5: error: `a` needs an explicit copy here
+  
+    2 |     return a
+      |     ^^^^^^^^
+  
+    help: wrap it in copy():
+            copy(a)
+  
+  '''
+# ---
 # name: test_error_message[mixed_bool_op.py]
   '''
   mixed_bool_op.py:6:13: error: `or` on unrelated types has no single C++ type

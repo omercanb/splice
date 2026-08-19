@@ -972,7 +972,7 @@ int run() {
         destructure(x, y) = next(__iter_16);
         print(x, y);
     }
-    nums = a;
+    nums = copy(a);
     for (auto __iter_17 = iter(enumerate(nums)); !__iter_17.done();) {
         destructure(i, n) = next(__iter_17);
         print(i, n);
@@ -993,7 +993,7 @@ ptr<list<_int>> give_list(ptr<list<_int>> l) {
     print(l);
     l->append(2LL);
     print(l);
-    return l;
+    return copy(l);
 }
 
 int run() {
@@ -1024,7 +1024,7 @@ int run() {
     print(l);
     l->__setitem__(0LL, 2LL);
     print(l);
-    l2 = l->__getitem__(slice(0LL, 1LL, std::nullopt));
+    l2 = copy(l->__getitem__(slice(0LL, 1LL, std::nullopt)));
     print(l2);
     l->insert(0LL, 100LL);
     print(l);
@@ -1403,7 +1403,7 @@ int run() {
     print(empty->__getitem__(slice(0LL, 5LL, std::nullopt)));
     print(empty->__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
     original = ptr(new list<_int>({1LL, 2LL, 3LL}));
-    copied = original->__getitem__(slice(std::nullopt, std::nullopt, std::nullopt));
+    copied = copy(original->__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
     copied->append(4LL);
     print(original, copied);
     s = str("abcdef");
@@ -1610,7 +1610,7 @@ int run() {
     destructure(m, n) = tuple(p, q);
     print(str("Test 4 - Chained destructure:"), m, n);
     t = tuple(1LL, 2LL);
-    t2 = t;
+    t2 = copy(t);
     z = t.get<0>();
     z = t.get<1>();
     return 0LL;

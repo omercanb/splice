@@ -1,3 +1,6 @@
+from splice.stdlib import copy
+
+
 def main() -> int:
     l = [0, 1, 2, 3, 4, 5]
 
@@ -39,7 +42,7 @@ def main() -> int:
 
     # a slice is a copy: mutating it leaves the original alone
     original = [1, 2, 3]
-    copied = original[:]
+    copied = copy(original[:])
     copied.append(4)
     print(original, copied)
 

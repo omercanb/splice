@@ -30,7 +30,7 @@ def _format_access_path(name: str, expr: Expression) -> str:
 
 
 def test_access_path(snapshot):
-    program = analyse(str(test_file), open(test_file).read())
+    program = analyse(str(test_file), open(test_file).read(), check_semantics=False)
 
     lines: list[str] = []
     for definition in program.tree.defs:

@@ -1,0 +1,37 @@
+# serializer version: 1
+# name: test_hand_off_errors
+  '''
+  program_hand_off_errors.py:2:5: error: `a` needs an explicit copy here
+  
+    2 |     return a
+      |     ^^^^^^^^
+  
+    help: wrap it in copy():
+            copy(a)
+  
+  program_hand_off_errors.py:6:5: error: `a[0:1]` needs an explicit copy here
+  
+    6 |     return a[0:1]
+      |     ^^^^^^^^^^^^^
+  
+    help: wrap it in copy():
+            copy(a[0:1])
+  
+  program_hand_off_errors.py:11:5: error: `a` needs an explicit copy here
+  
+    11 |     b = a
+       |     ^^^^^
+  
+    help: wrap it in copy():
+            copy(a)
+  
+  program_hand_off_errors.py:23:5: error: `b.value` needs an explicit copy here
+  
+    23 |     return b.value
+       |     ^^^^^^^^^^^^^^
+  
+    help: wrap it in copy():
+            copy(b.value)
+  
+  '''
+# ---

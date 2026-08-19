@@ -1,3 +1,6 @@
+from splice.stdlib import copy
+
+
 def main() -> int:
     # Test 1: Simple tuple destructuring
     a, b = (1, 2)
@@ -17,7 +20,7 @@ def main() -> int:
     print("Test 4 - Chained destructure:", m, n)
 
     t = (1, 2)
-    t2 = t
+    t2 = copy(t)
 
     z = t[0]
     z = t[1]

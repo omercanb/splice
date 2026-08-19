@@ -45,7 +45,7 @@ class CallGraphProducer(Traverser):
         self.current_function = None
 
     def visit_call_expr(self, o: CallExpr):
-        if not is_call_builtin(o, self.types):
+        if not is_call_builtin(o, self.types) and not is_call_splice_intrinsic(o):
             callee = resolve_funcdef(o, self.types)
             if callee is not None:
                 bindings = match_call_arguments(o, self.types)
@@ -135,3 +135,14 @@ def is_call_builtin(o: CallExpr, types: TypeTable):
         assert isinstance(t, Instance)
         return t.type.fullname.startswith("builtins.")
     assert False
+
+
+def is_call_splice_intrinsic(o: CallExpr) -> bool:
+    """A call to something defined in splice.stdlib (eg. copy()). These
+    have a real Python body for running under plain CPython, but are never
+    actually compiled from it - codegen emits a hand-written C++
+    implementation instead, the same way a real builtin does.
+    """
+    return isinstance(o.callee, NameExpr) and o.callee.fullname.startswith(
+        "splice.stdlib."
+    )

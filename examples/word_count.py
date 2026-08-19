@@ -7,6 +7,8 @@
 # Helpers come before their callers: the generated C++ is emitted in source
 # order, and C++ needs a declaration before use.
 
+from splice.stdlib import copy
+
 
 def clean_word(raw: str) -> str:
     """Strip surrounding punctuation and normalise case."""
@@ -67,7 +69,7 @@ def merge_counts(per_file: dict[str, dict[str, int]]) -> dict[str, int]:
     """Fold every per-file counter into one total counter."""
     total: dict[str, int] = {}
     for name in per_file:
-        counts = per_file[name]
+        counts = copy(per_file[name])
         for word in counts:
             total[word] = total.get(word, 0) + counts[word]
     return total
@@ -90,7 +92,7 @@ def words_shared_by_all(per_file: dict[str, dict[str, int]]) -> list[str]:
         for word in per_file[name]:
             current.add(word)
         if first:
-            shared = current
+            shared = copy(current)
             first = False
         else:
             shared = shared & current

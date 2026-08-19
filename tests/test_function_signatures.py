@@ -65,7 +65,7 @@ class TestFunctionSignatures:
 
     @classmethod
     def setup_class(cls):
-        result = analyse(None, test_code)
+        result = analyse(None, test_code, check_semantics=False)
         cls.tree = result.tree
         cls.types = result.types
         cls.expr_translator = ExpressionCodegen(result.types)

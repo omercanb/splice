@@ -78,11 +78,17 @@ def _set_global_function_fallback(result: build.BuildResult):
     function_fallback = Instance(function_type_info, [])
 
 
-def analyse(path: str | None, source: str) -> AnalysisResult:
+def analyse(
+    path: str | None, source: str, check_semantics: bool = True
+) -> AnalysisResult:
     """
     The mypy analysis pass
     Does type inference, defines classes, resolves names
     Does some additional work on top of just running mypy
+
+    check_semantics=False skips the value-semantics checks (copy(),
+    exclusivity, ...) while still returning the fully transformed tree -
+    for tools and tests that only need the tree, not a verdict on it.
     """
     # Path is an optional parameter because it's only used for error messages
     result = build.build(
@@ -109,10 +115,11 @@ def analyse(path: str | None, source: str) -> AnalysisResult:
     call_graph = compute_call_graph(tree, types)
     mutations = compute_mutating_parameters(function_effects, call_graph)
 
-    semantics_diagnostics = validate_semantics(tree, mutations, types, source)
-    if semantics_diagnostics:
-        print(render(semantics_diagnostics, source, path))
-        raise UnsupportedProgram(semantics_diagnostics)
+    if check_semantics:
+        semantics_diagnostics = validate_semantics(tree, mutations, types, source)
+        if semantics_diagnostics:
+            print(render(semantics_diagnostics, source, path))
+            raise UnsupportedProgram(semantics_diagnostics)
 
     return AnalysisResult(result.files["main"], types, source, path)
 
