@@ -7,11 +7,11 @@
 #include "exceptions.h"
 #include "hash.h"
 #include "list.h"
-#include "ptr.h"
 #include "str.h"
 #include "types.h"
 #include <initializer_list>
 #include <string>
+#include <type_traits>
 #include <unordered_set>
 
 namespace py {
@@ -24,7 +24,17 @@ template <typename T> class set {
     set() = default;
     set(std::initializer_list<T> init) : data_(init) {}
 
-    template <typename IterableType> set(IterableType &&iterable) {
+    // enable_if turns this constructor off when IterableType is set<T>
+    // itself. Without it, a plain set<T> lvalue would also match this
+    // template, and it would beat the real copy constructor: binding a
+    // non-const lvalue here needs no extra qualification, while the copy
+    // constructor's `const set<T>&` does, so the copy constructor loses.
+    // `set<T> b = a;` would then rebuild b element by element through the
+    // iterator protocol instead of copying it.
+    template <typename IterableType,
+              typename = std::enable_if_t<
+                  !std::is_same_v<std::decay_t<IterableType>, set<T>>>>
+    set(IterableType &&iterable) {
         auto it = py::iter(iterable);
         while (!it.done()) {
             data_.insert(it.current());
@@ -59,23 +69,23 @@ template <typename T> class set {
 
     void clear() noexcept { data_.clear(); }
 
-    void update(const ptr<set<T>> &other) {
-        for (const auto &v : other->data_)
+    void update(const set<T> &other) {
+        for (const auto &v : other.data_)
             data_.insert(v);
     }
-    void intersection_update(const ptr<set<T>> &other) {
+    void intersection_update(const set<T> &other) {
         std::unordered_set<T, hasher<T>> kept;
         for (const auto &v : data_)
-            if (other->__contains__(v))
+            if (other.__contains__(v))
                 kept.insert(v);
         data_ = std::move(kept);
     }
-    void difference_update(const ptr<set<T>> &other) {
-        for (const auto &v : other->data_)
+    void difference_update(const set<T> &other) {
+        for (const auto &v : other.data_)
             data_.erase(v);
     }
-    void symmetric_difference_update(const ptr<set<T>> &other) {
-        for (const auto &v : other->data_) {
+    void symmetric_difference_update(const set<T> &other) {
+        for (const auto &v : other.data_) {
             if (data_.find(v) != data_.end())
                 data_.erase(v);
             else
@@ -84,48 +94,48 @@ template <typename T> class set {
     }
 
     // `union` is a C++ keyword; codegen rewrites s.union(...) to union_.
-    ptr<set<T>> union_(const ptr<set<T>> &other) const {
-        auto out = ptr(new set<T>(*this));
-        out->update(other);
+    set<T> union_(const set<T> &other) const {
+        set<T> out = *this;
+        out.update(other);
         return out;
     }
-    ptr<set<T>> intersection(const ptr<set<T>> &other) const {
-        auto out = ptr(new set<T>());
+    set<T> intersection(const set<T> &other) const {
+        set<T> out;
         for (const auto &v : data_)
-            if (other->__contains__(v))
-                out->add(v);
+            if (other.__contains__(v))
+                out.add(v);
         return out;
     }
-    ptr<set<T>> difference(const ptr<set<T>> &other) const {
-        auto out = ptr(new set<T>());
+    set<T> difference(const set<T> &other) const {
+        set<T> out;
         for (const auto &v : data_)
-            if (!other->__contains__(v))
-                out->add(v);
+            if (!other.__contains__(v))
+                out.add(v);
         return out;
     }
-    ptr<set<T>> symmetric_difference(const ptr<set<T>> &other) const {
-        auto out = ptr(new set<T>(*this));
-        out->symmetric_difference_update(other);
+    set<T> symmetric_difference(const set<T> &other) const {
+        set<T> out = *this;
+        out.symmetric_difference_update(other);
         return out;
     }
 
-    ptr<set<T>> copy() const { return ptr(new set<T>(*this)); }
+    set<T> copy() const { return *this; }
 
-    bool issubset(const ptr<set<T>> &other) const {
+    bool issubset(const set<T> &other) const {
         for (const auto &v : data_)
-            if (!other->__contains__(v))
+            if (!other.__contains__(v))
                 return false;
         return true;
     }
-    bool issuperset(const ptr<set<T>> &other) const {
-        for (const auto &v : other->raw())
+    bool issuperset(const set<T> &other) const {
+        for (const auto &v : other.raw())
             if (!__contains__(v))
                 return false;
         return true;
     }
-    bool isdisjoint(const ptr<set<T>> &other) const {
+    bool isdisjoint(const set<T> &other) const {
         for (const auto &v : data_)
-            if (other->__contains__(v))
+            if (other.__contains__(v))
                 return false;
         return true;
     }
@@ -183,60 +193,35 @@ template <typename T> auto iter(const set<T> &s) { return s.iter(); }
 
 template <typename T> inline _int len(const set<T> &s) { return s.__len__(); }
 
-// Sets are pointer-wrapped, so the operators live on ptr<set<T>>.
 template <typename T>
-ptr<set<T>> operator|(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return a->union_(b);
+set<T> operator|(const set<T> &a, const set<T> &b) {
+    return a.union_(b);
 }
 template <typename T>
-ptr<set<T>> operator&(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return a->intersection(b);
+set<T> operator&(const set<T> &a, const set<T> &b) {
+    return a.intersection(b);
 }
 template <typename T>
-ptr<set<T>> operator-(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return a->difference(b);
+set<T> operator-(const set<T> &a, const set<T> &b) {
+    return a.difference(b);
 }
 template <typename T>
-ptr<set<T>> operator^(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return a->symmetric_difference(b);
-}
-template <typename T>
-bool operator==(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return *a == *b;
-}
-template <typename T>
-bool operator!=(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return *a != *b;
-}
-template <typename T>
-bool operator<=(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return *a <= *b;
-}
-template <typename T>
-bool operator<(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return *a < *b;
-}
-template <typename T>
-bool operator>=(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return *a >= *b;
-}
-template <typename T>
-bool operator>(const ptr<set<T>> &a, const ptr<set<T>> &b) {
-    return *a > *b;
+set<T> operator^(const set<T> &a, const set<T> &b) {
+    return a.symmetric_difference(b);
 }
 
 // sorted() is how a program gets a stable view of an unordered set.
-template <typename T> ptr<list<T>> sorted(const ptr<set<T>> &s) {
-    auto out = ptr(new list<T>());
-    for (const auto &v : s->raw())
-        out->append(v);
-    out->sort();
+template <typename T> list<T> sorted(const set<T> &s) {
+    list<T> out;
+    for (const auto &v : s.raw())
+        out.append(v);
+    out.sort();
     return out;
 }
 template <typename T>
-ptr<list<T>> _sorted_kwargs(bool reverse, const ptr<set<T>> &s) {
+list<T> _sorted_kwargs(bool reverse, const set<T> &s) {
     auto out = sorted(s);
-    out->sort(reverse);
+    out.sort(reverse);
     return out;
 }
 

@@ -38,7 +38,6 @@ NOT_PRINTABLE = {
     "bytes_iterator": "iteration state, never reachable from Python",
     "tuple_iterator": "iteration state, never reachable from Python",
     "range_iterator": "iteration state, never reachable from Python",
-    "owning_iter": "iteration state, never reachable from Python",
     "enumerate_iter": "iteration state, never reachable from Python",
     "zip_iter": "iteration state, never reachable from Python",
     "map_iter": "iteration state, never reachable from Python",

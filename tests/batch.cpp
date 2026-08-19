@@ -8,7 +8,6 @@
 #include "list.h"
 #include "mathops.h"
 #include "print.h"
-#include "ptr.h"
 #include "scalars.h"
 #include "set.h"
 #include "slice.h"
@@ -37,7 +36,7 @@ int run() {
     _int zero;
     str empty;
     str text;
-    ptr<list<_int>> no_items;
+    list<_int> no_items;
     _float f;
     _float g;
     _int n;
@@ -57,11 +56,11 @@ int run() {
     print(_and(text, empty));
     print(_or(text, empty));
     print(_and(empty, text));
-    no_items = ptr(new list<_int>());
-    print(_or(no_items, ptr(new list<_int>({1LL, 2LL}))));
-    print(_and(ptr(new list<_int>({3LL})), no_items));
-    print(_or(ptr(new list<_int>({3LL})), ptr(new list<_int>({4LL}))));
-    print(_and(no_items, ptr(new list<_int>({4LL}))));
+    no_items = list<_int>();
+    print(_or(no_items, list<_int>({1LL, 2LL})));
+    print(_and(list<_int>({3LL}), no_items));
+    print(_or(list<_int>({3LL}), list<_int>({4LL})));
+    print(_and(no_items, list<_int>({4LL})));
     f = 0.0;
     g = 2.5;
     print(_or(f, g));
@@ -107,41 +106,42 @@ int run() {
 }
 
 namespace prog_builtin_functions {
-ptr<list<_int>> __list_comprehension_0(ptr<list<_int>> numbers);
+list<_int> __list_comprehension_0(list<_int> numbers);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-ptr<list<_int>> __list_comprehension_0(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_0;
+list<_int> __list_comprehension_0(list<_int> numbers) {
+    list<_int> __tmp_0;
     _int v;
-    __tmp_0 = ptr(new list<_int>());
-    for (auto __iter_0 = iter(numbers); !__iter_0.done();) {
+    __tmp_0 = list<_int>();
+    auto && __range_0 = numbers;
+    for (auto __iter_0 = iter(__range_0); !__iter_0.done();) {
         v = next(__iter_0);
-        __tmp_0->append((v * 2LL));
+        __tmp_0.append((v * 2LL));
     }
     return __tmp_0;
 }
 
 int run() {
-    ptr<list<_int>> numbers;
-    ptr<list<_int>> empty;
-    ptr<list<_int>> zeros;
-    ptr<list<_int>> with_zero;
+    list<_int> numbers;
+    list<_int> empty;
+    list<_int> zeros;
+    list<_int> with_zero;
     __init_module__();
-    numbers = ptr(new list<_int>({4LL, 1LL, 7LL, 3LL}));
-    empty = ptr(new list<_int>());
+    numbers = list<_int>({4LL, 1LL, 7LL, 3LL});
+    empty = list<_int>();
     print(sum(numbers), sum(empty));
     print(min(numbers), max(numbers));
     print(min(3LL, 8LL), max(3LL, 8LL), min(2.5, 1.5));
-    zeros = ptr(new list<_int>({0LL, 0LL}));
-    with_zero = ptr(new list<_int>({1LL, 0LL, 2LL}));
+    zeros = list<_int>({0LL, 0LL});
+    with_zero = list<_int>({1LL, 0LL, 2LL});
     print(any(numbers), any(zeros), any(empty));
     print(all(numbers), all(with_zero), all(empty));
     print(sum(range(5LL)), max(range(5LL)));
-    print(sum(ptr(new set<_int>({1LL, 2LL, 3LL}))));
+    print(sum(set<_int>({1LL, 2LL, 3LL})));
     print(min(str("hello")), max(str("hello")));
     print(divmod(7LL, 2LL), divmod((-7LL), 2LL));
     print(py::round(2.5), py::round(3.5), py::round((-2.5)));
@@ -224,17 +224,19 @@ int run() {
     print((b.__contains__(87LL)));
     print((b.__contains__(90LL)));
     print(bytes(3LL));
-    print(bytes(ptr(new list<_int>({65LL, 66LL, 67LL}))));
+    print(bytes(list<_int>({65LL, 66LL, 67LL})));
     total = 0LL;
-    for (auto __iter_1 = iter(bytes(std::string("abc", 3))); !__iter_1.done();) {
+    auto && __range_1 = bytes(std::string("abc", 3));
+    for (auto __iter_1 = iter(__range_1); !__iter_1.done();) {
         byte = next(__iter_1);
         total += byte;
     }
     print(total);
     joined = bytes(std::string("", 0));
-    for (auto __iter_2 = iter(bytes(std::string("abc", 3))); !__iter_2.done();) {
+    auto && __range_2 = bytes(std::string("abc", 3));
+    for (auto __iter_2 = iter(__range_2); !__iter_2.done();) {
         byte = next(__iter_2);
-        joined = ((joined + bytes(ptr(new list<_int>({byte})))) + bytes(std::string(".", 1)));
+        joined = ((joined + bytes(list<_int>({byte}))) + bytes(std::string(".", 1)));
     }
     print(joined);
     return 0LL;
@@ -285,6 +287,8 @@ class Counter {
 
     Counter(_int start) { __init__(start); }
 
+    Counter() = default;
+
     void __init__(_int start);
     void bump(_int by);
     _int doubled();
@@ -297,9 +301,11 @@ class Point {
 
     Point(_int x, _int y) { __init__(x, y); }
 
+    Point() = default;
+
     void __init__(_int x, _int y);
     _int norm();
-    ptr<Point> moved(_int dx, _int dy);
+    Point moved(_int dx, _int dy);
     str __str__();
     _int __len__();
     bool __bool__();
@@ -330,8 +336,8 @@ _int Point::norm() {
     return ((this->x * this->x) + (this->y * this->y));
 }
 
-ptr<Point> Point::moved(_int dx, _int dy) {
-    return ptr(new Point((this->x + dx), (this->y + dy)));
+Point Point::moved(_int dx, _int dy) {
+    return Point((this->x + dx), (this->y + dy));
 }
 
 str Point::__str__() {
@@ -350,32 +356,33 @@ void __init_module__() {
 }
 
 int run() {
-    ptr<Counter> counter;
-    ptr<Point> p;
-    ptr<Point> q;
-    ptr<list<ptr<Point>>> points;
-    ptr<Point> point;
-    ptr<Empty> e;
+    Counter counter;
+    Point p;
+    Point q;
+    list<Point> points;
+    Point point;
+    Empty e;
     __init_module__();
-    counter = ptr(new Counter(5LL));
-    counter->bump(3LL);
-    print(counter->count, counter->doubled());
-    p = ptr(new Point(3LL, 4LL));
-    print(p->x, p->y, p->norm());
+    counter = Counter(5LL);
+    counter.bump(3LL);
+    print(counter.count, counter.doubled());
+    p = Point(3LL, 4LL);
+    print(p.x, p.y, p.norm());
     print(p);
     print(len(p));
-    print(to_bool(p), to_bool(ptr(new Point(0LL, 0LL))));
-    q = p->moved(1LL, 1LL);
-    print(q, q->norm());
-    p->x = 10LL;
-    print(p->x, p->norm());
-    points = ptr(new list<ptr<Point>>({ptr(new Point(1LL, 1LL)), ptr(new Point(2LL, 2LL))}));
-    for (auto __iter_3 = iter(points); !__iter_3.done();) {
+    print(to_bool(p), to_bool(Point(0LL, 0LL)));
+    q = p.moved(1LL, 1LL);
+    print(q, q.norm());
+    p.x = 10LL;
+    print(p.x, p.norm());
+    points = list<Point>({Point(1LL, 1LL), Point(2LL, 2LL)});
+    auto && __range_3 = points;
+    for (auto __iter_3 = iter(__range_3); !__iter_3.done();) {
         point = next(__iter_3);
-        print(point, point->norm());
+        print(point, point.norm());
     }
     print(len(points));
-    e = ptr(new Empty());
+    e = Empty();
     print((__is(e, e)));
     return 0LL;
 }
@@ -393,8 +400,8 @@ int run() {
     _int b;
     _int c;
     _int d;
-    ptr<list<_int>> l1;
-    ptr<list<_int>> l2;
+    list<_int> l1;
+    list<_int> l2;
     __init_module__();
     a = 1LL;
     b = 2LL;
@@ -406,8 +413,8 @@ int run() {
     print(((c <= d)));
     print(((a == d)));
     print(((c == d)));
-    l1 = ptr(new list<_int>({1LL, 2LL, 3LL}));
-    l2 = ptr(new list<_int>({1LL, 2LL, 3LL}));
+    l1 = list<_int>({1LL, 2LL, 3LL});
+    l2 = list<_int>({1LL, 2LL, 3LL});
     print((__is(l1, l1)));
     print((__is(l1, l2)));
     return 0LL;
@@ -415,192 +422,202 @@ int run() {
 }
 
 namespace prog_comprehensions {
-ptr<list<_int>> __list_comprehension_1(ptr<list<_int>> values, _int factor, _int offset);
-ptr<list<_int>> scaled(ptr<list<_int>> values, _int factor);
-ptr<list<_int>> __list_comprehension_2(ptr<list<_int>> numbers);
-ptr<list<_int>> __list_comprehension_3(ptr<list<_int>> numbers);
-ptr<list<_int>> __list_comprehension_4();
-ptr<list<_int>> __list_comprehension_5();
-ptr<list<_int>> __list_comprehension_6(ptr<list<_int>> numbers);
-ptr<set<_int>> __set_comprehension_0(ptr<list<_int>> numbers);
-ptr<dict<_int, _int>> __dict_comprehension_0(ptr<list<_int>> numbers);
-ptr<list<_int>> __list_comprehension_7(ptr<list<_int>> numbers);
-ptr<list<_int>> __list_comprehension_11(_int v);
-ptr<list<_int>> __list_comprehension_8(ptr<list<_int>> numbers);
-ptr<list<_int>> __list_comprehension_9(ptr<list<_int>> numbers);
-ptr<list<_int>> __list_comprehension_10(ptr<list<_int>> doubled);
+list<_int> __list_comprehension_1(list<_int> values, _int factor, _int offset);
+list<_int> scaled(list<_int> values, _int factor);
+list<_int> __list_comprehension_2(list<_int> numbers);
+list<_int> __list_comprehension_3(list<_int> numbers);
+list<_int> __list_comprehension_4();
+list<_int> __list_comprehension_5();
+list<_int> __list_comprehension_6(list<_int> numbers);
+set<_int> __set_comprehension_0(list<_int> numbers);
+dict<_int, _int> __dict_comprehension_0(list<_int> numbers);
+list<_int> __list_comprehension_7(list<_int> numbers);
+list<_int> __list_comprehension_11(_int v);
+list<_int> __list_comprehension_8(list<_int> numbers);
+list<_int> __list_comprehension_9(list<_int> numbers);
+list<_int> __list_comprehension_10(list<_int> doubled);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-ptr<list<_int>> __list_comprehension_1(ptr<list<_int>> values, _int factor, _int offset) {
-    ptr<list<_int>> __tmp_1;
+list<_int> __list_comprehension_1(list<_int> values, _int factor, _int offset) {
+    list<_int> __tmp_1;
     _int v;
-    __tmp_1 = ptr(new list<_int>());
-    for (auto __iter_4 = iter(values); !__iter_4.done();) {
+    __tmp_1 = list<_int>();
+    auto && __range_4 = values;
+    for (auto __iter_4 = iter(__range_4); !__iter_4.done();) {
         v = next(__iter_4);
-        __tmp_1->append(((v * factor) + offset));
+        __tmp_1.append(((v * factor) + offset));
     }
     return __tmp_1;
 }
 
-ptr<list<_int>> scaled(ptr<list<_int>> values, _int factor) {
+list<_int> scaled(list<_int> values, _int factor) {
     _int offset;
     offset = 1LL;
     return __list_comprehension_1(values, factor, offset);
 }
 
-ptr<list<_int>> __list_comprehension_2(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_2;
+list<_int> __list_comprehension_2(list<_int> numbers) {
+    list<_int> __tmp_2;
     _int v;
-    __tmp_2 = ptr(new list<_int>());
-    for (auto __iter_5 = iter(numbers); !__iter_5.done();) {
+    __tmp_2 = list<_int>();
+    auto && __range_5 = numbers;
+    for (auto __iter_5 = iter(__range_5); !__iter_5.done();) {
         v = next(__iter_5);
-        __tmp_2->append(v);
+        __tmp_2.append(v);
     }
     return __tmp_2;
 }
 
-ptr<list<_int>> __list_comprehension_3(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_3;
+list<_int> __list_comprehension_3(list<_int> numbers) {
+    list<_int> __tmp_3;
     _int v;
-    __tmp_3 = ptr(new list<_int>());
-    for (auto __iter_6 = iter(numbers); !__iter_6.done();) {
+    __tmp_3 = list<_int>();
+    auto && __range_6 = numbers;
+    for (auto __iter_6 = iter(__range_6); !__iter_6.done();) {
         v = next(__iter_6);
         if (to_bool(((v > 2LL)))) {
-            __tmp_3->append(v);
+            __tmp_3.append(v);
         }
     }
     return __tmp_3;
 }
 
-ptr<list<_int>> __list_comprehension_4() {
-    ptr<list<_int>> __tmp_4;
+list<_int> __list_comprehension_4() {
+    list<_int> __tmp_4;
     _int i;
-    __tmp_4 = ptr(new list<_int>());
+    __tmp_4 = list<_int>();
     _int __stop_0 = 4LL;
     for (i = 0; i < __stop_0; ++i) {
-        __tmp_4->append(i);
+        __tmp_4.append(i);
     }
     return __tmp_4;
 }
 
-ptr<list<_int>> __list_comprehension_5() {
-    ptr<list<_int>> __tmp_5;
+list<_int> __list_comprehension_5() {
+    list<_int> __tmp_5;
     _int i;
-    __tmp_5 = ptr(new list<_int>());
+    __tmp_5 = list<_int>();
     _int __stop_1 = 8LL;
     for (i = 1LL; i < __stop_1; i += 2) {
-        __tmp_5->append(i);
+        __tmp_5.append(i);
     }
     return __tmp_5;
 }
 
-ptr<list<_int>> __list_comprehension_6(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_6;
+list<_int> __list_comprehension_6(list<_int> numbers) {
+    list<_int> __tmp_6;
     _int i;
-    __tmp_6 = ptr(new list<_int>());
+    __tmp_6 = list<_int>();
     _int __len_0 = len(numbers);
     for (i = 0; i < __len_0; ++i) {
-        __tmp_6->append(numbers->__getitem__(i));
+        __tmp_6.append(numbers.__getitem__(i));
     }
     return __tmp_6;
 }
 
-ptr<set<_int>> __set_comprehension_0(ptr<list<_int>> numbers) {
-    ptr<set<_int>> __tmp_7;
+set<_int> __set_comprehension_0(list<_int> numbers) {
+    set<_int> __tmp_7;
     _int v;
-    __tmp_7 = ptr(new set<_int>());
-    for (auto __iter_7 = iter(numbers); !__iter_7.done();) {
+    __tmp_7 = set<_int>();
+    auto && __range_7 = numbers;
+    for (auto __iter_7 = iter(__range_7); !__iter_7.done();) {
         v = next(__iter_7);
-        __tmp_7->add((v * v));
+        __tmp_7.add((v * v));
     }
     return __tmp_7;
 }
 
-ptr<dict<_int, _int>> __dict_comprehension_0(ptr<list<_int>> numbers) {
-    ptr<dict<_int, _int>> __tmp_8;
+dict<_int, _int> __dict_comprehension_0(list<_int> numbers) {
+    dict<_int, _int> __tmp_8;
     _int v;
-    __tmp_8 = ptr(new dict<_int, _int>());
-    for (auto __iter_8 = iter(numbers); !__iter_8.done();) {
+    __tmp_8 = dict<_int, _int>();
+    auto && __range_8 = numbers;
+    for (auto __iter_8 = iter(__range_8); !__iter_8.done();) {
         v = next(__iter_8);
         if (to_bool(((v > 1LL)))) {
-            __tmp_8->__setitem__(v, (v * v));
+            __tmp_8.__setitem__(v, (v * v));
         }
     }
     return __tmp_8;
 }
 
-ptr<list<_int>> __list_comprehension_7(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_9;
+list<_int> __list_comprehension_7(list<_int> numbers) {
+    list<_int> __tmp_9;
     _int x;
     _int y;
-    __tmp_9 = ptr(new list<_int>());
-    for (auto __iter_9 = iter(numbers); !__iter_9.done();) {
+    __tmp_9 = list<_int>();
+    auto && __range_9 = numbers;
+    for (auto __iter_9 = iter(__range_9); !__iter_9.done();) {
         x = next(__iter_9);
-        for (auto __iter_10 = iter(numbers); !__iter_10.done();) {
+        auto && __range_10 = numbers;
+        for (auto __iter_10 = iter(__range_10); !__iter_10.done();) {
             y = next(__iter_10);
             if (to_bool(((x < y)))) {
-                __tmp_9->append((x * y));
+                __tmp_9.append((x * y));
             }
         }
     }
     return __tmp_9;
 }
 
-ptr<list<_int>> __list_comprehension_11(_int v) {
-    ptr<list<_int>> __tmp_13;
+list<_int> __list_comprehension_11(_int v) {
+    list<_int> __tmp_13;
     _int w;
-    __tmp_13 = ptr(new list<_int>());
+    __tmp_13 = list<_int>();
     _int __stop_2 = v;
     for (w = 0; w < __stop_2; ++w) {
-        __tmp_13->append(w);
+        __tmp_13.append(w);
     }
     return __tmp_13;
 }
 
-ptr<list<_int>> __list_comprehension_8(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_10;
+list<_int> __list_comprehension_8(list<_int> numbers) {
+    list<_int> __tmp_10;
     _int v;
-    __tmp_10 = ptr(new list<_int>());
-    for (auto __iter_11 = iter(numbers); !__iter_11.done();) {
+    __tmp_10 = list<_int>();
+    auto && __range_11 = numbers;
+    for (auto __iter_11 = iter(__range_11); !__iter_11.done();) {
         v = next(__iter_11);
-        __tmp_10->append(len(__list_comprehension_11(v)));
+        __tmp_10.append(len(__list_comprehension_11(v)));
     }
     return __tmp_10;
 }
 
-ptr<list<_int>> __list_comprehension_9(ptr<list<_int>> numbers) {
-    ptr<list<_int>> __tmp_11;
+list<_int> __list_comprehension_9(list<_int> numbers) {
+    list<_int> __tmp_11;
     _int v;
-    __tmp_11 = ptr(new list<_int>());
-    for (auto __iter_12 = iter(numbers); !__iter_12.done();) {
+    __tmp_11 = list<_int>();
+    auto && __range_12 = numbers;
+    for (auto __iter_12 = iter(__range_12); !__iter_12.done();) {
         v = next(__iter_12);
-        __tmp_11->append((v * 2LL));
+        __tmp_11.append((v * 2LL));
     }
     return __tmp_11;
 }
 
-ptr<list<_int>> __list_comprehension_10(ptr<list<_int>> doubled) {
-    ptr<list<_int>> __tmp_12;
+list<_int> __list_comprehension_10(list<_int> doubled) {
+    list<_int> __tmp_12;
     _int v;
-    __tmp_12 = ptr(new list<_int>());
-    for (auto __iter_13 = iter(doubled); !__iter_13.done();) {
+    __tmp_12 = list<_int>();
+    auto && __range_13 = doubled;
+    for (auto __iter_13 = iter(__range_13); !__iter_13.done();) {
         v = next(__iter_13);
-        __tmp_12->append((v + 1LL));
+        __tmp_12.append((v + 1LL));
     }
     return __tmp_12;
 }
 
 int run() {
-    ptr<list<_int>> numbers;
-    ptr<set<_int>> squares;
-    ptr<dict<_int, _int>> lookup;
-    ptr<list<_int>> doubled;
+    list<_int> numbers;
+    set<_int> squares;
+    dict<_int, _int> lookup;
+    list<_int> doubled;
     __init_module__();
-    numbers = ptr(new list<_int>({1LL, 2LL, 3LL, 4LL}));
+    numbers = list<_int>({1LL, 2LL, 3LL, 4LL});
     print(__list_comprehension_2(numbers));
     print(__list_comprehension_3(numbers));
     print(__list_comprehension_4());
@@ -610,7 +627,7 @@ int run() {
     squares = __set_comprehension_0(numbers);
     print(sorted(squares));
     lookup = __dict_comprehension_0(numbers);
-    print(len(lookup), lookup->__getitem__(2LL), lookup->__getitem__(4LL));
+    print(len(lookup), lookup.__getitem__(2LL), lookup.__getitem__(4LL));
     print(sorted(lookup));
     print(__list_comprehension_7(numbers));
     print(__list_comprehension_8(numbers));
@@ -628,40 +645,40 @@ void __init_module__() {
 }
 
 int run() {
-    ptr<dict<_int, _int>> d;
-    ptr<dict<_int, _int>> e;
-    ptr<dict<_int, _int>> c;
-    ptr<dict<str, _int>> s;
+    dict<_int, _int> d;
+    dict<_int, _int> e;
+    dict<_int, _int> c;
+    dict<str, _int> s;
     __init_module__();
-    d = ptr(new dict<_int, _int>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}}));
+    d = dict<_int, _int>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});
     print(len(d));
-    print(d->__getitem__(1LL), d->__getitem__(2LL), d->__getitem__(3LL));
+    print(d.__getitem__(1LL), d.__getitem__(2LL), d.__getitem__(3LL));
     print(sorted(d));
     print(_sorted_kwargs(true, d));
-    d->__setitem__(4LL, 40LL);
-    print(len(d), d->__getitem__(4LL));
-    d->__setitem__(1LL, 11LL);
-    print(len(d), d->__getitem__(1LL));
-    print(d->get(1LL));
-    print(d->get(99LL, (-1LL)));
-    print(d->pop(4LL));
-    print(d->pop(99LL, (-1LL)));
+    d.__setitem__(4LL, 40LL);
+    print(len(d), d.__getitem__(4LL));
+    d.__setitem__(1LL, 11LL);
+    print(len(d), d.__getitem__(1LL));
+    print(d.get(1LL));
+    print(d.get(99LL, (-1LL)));
+    print(d.pop(4LL));
+    print(d.pop(99LL, (-1LL)));
     print(len(d));
-    print(d->setdefault(2LL, 999LL));
-    print(d->setdefault(9LL, 90LL));
+    print(d.setdefault(2LL, 999LL));
+    print(d.setdefault(9LL, 90LL));
     print(sorted(d));
-    print(sorted(d->keys()));
-    print(sorted(d->values()));
-    e = ptr(new dict<_int, _int>({{5LL, 50LL}}));
-    d->update(e);
+    print(sorted(d.keys()));
+    print(sorted(d.values()));
+    e = dict<_int, _int>({{5LL, 50LL}});
+    d.update(e);
     print(sorted(d));
-    c = d->copy();
+    c = d.copy();
     print(len(c));
-    c->clear();
+    c.clear();
     print(len(c), len(d));
-    s = ptr(new dict<str, _int>({{str("b"), 2LL}, {str("a"), 1LL}}));
+    s = dict<str, _int>({{str("b"), 2LL}, {str("a"), 1LL}});
     print(sorted(s));
-    print(s->__getitem__(str("a")), s->__getitem__(str("b")));
+    print(s.__getitem__(str("a")), s.__getitem__(str("b")));
     return 0LL;
 }
 }
@@ -815,8 +832,8 @@ _int relay() {
 }
 
 int run() {
-    ptr<list<_int>> numbers;
-    ptr<dict<str, _int>> counts;
+    list<_int> numbers;
+    dict<str, _int> counts;
     _int i;
     __init_module__();
     print(guarded_parse(str("41")));
@@ -856,17 +873,17 @@ int run() {
     } catch (PyException &) {
         print(str("base handler took the subclass"));
     }
-    numbers = ptr(new list<_int>({1LL, 2LL, 3LL}));
+    numbers = list<_int>({1LL, 2LL, 3LL});
     try {
-        print(numbers->__getitem__(10LL));
+        print(numbers.__getitem__(10LL));
     } catch (IndexError &) {
         print(str("index error wins over the base class"));
     } catch (PyException &) {
         print(str("not reached"));
     }
-    counts = ptr(new dict<str, _int>({{str("a"), 1LL}}));
+    counts = dict<str, _int>({{str("a"), 1LL}});
     try {
-        print(counts->__getitem__(str("b")));
+        print(counts.__getitem__(str("b")));
     } catch (PyException &) {
         print(str("bare except caught it"));
     }
@@ -900,38 +917,39 @@ void __init_module__() {
 
 int run() {
     str SAMPLE;
-    ptr<file> handle;
+    file handle;
     str text;
-    ptr<file> stepped;
-    ptr<list<str>> rest;
-    ptr<file> lines;
+    file stepped;
+    list<str> rest;
+    file lines;
     str line;
-    ptr<file> out;
+    file out;
     str written;
     __init_module__();
     SAMPLE = str("tests/test_files/sample.txt");
     handle = open(SAMPLE);
-    text = handle->read();
+    text = handle.read();
     print(len(text));
     print(text.splitlines());
-    print(len(handle->read()));
-    handle->close();
+    print(len(handle.read()));
+    handle.close();
     stepped = open(SAMPLE);
-    print(stepped->readline().strip());
-    print(stepped->readline().strip());
-    rest = stepped->readlines();
-    print(len(rest), rest->__getitem__(0LL).strip());
-    print(len(stepped->readlines()));
+    print(stepped.readline().strip());
+    print(stepped.readline().strip());
+    rest = stepped.readlines();
+    print(len(rest), rest.__getitem__(0LL).strip());
+    print(len(stepped.readlines()));
     lines = open(SAMPLE);
-    for (auto __iter_14 = iter(lines); !__iter_14.done();) {
+    auto && __range_14 = lines;
+    for (auto __iter_14 = iter(__range_14); !__iter_14.done();) {
         line = next(__iter_14);
         print(len(line), line.strip());
     }
     out = open(str("tests/test_files/sample_out.txt"), str("w"));
-    print(out->write(str("alpha\n")));
-    print(out->write(str("beta\n")));
-    out->close();
-    written = open(str("tests/test_files/sample_out.txt"))->read();
+    print(out.write(str("alpha\n")));
+    print(out.write(str("beta\n")));
+    out.close();
+    written = open(str("tests/test_files/sample_out.txt")).read();
     print(written.splitlines(), len(written));
     try {
         open(str("tests/test_files/no_such_file.txt"));
@@ -950,30 +968,33 @@ void __init_module__() {
 }
 
 int run() {
-    ptr<list<_int>> nums;
-    ptr<list<_int>> a;
+    list<_int> nums;
+    list<_int> a;
     str s;
-    ptr<list<_int>> filtered;
+    list<_int> filtered;
     _int x;
     _int y;
     _int i;
     _int n;
     __init_module__();
-    nums = ptr(new list<_int>({1LL, 2LL, 3LL, 4LL, 5LL}));
-    a = ptr(new list<_int>(map([](auto x) { return (x * 2LL); }, nums)));
+    nums = list<_int>({1LL, 2LL, 3LL, 4LL, 5LL});
+    a = list<_int>(map([](auto x) { return (x * 2LL); }, nums));
     print(a);
-    for (auto __iter_15 = iter(map([](auto x) { return to_str(x); }, nums)); !__iter_15.done();) {
+    auto && __range_15 = map([](auto x) { return to_str(x); }, nums);
+    for (auto __iter_15 = iter(__range_15); !__iter_15.done();) {
         s = next(__iter_15);
         print(s);
     }
-    filtered = ptr(new list<_int>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums)));
+    filtered = list<_int>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));
     print(filtered);
-    for (auto __iter_16 = iter(zip(nums, a)); !__iter_16.done();) {
+    auto && __range_16 = zip(nums, a);
+    for (auto __iter_16 = iter(__range_16); !__iter_16.done();) {
         destructure(x, y) = next(__iter_16);
         print(x, y);
     }
     nums = copy(a);
-    for (auto __iter_17 = iter(enumerate(nums)); !__iter_17.done();) {
+    auto && __range_17 = enumerate(nums);
+    for (auto __iter_17 = iter(__range_17); !__iter_17.done();) {
         destructure(i, n) = next(__iter_17);
         print(i, n);
     }
@@ -982,103 +1003,103 @@ int run() {
 }
 
 namespace prog_list {
-ptr<list<_int>> give_list(ptr<list<_int>> l);
+list<_int> give_list(list<_int> l);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-ptr<list<_int>> give_list(ptr<list<_int>> l) {
+list<_int> give_list(list<_int> l) {
     print(l);
-    l->append(2LL);
+    l.append(2LL);
     print(l);
     return copy(l);
 }
 
 int run() {
-    ptr<list<_int>> l;
+    list<_int> l;
     _int a;
-    ptr<list<_int>> l2;
+    list<_int> l2;
     _int x;
     _int y;
     _int z;
-    ptr<list<_int>> l3;
+    list<_int> l3;
     _int n;
-    ptr<list<_int>> l4;
-    ptr<list<_int>> l5;
+    list<_int> l4;
+    list<_int> l5;
     __init_module__();
-    print(ptr(new list<_int>(ptr(new list<_int>({1LL, 2LL, 3LL})))));
-    l = ptr(new list<_int>({1LL, 2LL, 3LL}));
+    print(list<_int>(list<_int>({1LL, 2LL, 3LL})));
+    l = list<_int>({1LL, 2LL, 3LL});
     print(l);
-    l = ptr(new list<_int>({1LL, 2LL, 3LL}));
+    l = list<_int>({1LL, 2LL, 3LL});
     print(l);
-    l->append(4LL);
+    l.append(4LL);
     print(l);
     l = give_list(l);
     print(l);
-    print(l->__getitem__(1LL));
-    a = l->__getitem__(0LL);
+    print(l.__getitem__(1LL));
+    a = l.__getitem__(0LL);
     print(l);
-    l->__setitem__(0LL, a);
+    l.__setitem__(0LL, a);
     print(l);
-    l->__setitem__(0LL, 2LL);
+    l.__setitem__(0LL, 2LL);
     print(l);
-    l2 = copy(l->__getitem__(slice(0LL, 1LL, std::nullopt)));
+    l2 = copy(l.__getitem__(slice(0LL, 1LL, std::nullopt)));
     print(l2);
-    l->insert(0LL, 100LL);
+    l.insert(0LL, 100LL);
     print(l);
-    l->insert(2LL, 200LL);
+    l.insert(2LL, 200LL);
     print(l);
-    l->insert((-1LL), 300LL);
+    l.insert((-1LL), 300LL);
     print(l);
-    l->insert(100LL, 400LL);
+    l.insert(100LL, 400LL);
     print(l);
-    l->insert((-100LL), 500LL);
+    l.insert((-100LL), 500LL);
     print(l);
-    l->remove(200LL);
+    l.remove(200LL);
     print(l);
-    x = l->pop();
+    x = l.pop();
     print(x, l);
-    y = l->pop(0LL);
+    y = l.pop(0LL);
     print(y, l);
-    z = l->pop((-2LL));
+    z = l.pop((-2LL));
     print(z, l);
-    l->extend(ptr(new list<_int>({7LL, 8LL})));
+    l.extend(list<_int>({7LL, 8LL}));
     print(l);
-    l3 = l->copy();
+    l3 = l.copy();
     print(l3);
-    l->clear();
+    l.clear();
     print(l);
-    l2 = ptr(new list<_int>({5LL, 3LL, 1LL, 3LL, 9LL}));
-    print(l2->index(3LL));
-    print(l2->index(3LL, 3LL));
-    print(l2->index(3LL, 0LL, 2LL));
-    print(l2->index(9LL, (-2LL)));
-    print(l2->count(3LL));
-    print(l2->count(42LL));
-    l2->sort();
+    l2 = list<_int>({5LL, 3LL, 1LL, 3LL, 9LL});
+    print(l2.index(3LL));
+    print(l2.index(3LL, 3LL));
+    print(l2.index(3LL, 0LL, 2LL));
+    print(l2.index(9LL, (-2LL)));
+    print(l2.count(3LL));
+    print(l2.count(42LL));
+    l2.sort();
     print(l2);
-    l2->sort(true);
+    l2.sort(true);
     print(l2);
-    l2->sort(false);
+    l2.sort(false);
     print(l2);
-    l2->reverse();
+    l2.reverse();
     print(l2);
     n = len(l2);
     print(n);
-    print(l2->__getitem__(0LL), l2->back());
-    if (!(to_bool(((l2->back() == l2->__getitem__((n - 1LL))))))) throw AssertionError("");
-    l4 = ptr(new list<_int>({1LL, 2LL, 3LL}));
-    print(l4->back());
-    l4->back() += 10LL;
-    if (!(to_bool(((l4->back() == 13LL))))) throw AssertionError("");
+    print(l2.__getitem__(0LL), l2.back());
+    if (!(to_bool(((l2.back() == l2.__getitem__((n - 1LL))))))) throw AssertionError("");
+    l4 = list<_int>({1LL, 2LL, 3LL});
+    print(l4.back());
+    l4.back() += 10LL;
+    if (!(to_bool(((l4.back() == 13LL))))) throw AssertionError("");
     print(l4);
-    l5 = (ptr(new list<_int>({1LL, 2LL})) * 3LL);
+    l5 = (list<_int>({1LL, 2LL}) * 3LL);
     print(l5);
-    l5 = (3LL * ptr(new list<_int>({1LL, 2LL})));
+    l5 = (3LL * list<_int>({1LL, 2LL}));
     print(l5);
-    if (!(to_bool(((l5 == (ptr(new list<_int>({1LL, 2LL})) * 3LL)))))) throw AssertionError("");
+    if (!(to_bool(((l5 == (list<_int>({1LL, 2LL}) * 3LL)))))) throw AssertionError("");
     l5 *= 2LL;
     print(l5);
     return 0LL;
@@ -1094,13 +1115,13 @@ void __init_module__() {
 
 int run() {
     _int x;
-    ptr<list<_int>> l;
+    list<_int> l;
     _int i;
     _int step;
     _int n;
     __init_module__();
     x = 2LL;
-    l = ptr(new list<_int>({2LL, 3LL, 4LL}));
+    l = list<_int>({2LL, 3LL, 4LL});
     _int __len_1 = len(l);
     for (i = 0; i < __len_1; ++i) {
         print(l);
@@ -1135,11 +1156,13 @@ int run() {
         if ((__step_1 > 0 && i >= __stop_9) || (__step_1 < 0 && i <= __stop_9)) break;
         print(str("sixth"), i);
     }
-    for (auto __iter_18 = iter(l); !__iter_18.done();) {
+    auto && __range_18 = l;
+    for (auto __iter_18 = iter(__range_18); !__iter_18.done();) {
         n = next(__iter_18);
         print(str("seventh"), n);
     }
-    for (auto __iter_19 = iter(l); !__iter_19.done();) {
+    auto && __range_19 = l;
+    for (auto __iter_19 = iter(__range_19); !__iter_19.done();) {
         n = next(__iter_19);
         print(str("eight"), n);
     }
@@ -1179,60 +1202,61 @@ void __init_module__() {
 }
 
 int run() {
-    ptr<list<_int>> l;
-    ptr<dict<_int, _int>> d;
-    ptr<set<_int>> s;
+    list<_int> l;
+    dict<_int, _int> d;
+    set<_int> s;
     str text;
     tuple<_int, _int, _int> t;
-    ptr<list<tuple<_int, _int>>> pairs;
-    ptr<set<tuple<_int, _int>>> pair_set;
-    ptr<dict<tuple<_int, _int>, str>> pair_dict;
+    list<tuple<_int, _int>> pairs;
+    set<tuple<_int, _int>> pair_set;
+    dict<tuple<_int, _int>, str> pair_dict;
     tuple<tuple<_int, _int>, tuple<_int, _int>> nested;
-    ptr<list<tuple<str, _int>>> mixed;
-    ptr<list<str>> strs;
+    list<tuple<str, _int>> mixed;
+    list<str> strs;
     _int count;
     _int x;
     __init_module__();
-    l = ptr(new list<_int>({1LL, 2LL, 3LL}));
-    print((l->__contains__(2LL)), (l->__contains__(9LL)));
-    print((!l->__contains__(2LL)), (!l->__contains__(9LL)));
-    d = ptr(new dict<_int, _int>({{1LL, 10LL}, {2LL, 20LL}}));
-    print((d->__contains__(1LL)), (d->__contains__(9LL)));
-    print((d->values()->__contains__(10LL)));
-    print((!d->__contains__(1LL)), (!d->__contains__(9LL)));
-    s = ptr(new set<_int>({1LL, 2LL, 3LL}));
-    print((s->__contains__(2LL)), (s->__contains__(9LL)));
-    print((!s->__contains__(2LL)), (!s->__contains__(9LL)));
+    l = list<_int>({1LL, 2LL, 3LL});
+    print((l.__contains__(2LL)), (l.__contains__(9LL)));
+    print((!l.__contains__(2LL)), (!l.__contains__(9LL)));
+    d = dict<_int, _int>({{1LL, 10LL}, {2LL, 20LL}});
+    print((d.__contains__(1LL)), (d.__contains__(9LL)));
+    print((d.values().__contains__(10LL)));
+    print((!d.__contains__(1LL)), (!d.__contains__(9LL)));
+    s = set<_int>({1LL, 2LL, 3LL});
+    print((s.__contains__(2LL)), (s.__contains__(9LL)));
+    print((!s.__contains__(2LL)), (!s.__contains__(9LL)));
     text = str("hello world");
     print((text.__contains__(str("hello"))), (text.__contains__(str("zz"))));
     print((text.__contains__(str("o w"))));
     print((!text.__contains__(str("hello"))), (!text.__contains__(str("zz"))));
     t = tuple(1LL, 2LL, 3LL);
     print((t.__contains__(2LL)), (t.__contains__(9LL)));
-    pairs = ptr(new list<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(3LL, 4LL)}));
-    print((pairs->__contains__(tuple(1LL, 2LL))), (pairs->__contains__(tuple(9LL, 9LL))));
-    print((!pairs->__contains__(tuple(1LL, 2LL))), (!pairs->__contains__(tuple(9LL, 9LL))));
-    print((pairs->__contains__(tuple(2LL, 1LL))));
-    pair_set = ptr(new set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(3LL, 4LL)}));
-    print((pair_set->__contains__(tuple(1LL, 2LL))), (pair_set->__contains__(tuple(9LL, 9LL))));
-    print((pair_set->__contains__(tuple(2LL, 1LL))));
-    pair_dict = ptr(new dict<tuple<_int, _int>, str>({{tuple(1LL, 2LL), str("a")}, {tuple(3LL, 4LL), str("b")}}));
-    print((pair_dict->__contains__(tuple(1LL, 2LL))), (pair_dict->__contains__(tuple(9LL, 9LL))));
+    pairs = list<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
+    print((pairs.__contains__(tuple(1LL, 2LL))), (pairs.__contains__(tuple(9LL, 9LL))));
+    print((!pairs.__contains__(tuple(1LL, 2LL))), (!pairs.__contains__(tuple(9LL, 9LL))));
+    print((pairs.__contains__(tuple(2LL, 1LL))));
+    pair_set = set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
+    print((pair_set.__contains__(tuple(1LL, 2LL))), (pair_set.__contains__(tuple(9LL, 9LL))));
+    print((pair_set.__contains__(tuple(2LL, 1LL))));
+    pair_dict = dict<tuple<_int, _int>, str>({{tuple(1LL, 2LL), str("a")}, {tuple(3LL, 4LL), str("b")}});
+    print((pair_dict.__contains__(tuple(1LL, 2LL))), (pair_dict.__contains__(tuple(9LL, 9LL))));
     nested = tuple(tuple(1LL, 2LL), tuple(3LL, 4LL));
     print((nested.__contains__(tuple(1LL, 2LL))), (nested.__contains__(tuple(9LL, 9LL))));
-    mixed = ptr(new list<tuple<str, _int>>({tuple(str("a"), 1LL), tuple(str("b"), 2LL)}));
-    print((mixed->__contains__(tuple(str("a"), 1LL))), (mixed->__contains__(tuple(str("a"), 2LL))));
-    strs = ptr(new list<str>({str("a"), str("b")}));
-    print((strs->__contains__(str("a"))), (strs->__contains__(str("z"))));
-    if (to_bool((l->__contains__(2LL)))) {
+    mixed = list<tuple<str, _int>>({tuple(str("a"), 1LL), tuple(str("b"), 2LL)});
+    print((mixed.__contains__(tuple(str("a"), 1LL))), (mixed.__contains__(tuple(str("a"), 2LL))));
+    strs = list<str>({str("a"), str("b")});
+    print((strs.__contains__(str("a"))), (strs.__contains__(str("z"))));
+    if (to_bool((l.__contains__(2LL)))) {
         print(str("found"));
     } else {
         print(str("missing"));
     }
     count = 0LL;
-    for (auto __iter_20 = iter(ptr(new list<_int>({1LL, 2LL, 3LL, 4LL}))); !__iter_20.done();) {
+    auto && __range_20 = list<_int>({1LL, 2LL, 3LL, 4LL});
+    for (auto __iter_20 = iter(__range_20); !__iter_20.done();) {
         x = next(__iter_20);
-        if (to_bool((s->__contains__(x)))) {
+        if (to_bool((s.__contains__(x)))) {
             count = (count + 1LL);
         }
     }
@@ -1278,83 +1302,84 @@ void __init_module__() {
 }
 
 int run() {
-    ptr<set<_int>> s;
-    ptr<set<_int>> a;
-    ptr<set<_int>> b;
-    ptr<set<_int>> small;
-    ptr<set<_int>> big;
-    ptr<set<_int>> nine;
-    ptr<set<_int>> c;
-    ptr<set<_int>> d;
-    ptr<set<_int>> keep;
-    ptr<set<_int>> drop;
+    set<_int> s;
+    set<_int> a;
+    set<_int> b;
+    set<_int> small;
+    set<_int> big;
+    set<_int> nine;
+    set<_int> c;
+    set<_int> d;
+    set<_int> keep;
+    set<_int> drop;
     _int total;
     _int x;
-    ptr<set<tuple<_int, _int>>> s1;
-    ptr<set<tuple<_int, _int>>> s2;
-    ptr<set<str>> s3;
+    set<tuple<_int, _int>> s1;
+    set<tuple<_int, _int>> s2;
+    set<str> s3;
     __init_module__();
-    s = ptr(new set<_int>({3LL, 1LL, 2LL, 1LL}));
+    s = set<_int>({3LL, 1LL, 2LL, 1LL});
     print(len(s));
     print(sorted(s));
     print(_sorted_kwargs(true, s));
-    s->add(4LL);
+    s.add(4LL);
     print(sorted(s));
-    s->add(4LL);
+    s.add(4LL);
     print(len(s));
-    s->remove(4LL);
+    s.remove(4LL);
     print(sorted(s));
-    s->discard(99LL);
+    s.discard(99LL);
     print(sorted(s));
-    a = ptr(new set<_int>({1LL, 2LL, 3LL}));
-    b = ptr(new set<_int>({3LL, 4LL}));
+    a = set<_int>({1LL, 2LL, 3LL});
+    b = set<_int>({3LL, 4LL});
     print(sorted((a | b)));
     print(sorted((a & b)));
     print(sorted((a - b)));
     print(sorted((a ^ b)));
-    print(sorted(a->union_(b)));
-    print(sorted(a->intersection(b)));
-    print(sorted(a->difference(b)));
-    print(sorted(a->symmetric_difference(b)));
+    print(sorted(a.union_(b)));
+    print(sorted(a.intersection(b)));
+    print(sorted(a.difference(b)));
+    print(sorted(a.symmetric_difference(b)));
     print(sorted(a), sorted(b));
-    small = ptr(new set<_int>({1LL, 2LL}));
-    big = ptr(new set<_int>({1LL, 2LL, 3LL}));
-    print(small->issubset(big));
-    print(big->issuperset(small));
-    nine = ptr(new set<_int>({9LL}));
-    print(small->isdisjoint(nine));
-    print(small->isdisjoint(big));
+    small = set<_int>({1LL, 2LL});
+    big = set<_int>({1LL, 2LL, 3LL});
+    print(small.issubset(big));
+    print(big.issuperset(small));
+    nine = set<_int>({9LL});
+    print(small.isdisjoint(nine));
+    print(small.isdisjoint(big));
     print(((small <= big)), ((small < big)));
     print(((big >= small)), ((big > small)));
-    print(((ptr(new set<_int>({1LL, 2LL})) == ptr(new set<_int>({2LL, 1LL})))));
+    print(((set<_int>({1LL, 2LL}) == set<_int>({2LL, 1LL}))));
     print(((small != big)));
-    c = a->copy();
-    c->add(99LL);
+    c = a.copy();
+    c.add(99LL);
     print(sorted(a), sorted(c));
-    d = ptr(new set<_int>({1LL, 2LL, 3LL}));
-    d->update(ptr(new set<_int>({4LL})));
+    d = set<_int>({1LL, 2LL, 3LL});
+    d.update(set<_int>({4LL}));
     print(sorted(d));
-    keep = ptr(new set<_int>({2LL, 3LL, 4LL}));
-    d->intersection_update(keep);
+    keep = set<_int>({2LL, 3LL, 4LL});
+    d.intersection_update(keep);
     print(sorted(d));
-    drop = ptr(new set<_int>({4LL}));
-    d->difference_update(drop);
+    drop = set<_int>({4LL});
+    d.difference_update(drop);
     print(sorted(d));
-    d->symmetric_difference_update(ptr(new set<_int>({3LL, 5LL})));
+    d.symmetric_difference_update(set<_int>({3LL, 5LL}));
     print(sorted(d));
-    d->clear();
+    d.clear();
     print(len(d));
     total = 0LL;
-    for (auto __iter_21 = iter(ptr(new set<_int>({1LL, 2LL, 3LL}))); !__iter_21.done();) {
+    auto && __range_21 = set<_int>({1LL, 2LL, 3LL});
+    for (auto __iter_21 = iter(__range_21); !__iter_21.done();) {
         x = next(__iter_21);
         total = (total + x);
     }
     print(total);
-    s1 = ptr(new set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(1LL, 3LL)}));
+    s1 = set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(1LL, 3LL)});
     print(sorted(s1));
-    s2 = ptr(new set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(1LL, 2LL)}));
+    s2 = set<tuple<_int, _int>>({tuple(1LL, 2LL), tuple(1LL, 2LL)});
     print(sorted(s2));
-    s3 = ptr(new set<str>({str("Hello"), str("World")}));
+    s3 = set<str>({str("Hello"), str("World")});
     print(sorted(s3));
     return 0LL;
 }
@@ -1368,43 +1393,43 @@ void __init_module__() {
 }
 
 int run() {
-    ptr<list<_int>> l;
-    ptr<list<_int>> empty;
-    ptr<list<_int>> original;
-    ptr<list<_int>> copied;
+    list<_int> l;
+    list<_int> empty;
+    list<_int> original;
+    list<_int> copied;
     str s;
     __init_module__();
-    l = ptr(new list<_int>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL}));
-    print(l->__getitem__(slice(0LL, 1LL, std::nullopt)));
-    print(l->__getitem__(slice(1LL, 4LL, std::nullopt)));
-    print(l->__getitem__(slice(std::nullopt, 3LL, std::nullopt)));
-    print(l->__getitem__(slice(3LL, std::nullopt, std::nullopt)));
-    print(l->__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    print(l->__getitem__(slice(std::nullopt, std::nullopt, 2LL)));
-    print(l->__getitem__(slice(1LL, 5LL, 2LL)));
-    print(l->__getitem__(slice(std::nullopt, std::nullopt, 3LL)));
-    print(l->__getitem__(slice((-3LL), std::nullopt, std::nullopt)));
-    print(l->__getitem__(slice(std::nullopt, (-2LL), std::nullopt)));
-    print(l->__getitem__(slice((-4LL), (-1LL), std::nullopt)));
-    print(l->__getitem__(slice((-1LL), std::nullopt, std::nullopt)));
-    print(l->__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
-    print(l->__getitem__(slice(4LL, 1LL, (-1LL))));
-    print(l->__getitem__(slice(std::nullopt, std::nullopt, (-2LL))));
-    print(l->__getitem__(slice((-1LL), (-4LL), (-1LL))));
-    print(l->__getitem__(slice(10LL, 20LL, std::nullopt)));
-    print(l->__getitem__(slice((-100LL), 100LL, std::nullopt)));
-    print(l->__getitem__(slice(std::nullopt, 100LL, std::nullopt)));
-    print(l->__getitem__(slice((-100LL), std::nullopt, std::nullopt)));
-    print(l->__getitem__(slice(2LL, 2LL, std::nullopt)));
-    print(l->__getitem__(slice(4LL, 1LL, std::nullopt)));
-    print(l->__getitem__(slice(1LL, 4LL, (-1LL))));
-    empty = ptr(new list<_int>());
-    print(empty->__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    print(empty->__getitem__(slice(0LL, 5LL, std::nullopt)));
-    print(empty->__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
-    original = ptr(new list<_int>({1LL, 2LL, 3LL}));
-    copied = copy(original->__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    copied->append(4LL);
+    l = list<_int>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});
+    print(l.__getitem__(slice(0LL, 1LL, std::nullopt)));
+    print(l.__getitem__(slice(1LL, 4LL, std::nullopt)));
+    print(l.__getitem__(slice(std::nullopt, 3LL, std::nullopt)));
+    print(l.__getitem__(slice(3LL, std::nullopt, std::nullopt)));
+    print(l.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
+    print(l.__getitem__(slice(std::nullopt, std::nullopt, 2LL)));
+    print(l.__getitem__(slice(1LL, 5LL, 2LL)));
+    print(l.__getitem__(slice(std::nullopt, std::nullopt, 3LL)));
+    print(l.__getitem__(slice((-3LL), std::nullopt, std::nullopt)));
+    print(l.__getitem__(slice(std::nullopt, (-2LL), std::nullopt)));
+    print(l.__getitem__(slice((-4LL), (-1LL), std::nullopt)));
+    print(l.__getitem__(slice((-1LL), std::nullopt, std::nullopt)));
+    print(l.__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
+    print(l.__getitem__(slice(4LL, 1LL, (-1LL))));
+    print(l.__getitem__(slice(std::nullopt, std::nullopt, (-2LL))));
+    print(l.__getitem__(slice((-1LL), (-4LL), (-1LL))));
+    print(l.__getitem__(slice(10LL, 20LL, std::nullopt)));
+    print(l.__getitem__(slice((-100LL), 100LL, std::nullopt)));
+    print(l.__getitem__(slice(std::nullopt, 100LL, std::nullopt)));
+    print(l.__getitem__(slice((-100LL), std::nullopt, std::nullopt)));
+    print(l.__getitem__(slice(2LL, 2LL, std::nullopt)));
+    print(l.__getitem__(slice(4LL, 1LL, std::nullopt)));
+    print(l.__getitem__(slice(1LL, 4LL, (-1LL))));
+    empty = list<_int>();
+    print(empty.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
+    print(empty.__getitem__(slice(0LL, 5LL, std::nullopt)));
+    print(empty.__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
+    original = list<_int>({1LL, 2LL, 3LL});
+    copied = copy(original.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
+    copied.append(4LL);
     print(original, copied);
     s = str("abcdef");
     print(s.__getitem__(slice(0LL, 1LL, std::nullopt)));
@@ -1502,7 +1527,8 @@ int run() {
     print(to_int(str("100")));
     print(to_float(str("0.5")));
     joined = str("");
-    for (auto __iter_22 = iter(str("abc")); !__iter_22.done();) {
+    auto && __range_22 = str("abc");
+    for (auto __iter_22 = iter(__range_22); !__iter_22.done();) {
         c = next(__iter_22);
         joined = ((joined + c) + str("."));
     }
@@ -1523,8 +1549,8 @@ int run() {
     _int b;
     str s1;
     str s2;
-    ptr<list<_int>> empty;
-    ptr<list<_int>> full;
+    list<_int> empty;
+    list<_int> full;
     _int n;
     __init_module__();
     a = 0LL;
@@ -1551,8 +1577,8 @@ int run() {
     } else {
         print(str("s2 falsy"));
     }
-    empty = ptr(new list<_int>());
-    full = ptr(new list<_int>({1LL, 2LL, 3LL}));
+    empty = list<_int>();
+    full = list<_int>({1LL, 2LL, 3LL});
     if (to_bool(empty)) {
         print(str("empty truthy"));
     } else {

@@ -49,11 +49,11 @@ function_signatures = {
     "with_defaults": 'str with_defaults(_int a, str b = str("hello"), _float c = 3.14)',
     "multiple_params": "str multiple_params(_int x, _float y, bool z)",
     "no_return": "void no_return()",
-    "returns_list": "ptr<list<str>> returns_list(ptr<list<_int>> items)",
-    "returns_dict": "ptr<dict<_int, str>> returns_dict(ptr<dict<str, _int>> d)",
+    "returns_list": "list<str> returns_list(list<_int> items)",
+    "returns_dict": "dict<_int, str> returns_dict(dict<str, _int> d)",
     "no_params": "_int no_params()",
     "with_optional": "str with_optional(std::optional<_int> x)",
-    "with_object": "ptr<B> with_object(ptr<B> x)",
+    "with_object": "B with_object(B x)",
 }
 
 class_name = "A"

@@ -1,13 +1,12 @@
 #pragma once
 
 // Python's open() and the file object it hands back. No context manager: a
-// file closes when its last ptr reference goes, like everything else. Reads
-// pull the whole file in at once, so read/readline/readlines/iteration all
-// just share one position rather than needing their own buffering.
+// file closes when it goes out of scope, like everything else. Reads pull
+// the whole file in at once, so read/readline/readlines/iteration all just
+// share one position rather than needing their own buffering.
 
 #include "exceptions.h"
 #include "list.h"
-#include "ptr.h"
 #include "str.h"
 #include "types.h"
 #include <fstream>
@@ -36,6 +35,11 @@ inline std::vector<std::string> _split_keepends(const std::string &text) {
 
 class file {
   public:
+    // Locals are pre-declared before their first assignment, so every held
+    // type needs a default constructor - even file, which has no real
+    // "empty" state; it's always overwritten before use.
+    file() = default;
+
     file(const str &path, const str &mode) : path_(path), mode_(mode) {
         const std::string &m = mode.raw();
         writing_ = m.find('w') != std::string::npos ||
@@ -59,8 +63,12 @@ class file {
     }
 
     ~file() { close(); }
+    // An open file handle isn't copyable, only movable - like Python, where
+    // there's no meaningful way to duplicate one.
     file(const file &) = delete;
     file &operator=(const file &) = delete;
+    file(file &&) = default;
+    file &operator=(file &&) = default;
 
     // The rest of the file from where the last read stopped, like Python.
     str read() {
@@ -80,10 +88,10 @@ class file {
         return str(std::move(line));
     }
 
-    ptr<list<str>> readlines() {
-        auto lines = ptr(new list<str>());
+    list<str> readlines() {
+        list<str> lines;
         for (const std::string &line : _split_keepends(content_.substr(position_)))
-            lines->append(str(line));
+            lines.append(str(line));
         position_ = content_.size();
         return lines;
     }
@@ -135,8 +143,10 @@ class file {
     std::ofstream out_;
 };
 
-inline ptr<file> open(const str &path, const str &mode = str("r")) {
-    return ptr(new file(path, mode));
+inline file open(const str &path, const str &mode = str("r")) {
+    return file(path, mode);
 }
+
+inline auto iter(file &f) { return f.iter(); }
 
 } // namespace py

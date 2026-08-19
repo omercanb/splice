@@ -68,20 +68,10 @@ SCALAR_CONSTRUCTORS = {
     "str": "to_str",
 }
 
-NON_POINTER_TYPES = {
-    "int",
-    "float",
-    "str",
-    "bytes",
-    "bool",
-    "map",
-    "filter",
-    "zip",
-    "enumerate",
-    "SupportsIndex",
-}
-
-POINTER_TYPES = {"list", "dict", "set"}
+# A constructor call with no arguments (list(), set()) gives C++ template
+# argument deduction nothing to work with, so these need their element type
+# spelled out explicitly rather than left to CTAD.
+EXPLICIT_TYPE_CONSTRUCTORS = {"list", "dict", "set"}
 
 # Exceptions catchable by an except clause (runtime/exceptions.h). Flat
 # hierarchy, so a base like LookupError has no equivalent and is rejected

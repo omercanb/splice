@@ -37,7 +37,7 @@ from splice.codegen.exceptions import translate_raise_stmt, translate_try_stmt
 from splice.codegen.expression_codegen import ExpressionCodegen
 from splice.codegen.for_loop import translate_for_stmt
 from splice.codegen.translation_utils import translate_func_signature
-from splice.codegen.typegen import cpp_type, is_pointer
+from splice.codegen.typegen import cpp_type
 from splice.visitor import Traverser
 
 includes = [
@@ -47,7 +47,6 @@ includes = [
     "truthy.h",
     "iter.h",
     "tuple.h",
-    "ptr.h",
     "slice.h",
     "list.h",
     "strops.h",

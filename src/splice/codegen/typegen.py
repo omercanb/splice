@@ -11,9 +11,6 @@ from mypy.types import (
     get_proper_type,
 )
 
-from splice.codegen.builtins import NON_POINTER_TYPES, POINTER_TYPES
-
-
 class UnsupportedType(Exception):
     """A mypy type with no C++ equivalent.
 
@@ -27,15 +24,8 @@ class UnsupportedType(Exception):
         super().__init__(f"no C++ equivalent for the type {t}")
 
 
-def ptr_type(t: str) -> str:
-    return f"ptr<{t}>"
-
-
 def cpp_type(t: Type) -> str:
-    type_name = cpp_type_name(t)
-    if is_pointer(t):
-        type_name = ptr_type(type_name)
-    return type_name
+    return cpp_type_name(t)
 
 
 def cpp_type_name(t: Type) -> str:
@@ -153,36 +143,3 @@ def cpp_type_name(t: Type) -> str:
             raise
         else:
             raise UnsupportedType(t, problematic_member_type=e.type)
-
-
-def is_pointer(t: Type) -> bool:
-    """Returns whether a type is a pointer"""
-    t = get_proper_type(t)
-
-    match t:
-        # Builtin types
-        case Instance(type=type_info):
-            if type_info.name in NON_POINTER_TYPES:
-                return False
-            if type_info.name in POINTER_TYPES:
-                return True
-            # User defined classes
-            return True
-        case TupleType():
-            return False
-        case LiteralType(fallback=fallback):
-            return is_pointer(fallback)
-
-        # Optional[T] = T | None
-        case UnionType():
-            return False
-        # None/void
-        case NoneType():
-            return False
-        # Any becomes `auto`, which is never explicitly ptr-wrapped
-        case AnyType():
-            return False
-
-        # Default fallback
-        case _:
-            raise UnsupportedType(t)

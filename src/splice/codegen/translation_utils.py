@@ -4,21 +4,21 @@ from mypy.nodes import CallExpr, ComparisonExpr
 from mypy.nodes import Expression
 from mypy.nodes import Expression as MypyExpression
 from mypy.nodes import FuncDef, IndexExpr, IntExpr, LambdaExpr, NameExpr, TypeInfo
-from mypy.types import CallableType, TupleType, Type, get_proper_type
+from mypy.types import CallableType, Type, get_proper_type
 
 from splice.codegen.builtins import (
     BOOL_OP_MACROS,
     EXCEPTION_TYPES,
+    EXPLICIT_TYPE_CONSTRUCTORS,
     METHOD_RENAMES,
     OP_MAP,
-    POINTER_TYPES,
     QUALIFIED_BUILTINS,
     SCALAR_CONSTRUCTORS,
     get_kwarg_defaults,
     get_kwarg_order,
     is_builtin_with_kwargs,
 )
-from splice.codegen.typegen import cpp_type, cpp_type_name, is_pointer
+from splice.codegen.typegen import cpp_type, cpp_type_name
 from splice.visitor import Visitor
 
 
@@ -176,21 +176,21 @@ def translate_constructor_special_cases(callee: Expression) -> Optional[str]:
     return
 
 
-def translate_tuple_access(tuple_type: TupleType, expr: IndexExpr, base: str):
+def translate_tuple_access(expr: IndexExpr, base: str):
     # A tuple's elements have different types, so the index has to be a
     # compile-time one: t[0] becomes get<0>(), and only literals work.
     assert isinstance(expr.index, IntExpr)
     i = expr.index.value
-    return f"{member_access(base, tuple_type, f'get<{i}>')}()"
+    return f"{member_access(base, f'get<{i}>')}()"
 
 
-def should_wrap_call_in_pointer(callee: Expression) -> bool:
-    """Call's that are constructors like list() or map() need to be wrapped in ptr(new x)"""
+def needs_explicit_constructor_type(callee: Expression) -> bool:
+    """A constructor call like list() or a class needs its C++ type spelled
+    out rather than left to CTAD - see EXPLICIT_TYPE_CONSTRUCTORS."""
     if not isinstance(callee, NameExpr):
         return False
-    if callee.name in POINTER_TYPES:
+    if callee.name in EXPLICIT_TYPE_CONSTRUCTORS:
         return True
-    # A user's class is held behind ptr too, so constructing one allocates.
     # The builtin classes are spelled by hand above and in SCALAR_CONSTRUCTORS,
     # and str(x) has to stay to_str(x) rather than become a str constructor.
     return isinstance(callee.node, TypeInfo) and not callee.fullname.startswith(
@@ -200,17 +200,12 @@ def should_wrap_call_in_pointer(callee: Expression) -> bool:
 
 def translate_constructor(t: Type, constructor: str):
     typ = cpp_type_name(t)
-    if is_pointer(t):
-        return f"ptr(new {typ}({constructor}))"
-    else:
-        return f"{typ}({constructor})"
+    return f"{typ}({constructor})"
 
 
-def translate_membership(
-    op: str, item: str, container: str, container_type: Type
-) -> str:
+def translate_membership(op: str, item: str, container: str) -> str:
     """`x in c` / `x not in c` -> c.__contains__(x), operands swapped."""
-    call = call_method(container, container_type, "__contains__", item)
+    call = call_method(container, "__contains__", item)
     return call if op == "in" else f"!{call}"
 
 
@@ -222,9 +217,7 @@ def translate_comparison(expr: ComparisonExpr, expr_translator: Visitor[str]):
         left = expr_translator.visit(expr1)
         right = expr_translator.visit(expr2)
         if op in ("in", "not in"):
-            terms.append(
-                translate_membership(op, left, right, expr_translator.types[expr2])
-            )
+            terms.append(translate_membership(op, left, right))
         else:
             terms.append(translate_binary_expr(op, left, right))
     full_comparison = " && ".join(terms)
@@ -248,27 +241,16 @@ def translate_method_name(name: str) -> str:
     return METHOD_RENAMES.get(name, name)
 
 
-def member_access(obj: str, obj_type: Type, name: str) -> str:
-    """`obj.name` or `obj->name`, depending on whether obj is pointer-backed."""
-    return f"{obj}{'->' if is_pointer(obj_type) else '.'}{name}"
+def member_access(obj: str, name: str) -> str:
+    """`obj.name`"""
+    return f"{obj}.{name}"
 
 
-def call_method(obj: str, obj_type: Type, name: str, *args: str) -> str:
-    """Call a method on a Python value, eg. `c->__contains__(x)`."""
-    return f"{member_access(obj, obj_type, name)}({', '.join(args)})"
+def call_method(obj: str, name: str, *args: str) -> str:
+    """Call a method on a Python value, eg. `c.__contains__(x)`."""
+    return f"{member_access(obj, name)}({', '.join(args)})"
 
 
 def is_truthy(expr: str) -> str:
     """Wrap a C++ expression with Python's truthiness rules (bool()/`if`/`while`/`not`)."""
     return f"to_bool({expr})"
-
-
-def pointer_to(obj: str):
-    return f"ptr(new {obj})"
-
-
-def list_of(elements: list[str]):
-    if elements:
-        return pointer_to(f"list({{{', '.join(elements)}}})")
-    else:
-        assert False, "We don't support empty lists for now"

@@ -7,7 +7,6 @@
 #include "exceptions.h"
 #include "hash.h"
 #include "list.h"
-#include "ptr.h"
 #include "str.h"
 #include "tuple.h"
 #include "types.h"
@@ -30,10 +29,10 @@ template <typename K, typename V> class dict {
 
     // dict(pairs): from a list of (key, value) tuples, like Python's
     // dict([(k, v), ...]).
-    dict(const ptr<list<tuple<K, V>>> &pairs) {
-        _int n = pairs->__len__();
+    dict(const list<tuple<K, V>> &pairs) {
+        _int n = pairs.__len__();
         for (_int i = 0; i < n; ++i) {
-            const tuple<K, V> &pair = (*pairs)[i];
+            const tuple<K, V> &pair = pairs[i];
             data_[pair.first()] = pair.second();
         }
     }
@@ -122,32 +121,32 @@ template <typename K, typename V> class dict {
         return it->second;
     }
 
-    void update(const ptr<dict<K, V>> &other) {
-        for (const auto &entry : other->data_)
+    void update(const dict<K, V> &other) {
+        for (const auto &entry : other.data_)
             data_[entry.first] = entry.second;
     }
 
     void clear() noexcept { data_.clear(); }
 
-    ptr<dict<K, V>> copy() const { return ptr(new dict<K, V>(*this)); }
+    dict<K, V> copy() const { return *this; }
 
     // Snapshots, not CPython's live views.
-    ptr<list<K>> keys() const {
-        auto out = ptr(new list<K>());
+    list<K> keys() const {
+        list<K> out;
         for (const auto &entry : data_)
-            out->append(entry.first);
+            out.append(entry.first);
         return out;
     }
-    ptr<list<V>> values() const {
-        auto out = ptr(new list<V>());
+    list<V> values() const {
+        list<V> out;
         for (const auto &entry : data_)
-            out->append(entry.second);
+            out.append(entry.second);
         return out;
     }
-    ptr<list<tuple<K, V>>> items() const {
-        auto out = ptr(new list<tuple<K, V>>());
+    list<tuple<K, V>> items() const {
+        list<tuple<K, V>> out;
         for (const auto &entry : data_)
-            out->append(tuple<K, V>(entry.first, entry.second));
+            out.append(tuple<K, V>(entry.first, entry.second));
         return out;
     }
 
@@ -203,15 +202,15 @@ inline _int len(const dict<K, V> &d) {
 }
 
 // sorted(d) sorts the keys, since iterating a dict yields keys.
-template <typename K, typename V> ptr<list<K>> sorted(const ptr<dict<K, V>> &d) {
-    auto out = d->keys();
-    out->sort();
+template <typename K, typename V> list<K> sorted(const dict<K, V> &d) {
+    auto out = d.keys();
+    out.sort();
     return out;
 }
 template <typename K, typename V>
-ptr<list<K>> _sorted_kwargs(bool reverse, const ptr<dict<K, V>> &d) {
-    auto out = d->keys();
-    out->sort(reverse);
+list<K> _sorted_kwargs(bool reverse, const dict<K, V> &d) {
+    auto out = d.keys();
+    out.sort(reverse);
     return out;
 }
 

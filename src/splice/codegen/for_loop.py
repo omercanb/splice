@@ -184,11 +184,14 @@ def for_generic(
 ) -> LoopHeader:
     """Translate: for var in iterable (generic iterator protocol)"""
     target = codegen.get_expr(index, lvalue=True)
-    iterable_expr = codegen.get_expr(iterable)
+    # `for x in [1, 2, 3]:` iterates a temporary; the containers' iterators
+    # hold only a reference, which would dangle once this statement ends.
+    # Binding it to auto&& first extends its lifetime for the whole loop.
+    range_var = _hoist(codegen, codegen.get_expr(iterable), "auto &&", "range")
     iter_var = temp_name("iter")
     # TODO itervar shouldnt be declared in the loop
 
     return LoopHeader(
-        f"for (auto {iter_var} = iter({iterable_expr}); !{iter_var}.done();)",
+        f"for (auto {iter_var} = iter({range_var}); !{iter_var}.done();)",
         [f"{target} = next({iter_var});"],
     )

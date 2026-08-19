@@ -11,8 +11,8 @@ namespace py {
 
 // No separator splits on runs of whitespace and drops empty pieces;
 // an explicit separator keeps them. Python draws the same distinction.
-inline ptr<list<str>> str::split() const {
-    auto out = ptr(new list<str>());
+inline list<str> str::split() const {
+    list<str> out;
     const std::string &s = raw();
     size_t i = 0;
     while (i < s.size()) {
@@ -22,54 +22,54 @@ inline ptr<list<str>> str::split() const {
         while (i < s.size() && !std::isspace((unsigned char)s[i]))
             ++i;
         if (i > start)
-            out->append(str(s.substr(start, i - start)));
+            out.append(str(s.substr(start, i - start)));
     }
     return out;
 }
 
-inline ptr<list<str>> str::split(const str &sep) const {
-    auto out = ptr(new list<str>());
+inline list<str> str::split(const str &sep) const {
+    list<str> out;
     const std::string &s = raw();
     const std::string &d = sep.raw();
     if (d.empty())
         throw ValueError("empty separator");
     size_t prev = 0, at;
     while ((at = s.find(d, prev)) != std::string::npos) {
-        out->append(str(s.substr(prev, at - prev)));
+        out.append(str(s.substr(prev, at - prev)));
         prev = at + d.size();
     }
-    out->append(str(s.substr(prev)));
+    out.append(str(s.substr(prev)));
     return out;
 }
 
-inline ptr<list<str>> str::rsplit(const str &sep) const {
+inline list<str> str::rsplit(const str &sep) const {
     auto parts = split(sep);
     return parts;
 }
 
 // A trailing newline does not produce a final empty line.
-inline ptr<list<str>> str::splitlines() const {
-    auto out = ptr(new list<str>());
+inline list<str> str::splitlines() const {
+    list<str> out;
     const std::string &s = raw();
     size_t start = 0;
     for (size_t i = 0; i < s.size(); ++i) {
         if (s[i] == '\n') {
-            out->append(str(s.substr(start, i - start)));
+            out.append(str(s.substr(start, i - start)));
             start = i + 1;
         }
     }
     if (start < s.size())
-        out->append(str(s.substr(start)));
+        out.append(str(s.substr(start)));
     return out;
 }
 
-inline str str::join(const ptr<list<str>> &parts) const {
+inline str str::join(const list<str> &parts) const {
     std::string out;
-    _int n = parts->__len__();
+    _int n = parts.__len__();
     for (_int i = 0; i < n; ++i) {
         if (i)
             out += raw();
-        out += parts->__getitem__(i).raw();
+        out += parts.__getitem__(i).raw();
     }
     return str(std::move(out));
 }

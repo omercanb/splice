@@ -6,7 +6,6 @@
 
 #include "exceptions.h"
 #include "list.h"
-#include "ptr.h"
 #include "slice.h"
 #include "truthy.h"
 #include "tuple.h"
@@ -41,11 +40,11 @@ class bytes {
     // bytes(n): n zero bytes, like Python.
     explicit bytes(size_type n) : data_(static_cast<size_t>(n < 0 ? 0 : n), '\0') {}
     // bytes(values): from an iterable of ints, like Python.
-    explicit bytes(const ptr<list<_int>> &values) {
-        _int n = values->__len__();
+    explicit bytes(const list<_int> &values) {
+        _int n = values.__len__();
         data_.resize(static_cast<size_t>(n));
         for (_int i = 0; i < n; ++i)
-            data_[static_cast<size_t>(i)] = static_cast<char>((*values)[i]);
+            data_[static_cast<size_t>(i)] = static_cast<char>(values[i]);
     }
 
     const std::string &raw() const noexcept { return data_; }
@@ -251,8 +250,8 @@ class bytes {
     bool isupper() const { return casedAllAre(true); }
     bool islower() const { return casedAllAre(false); }
 
-    ptr<list<bytes>> split() const { // on whitespace
-        auto out = ptr(new list<bytes>());
+    list<bytes> split() const { // on whitespace
+        list<bytes> out;
         const std::string &s = data_;
         size_t i = 0;
         while (i < s.size()) {
@@ -262,46 +261,46 @@ class bytes {
             while (i < s.size() && !std::isspace((unsigned char)s[i]))
                 ++i;
             if (i > start)
-                out->append(bytes(s.substr(start, i - start)));
+                out.append(bytes(s.substr(start, i - start)));
         }
         return out;
     }
-    ptr<list<bytes>> split(const bytes &sep) const {
-        auto out = ptr(new list<bytes>());
+    list<bytes> split(const bytes &sep) const {
+        list<bytes> out;
         const std::string &s = data_;
         const std::string &d = sep.data_;
         if (d.empty())
             throw ValueError("empty separator");
         size_t prev = 0, at;
         while ((at = s.find(d, prev)) != std::string::npos) {
-            out->append(bytes(s.substr(prev, at - prev)));
+            out.append(bytes(s.substr(prev, at - prev)));
             prev = at + d.size();
         }
-        out->append(bytes(s.substr(prev)));
+        out.append(bytes(s.substr(prev)));
         return out;
     }
-    ptr<list<bytes>> rsplit(const bytes &sep) const { return split(sep); }
-    ptr<list<bytes>> splitlines() const {
-        auto out = ptr(new list<bytes>());
+    list<bytes> rsplit(const bytes &sep) const { return split(sep); }
+    list<bytes> splitlines() const {
+        list<bytes> out;
         const std::string &s = data_;
         size_t start = 0;
         for (size_t i = 0; i < s.size(); ++i) {
             if (s[i] == '\n') {
-                out->append(bytes(s.substr(start, i - start)));
+                out.append(bytes(s.substr(start, i - start)));
                 start = i + 1;
             }
         }
         if (start < s.size())
-            out->append(bytes(s.substr(start)));
+            out.append(bytes(s.substr(start)));
         return out;
     }
-    bytes join(const ptr<list<bytes>> &parts) const {
+    bytes join(const list<bytes> &parts) const {
         std::string out;
-        _int n = parts->__len__();
+        _int n = parts.__len__();
         for (_int i = 0; i < n; ++i) {
             if (i)
                 out += data_;
-            out += parts->__getitem__(i).raw();
+            out += parts.__getitem__(i).raw();
         }
         return bytes(std::move(out));
     }

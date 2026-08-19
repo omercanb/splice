@@ -4,7 +4,6 @@
 
 #include "exceptions.h"
 #include "iter.h"
-#include "ptr.h"
 #include "range.h"
 #include "slice.h"
 #include "str.h"
@@ -17,6 +16,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace py {
@@ -103,8 +103,17 @@ class list {
 
     // Construct from any iterable - requires explicit type: list<int>(map(...))
     // (deduction guide in iter.h handles type inference)
-
-    template <typename IterableType>
+    //
+    // enable_if turns this constructor off when IterableType is list<T>
+    // itself. Without it, a plain list<T> lvalue would also match this
+    // template, and it would beat the real copy constructor: binding a
+    // non-const lvalue here needs no extra qualification, while the copy
+    // constructor's `const list<T>&` does, so the copy constructor loses.
+    // `list<T> b = a;` would then rebuild b element by element through the
+    // iterator protocol instead of copying it.
+    template <typename IterableType,
+              typename = std::enable_if_t<
+                  !std::is_same_v<std::decay_t<IterableType>, list<T>>>>
     list(IterableType &&iterable) {
         auto it = py::iter(iterable);
         while (!it.done()) {
@@ -141,20 +150,20 @@ class list {
 
     // a[i:j:k] -- a new list, like Python. Out of range bounds clamp rather
     // than raising, which is why this does not go through normIndex.
-    ptr<list<T>> __getitem__(const slice &s) const {
+    list<T> __getitem__(const slice &s) const {
         tuple<_int, _int, _int> bounds = s.indices(__len__());
         _int start = bounds.get<0>(), stop = bounds.get<1>(),
              step = bounds.get<2>();
 
-        auto out = new list<T>();
+        list<T> out;
         if (step > 0) {
             for (_int i = start; i < stop; i += step)
-                out->append(data_[static_cast<std::size_t>(i)]);
+                out.append(data_[static_cast<std::size_t>(i)]);
         } else {
             for (_int i = start; i > stop; i += step)
-                out->append(data_[static_cast<std::size_t>(i)]);
+                out.append(data_[static_cast<std::size_t>(i)]);
         }
-        return ptr<list<T>>(out);
+        return out;
     }
     void __setitem__(size_type i, const T &value) {
         data_[normIndex(i)] = value;
@@ -203,10 +212,10 @@ class list {
         return value;
     }
 
-    void extend(const ptr<list<T>> &other) {
-        auto len = other->__len__();
+    void extend(const list<T> &other) {
+        auto len = other.__len__();
         for (size_type i = 0; i < len; ++i) {
-            this->append((*other)[i]);
+            this->append(other[i]);
         }
     }
 
@@ -257,8 +266,7 @@ class list {
 
     void reverse() noexcept { std::reverse(data_.begin(), data_.end()); }
 
-    // Copies via *this; list<T>(data_) would hit the iterable constructor.
-    ptr<list<T>> copy() const { return ptr(new list<T>(*this)); }
+    list<T> copy() const { return *this; }
 
     bool __contains__(const T &value) const { // `value in a`
         for (const auto &e : data_)
@@ -358,37 +366,6 @@ list<T> operator*(typename list<T>::size_type n, const list<T> &a) {
     return a * n;
 }
 
-// Python list values are pointer-backed, so codegen's `a * n` / `n * a`
-// need this repeated here rather than on list<T> itself - forwards to the
-// value-type operator* above and re-wraps the result.
-template <typename T>
-ptr<list<T>> operator*(const ptr<list<T>> &a, typename list<T>::size_type n) {
-    return ptr<list<T>>(new list<T>(*a * n));
-}
-template <typename T>
-ptr<list<T>> operator*(typename list<T>::size_type n, const ptr<list<T>> &a) {
-    return a * n;
-}
-
-// a *= n -- mutates the pointed-to list in place, mirroring list<T>::operator*=.
-template <typename T>
-ptr<list<T>> &operator*=(ptr<list<T>> &a, typename list<T>::size_type n) {
-    *a *= n;
-    return a;
-}
-
-template <typename T>
-ptr<list<T>> operator+(const ptr<list<T>> &a, const ptr<list<T>> &b) {
-    return ptr<list<T>>(new list<T>(*a + *b));
-}
-
-// a += b -- mutates the pointed-to list in place, mirroring list<T>::operator+=.
-template <typename T>
-ptr<list<T>> &operator+=(ptr<list<T>> &a, const ptr<list<T>> &b) {
-    *a += *b;
-    return a;
-}
-
 template <typename T>
 inline _int len(const list<T> &l) {
     return l.__len__();
@@ -397,15 +374,15 @@ inline _int len(const list<T> &l) {
 // sorted(iterable, *, reverse=False) - returns a new list.
 // _sorted_kwargs is emitted when the call passes reverse=, like print.
 template <typename T>
-ptr<list<T>> sorted(const ptr<list<T>> &l) {
-    auto out = l->copy();
-    out->sort();
+list<T> sorted(const list<T> &l) {
+    auto out = l.copy();
+    out.sort();
     return out;
 }
 template <typename T>
-ptr<list<T>> _sorted_kwargs(bool reverse, const ptr<list<T>> &l) {
-    auto out = l->copy();
-    out->sort(reverse);
+list<T> _sorted_kwargs(bool reverse, const list<T> &l) {
+    auto out = l.copy();
+    out.sort(reverse);
     return out;
 }
 

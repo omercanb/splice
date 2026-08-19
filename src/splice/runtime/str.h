@@ -24,7 +24,6 @@
 namespace py {
 
 template <typename T> class list;
-template <typename T> class ptr;
 template <typename... Ts> class tuple;
 class slice;
 
@@ -206,11 +205,11 @@ class str {
     bool islower() const { return casedAllAre(false); }
 
     // list/tuple-returning: defined in strops.h.
-    ptr<list<str>> split() const;                  // on whitespace
-    ptr<list<str>> split(const str &sep) const;
-    ptr<list<str>> rsplit(const str &sep) const;
-    ptr<list<str>> splitlines() const;
-    str join(const ptr<list<str>> &parts) const;
+    list<str> split() const;                  // on whitespace
+    list<str> split(const str &sep) const;
+    list<str> rsplit(const str &sep) const;
+    list<str> splitlines() const;
+    str join(const list<str> &parts) const;
     tuple<str, str, str> partition(const str &sep) const;
     tuple<str, str, str> rpartition(const str &sep) const;
 

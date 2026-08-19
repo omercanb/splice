@@ -25,11 +25,9 @@ from mypy.types import TupleType, Type, UnionType, get_proper_type
 from splice.codegen.translation_utils import (
     call_method,
     is_truthy,
-    list_of,
     member_access,
-    pointer_to,
+    needs_explicit_constructor_type,
     should_translate_kwargs,
-    should_wrap_call_in_pointer,
     translate_arguments_with_kwargs,
     translate_binary_expr,
     translate_bool_op,
@@ -44,7 +42,7 @@ from splice.codegen.translation_utils import (
     translate_tuple_access,
 )
 from splice.ast_utils import get_int_literal
-from splice.codegen.typegen import cpp_type_name, is_pointer
+from splice.codegen.typegen import cpp_type_name
 from splice.visitor import Visitor
 
 
@@ -115,10 +113,13 @@ class ExpressionCodegen(Visitor[str]):
         return o.name
 
     def visit_member_expr(self, o: MemberExpr) -> str:
-        """Handle attribute access considering whether the object will be a pointer or value"""
         obj = self.visit(o.expr)
         name = translate_method_name(o.name)
-        return member_access(obj, self.types[o.expr], name)
+        # `self` becomes C++'s `this`, a real pointer no matter what value
+        # semantics does elsewhere, so it always needs -> instead of .
+        if isinstance(o.expr, NameExpr) and isinstance(o.expr.node, Var) and o.expr.node.is_self:
+            return f"{obj}->{name}"
+        return member_access(obj, name)
 
     def visit_call_expr(self, o: CallExpr) -> str:
         # __getitem__(-1)/__setitem__(-1, v) mean "the last element" - swap to back().
@@ -129,8 +130,7 @@ class ExpressionCodegen(Visitor[str]):
             and get_int_literal(o.args[0]) == -1
         ):
             base = self.visit(o.callee.expr)
-            base_type = self.types[o.callee.expr]
-            back_call = call_method(base, base_type, "back")
+            back_call = call_method(base, "back")
             if o.callee.name == "__setitem__":
                 value = self.visit(o.args[1])
                 return f"{back_call} = {value}"
@@ -153,7 +153,7 @@ class ExpressionCodegen(Visitor[str]):
         if qualified:
             callee = qualified
 
-        if should_wrap_call_in_pointer(o.callee):
+        if needs_explicit_constructor_type(o.callee):
             # Spell out the element type: an argument-less list()/set()
             # gives the compiler nothing to deduce it from.
             return translate_constructor(self.types[o], ", ".join(arguments))
@@ -200,9 +200,9 @@ class ExpressionCodegen(Visitor[str]):
         base = self.visit(o.base)
         base_type = get_proper_type(self.types[o.base])
         if isinstance(base_type, TupleType):
-            return translate_tuple_access(base_type, o, base)
+            return translate_tuple_access(o, base)
         index = self.visit(o.index)
-        return call_method(base, base_type, "__getitem__", index)
+        return call_method(base, "__getitem__", index)
 
     def visit_slice_expr(self, o: SliceExpr) -> str:
         """The index of a[i:j:k]. An omitted bound is nullopt, not a default:
@@ -248,7 +248,6 @@ class ExpressionCodegen(Visitor[str]):
         return str(o.value)
 
     def visit_list_expr(self, o: ListExpr) -> str:
-        assert is_pointer(self.types[o])
         elements = [self.visit(element) for element in o.items]
         if elements:
             constructor = f"{{{', '.join(elements)}}}"
