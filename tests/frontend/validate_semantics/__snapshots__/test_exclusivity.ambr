@@ -49,5 +49,29 @@
     help: pass a copy so they can't alias:
             matrix += copy(matrix[0:1])
   
+  program_aliasing_errors.py:31:9: error: `items` could alias `items`, which this loop is iterating
+  
+    31 |         items.append(1)
+       |         ^^^^^
+  
+    help: iterate a copy so mutating it inside the loop can't alias:
+            copy(items)
+  
+  program_aliasing_errors.py:36:9: error: `items` could alias `items`, which this loop is iterating
+  
+    36 |         items.append(1)
+       |         ^^^^^
+  
+    help: iterate a copy so mutating it inside the loop can't alias:
+            enumerate(copy(items))
+  
+  program_aliasing_errors.py:41:9: error: `b` could alias `b`, which this loop is iterating
+  
+    41 |         b.append(1)
+       |         ^
+  
+    help: iterate a copy so mutating it inside the loop can't alias:
+            zip(a, copy(b))
+  
   '''
 # ---

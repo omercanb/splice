@@ -11,6 +11,7 @@ from mypy.nodes import (
     CallExpr,
     Context,
     Expression,
+    ForStmt,
     MemberExpr,
     MypyFile,
     OperatorAssignmentStmt,
@@ -23,6 +24,7 @@ from splice.analysis.mutation import MutationTable
 from splice.analysis.structural_aliasing import (
     AccessPath,
     get_access_path,
+    get_loop_container_paths,
     is_access_path_structural_alias,
 )
 from splice.ast_utils import replace_in_source, source_text
@@ -42,6 +44,10 @@ class _SemanticsValidator(Traverser):
         self.source = source
         self.diagnostics: list[Diagnostic] = []
         self._enclosing_calls: list[CallExpr] = []
+        # Containers currently being iterated by an enclosing for loop, each
+        # paired with that loop's full iterated expression (for building a
+        # hint) - a stack, since loops can nest.
+        self._loop_claims: list[tuple[Expression, AccessPath, Expression]] = []
 
     def report(self, node, kind: str, message: str, hint: str) -> None:
         self.diagnostics.append(diagnostic(node, kind, message, hint))
@@ -68,13 +74,24 @@ class _SemanticsValidator(Traverser):
         self.check_compound_assign_exclusivity(o)
         super().visit_operator_assignment_stmt(o)
 
+    def visit_for_stmt(self, o: ForStmt) -> None:
+        self.visit(o.index)
+        self.visit(o.expr)
+        containers = get_loop_container_paths(o.expr)
+        self._loop_claims.extend((expr, path, o.expr) for expr, path in containers)
+        self.visit(o.body)
+        del self._loop_claims[len(self._loop_claims) - len(containers) :]
+        if o.else_body is not None:
+            self.visit(o.else_body)
+
     def check_compound_assign_exclusivity(self, o: OperatorAssignmentStmt) -> None:
-        """`l += l` can't structurally alias itself - a compound assignment
-        always mutates its target, same as append/extend do."""
+        """A compound assignment always mutates its target, so `l += l`
+        can't structurally alias itself."""
         claims: list[tuple[Expression, AccessPath, bool]] = []
         lhs_path = get_access_path(o.lvalue)
         if lhs_path is not None:
             claims.append((o.lvalue, lhs_path, True))
+            self._check_loop_claims(o.lvalue, lhs_path)
         rhs_path = get_access_path(o.rvalue)
         if rhs_path is not None:
             claims.append((o.rvalue, rhs_path, False))
@@ -87,13 +104,16 @@ class _SemanticsValidator(Traverser):
         for arg_expr, param_var in match_call_arguments(o, self.types):
             path = get_access_path(arg_expr)
             if path is not None:
-                claims.append((arg_expr, path, param_var in self.mutations))
+                mutable = param_var in self.mutations
+                claims.append((arg_expr, path, mutable))
+                if mutable:
+                    self._check_loop_claims(arg_expr, path)
         self._check_claims(o, claims)
 
     def check_builtin_exclusivity(self, o: CallExpr) -> None:
-        """Same check as check_exclusivity, but for a builtin method call
-        (eg. l.append(x)), where there's no FuncDef to read parameters from.
-        """
+        """A builtin method call (eg. l.append(x)) has no FuncDef to read
+        parameters from, so mutability comes from the builtin effects table
+        instead, keyed by argument index with self at index 0."""
         if not isinstance(o.callee, MemberExpr):
             return
         effect = builtin_operation_effect(self.types[o.callee.expr], o.callee.name)
@@ -104,8 +124,33 @@ class _SemanticsValidator(Traverser):
         for i, arg_expr in enumerate([o.callee.expr, *o.args]):
             path = get_access_path(arg_expr)
             if path is not None:
-                claims.append((arg_expr, path, i in effect.mutated_args))
+                mutable = i in effect.mutated_args
+                claims.append((arg_expr, path, mutable))
+                if mutable:
+                    self._check_loop_claims(arg_expr, path)
         self._check_claims(o, claims)
+
+    def _check_loop_claims(self, mutated_expr: Expression, mutated_path: AccessPath) -> None:
+        """A container being iterated by an enclosing for loop can't alias
+        anything mutated inside that loop's own body."""
+        for container_expr, container_path, loop_iterable in self._loop_claims:
+            if is_access_path_structural_alias(mutated_path, container_path) is not None:
+                mutated_text = source_text(mutated_expr, self.source)
+                container_text = source_text(container_expr, self.source)
+                rewritten = replace_in_source(
+                    loop_iterable, container_expr, f"copy({container_text})", self.source
+                )
+                if rewritten is not None:
+                    hint = f"iterate a copy so mutating it inside the loop can't alias:\n{rewritten}"
+                else:
+                    hint = f"iterate a copy so mutating it inside the loop can't alias, eg. wrap `{container_text}` in copy(...)"
+                self.report(
+                    mutated_expr,
+                    "aliasing-loop-container",
+                    f"`{mutated_text}` could alias `{container_text}`, which this loop is iterating",
+                    hint,
+                )
+                return
 
     def _check_claims(
         self, o: Context, claims: list[tuple[Expression, AccessPath, bool]]

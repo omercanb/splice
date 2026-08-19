@@ -21,6 +21,8 @@ from mypy.nodes import CallExpr, Expression, MemberExpr, NameExpr, Var
 from splice.analysis.mutation import _ALIASING_METHODS
 from splice.ast_utils import get_int_literal
 
+_ITER_WRAPPING_BUILTINS = {"builtins.enumerate", "builtins.zip"}
+
 
 @dataclass
 class AccessPath:
@@ -102,3 +104,21 @@ def is_access_path_structural_alias(
         else:
             assert False
     return common_path
+
+
+def get_loop_container_paths(iterable: Expression) -> list[tuple[Expression, AccessPath]]:
+    """The (expression, path) of each real container a for loop's iterated
+    expression walks, peeling through enumerate(x)/zip(a, b, ...) - they
+    can nest (zip(enumerate(a), b)), so this recurses. Anything else
+    (range(...), a plain call, .keys(), ...) produces a fresh value with
+    nothing to claim.
+    """
+    if isinstance(iterable, CallExpr) and isinstance(iterable.callee, NameExpr):
+        if iterable.callee.fullname in _ITER_WRAPPING_BUILTINS:
+            containers = []
+            for arg in iterable.args:
+                containers.extend(get_loop_container_paths(arg))
+            return containers
+        return []
+    path = get_access_path(iterable)
+    return [(iterable, path)] if path is not None else []

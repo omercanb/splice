@@ -23,6 +23,18 @@
   
   '''
 # ---
+# name: test_error_message[aliasing_loop_container.py]
+  '''
+  aliasing_loop_container.py:3:9: error: `items` could alias `items`, which this loop is iterating
+  
+    3 |         items.append(1)
+      |         ^^^^^
+  
+    help: iterate a copy so mutating it inside the loop can't alias:
+            copy(items)
+  
+  '''
+# ---
 # name: test_error_message[chained_assignment.py]
   '''
   chained_assignment.py:2:5: error: assigning to multiple targets in one statement is not supported

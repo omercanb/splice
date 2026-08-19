@@ -1,6 +1,6 @@
-"""check_exclusivity/check_builtin_exclusivity, covering both regular
-function/method calls and builtin calls (eg. list.append) - the two paths
-validate_semantics.py dispatches between based on is_call_builtin.
+"""The exclusivity checks in validate_semantics.py: check_exclusivity and
+check_builtin_exclusivity for regular vs. builtin calls, plus the for-loop
+container check and the compound-assignment check.
 """
 
 from pathlib import Path
@@ -20,8 +20,10 @@ def test_aliasing_errors(snapshot):
     with pytest.raises(UnsupportedProgram) as raised:
         pipeline(str(errors_path), source)
     diagnostics = raised.value.diagnostics
-    assert len(diagnostics) == 6
-    assert all(d.kind == "aliasing-arguments" for d in diagnostics)
+    assert len(diagnostics) == 9
+    assert all(
+        d.kind in ("aliasing-arguments", "aliasing-loop-container") for d in diagnostics
+    )
     assert render(diagnostics, source, errors_path.name) == snapshot
 
 

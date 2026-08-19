@@ -24,3 +24,18 @@ def compound_assign_self_alias(items: list[int]) -> None:
 
 def compound_assign_nested_alias(matrix: list[list[int]]) -> None:
     matrix += matrix[0:1]
+
+
+def loop_container_mutated_directly(items: list[int]) -> None:
+    for x in items:
+        items.append(1)
+
+
+def loop_container_mutated_through_enumerate(items: list[int]) -> None:
+    for i, x in enumerate(items):
+        items.append(1)
+
+
+def loop_container_mutated_through_zip(a: list[int], b: list[int]) -> None:
+    for x, y in zip(a, b):
+        b.append(1)

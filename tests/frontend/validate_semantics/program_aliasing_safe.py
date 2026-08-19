@@ -32,3 +32,25 @@ def no_alias_via_copy(items: list[int]) -> None:
 
 def compound_assign_no_alias(a: list[int], b: list[int]) -> None:
     a += b
+
+
+class Item:
+    value: int
+
+    def __init__(self) -> None:
+        self.value = 0
+
+
+def loop_setting_a_field_is_fine(items: list[Item]) -> None:
+    for x in items:
+        x.value = 5
+
+
+def loop_mutating_a_different_container(a: list[int], b: list[int]) -> None:
+    for x in a:
+        b.append(1)
+
+
+def loop_container_via_range_len(items: list[int]) -> None:
+    for i in range(len(items)):
+        items.append(1)

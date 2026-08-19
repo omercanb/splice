@@ -46,9 +46,8 @@ def source_text(node: Context, source: str) -> str:
 def replace_in_source(outer: Context, target: Context, replacement: str, source: str) -> str | None:
     """outer's source text, with target's span swapped for `replacement`.
 
-    Only handles outer and target both sitting on one line - the only case
-    this is used for so far (a call and one of its own arguments). Returns
-    None rather than wrong text when that doesn't hold.
+    target must be a sub-expression of outer, both on the same line. Returns
+    None instead of wrong text when that doesn't hold.
     """
     target_end_line = target.end_line if target.end_line is not None else target.line
     if outer.line != target.line or target.line != target_end_line:
