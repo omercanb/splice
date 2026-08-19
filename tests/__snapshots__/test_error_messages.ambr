@@ -185,6 +185,18 @@
   
   '''
 # ---
+# name: test_error_message[identity_comparison.py]
+  '''
+  identity_comparison.py:4:8: error: `is` doesn't make sense once compiled to C++
+  
+    4 |     if a is b:
+      |        ^^^^^^
+  
+    help: every value is independent once compiled, so there's no separate notion of identity - use == if you meant to compare values:
+            a == b
+  
+  '''
+# ---
 # name: test_error_message[missing_copy.py]
   '''
   missing_copy.py:2:5: error: `a` needs an explicit copy here

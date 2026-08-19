@@ -694,6 +694,21 @@ class _Validator(Traverser):
                 f"if {convert_to_python(o.left)} {o.op} {convert_to_python(o.right)}:",
             )
 
+    def visit_comparison_expr(self, o: ComparisonExpr) -> None:
+        for op, left, right in o.pairwise():
+            if op in ("is", "is not"):
+                replacement = "==" if op == "is" else "!="
+                self.report(
+                    o,
+                    "identity-comparison",
+                    f"`{op}` doesn't make sense once compiled to C++",
+                    "every value is independent once compiled, so there's no "
+                    f"separate notion of identity - use {replacement} if you "
+                    "meant to compare values:\n"
+                    f"{convert_to_python(left)} {replacement} {convert_to_python(right)}",
+                )
+        super().visit_comparison_expr(o)
+
 
 @dataclass(frozen=True)
 class Diagnostic:

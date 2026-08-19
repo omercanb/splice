@@ -1,5 +1,6 @@
 #include "builtins.h"
 #include "bytes.h"
+#include "copy.h"
 #include "dict.h"
 #include "exceptions.h"
 #include "file.h"
@@ -383,7 +384,6 @@ int run() {
     }
     print(len(points));
     e = Empty();
-    print((__is(e, e)));
     return 0LL;
 }
 }
@@ -400,8 +400,6 @@ int run() {
     _int b;
     _int c;
     _int d;
-    list<_int> l1;
-    list<_int> l2;
     __init_module__();
     a = 1LL;
     b = 2LL;
@@ -413,10 +411,6 @@ int run() {
     print(((c <= d)));
     print(((a == d)));
     print(((c == d)));
-    l1 = list<_int>({1LL, 2LL, 3LL});
-    l2 = list<_int>({1LL, 2LL, 3LL});
-    print((__is(l1, l1)));
-    print((__is(l1, l2)));
     return 0LL;
 }
 }

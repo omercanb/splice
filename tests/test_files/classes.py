@@ -68,6 +68,5 @@ def main() -> int:
     print(len(points))
 
     e = Empty()
-    print(e is e)
 
     return 0
