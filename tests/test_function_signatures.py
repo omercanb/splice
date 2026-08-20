@@ -45,19 +45,19 @@ class A:
 """
 
 function_signatures = {
-    "simple": "int64_t simple(int64_t x)",
-    "with_defaults": 'str with_defaults(int64_t a, str b = str("hello"), double c = 3.14)',
-    "multiple_params": "str multiple_params(int64_t x, double y, bool z)",
+    "simple": "int64_t simple(const int64_t &x)",
+    "with_defaults": 'str with_defaults(const int64_t &a, const str &b = str("hello"), const double &c = 3.14)',
+    "multiple_params": "str multiple_params(const int64_t &x, const double &y, const bool &z)",
     "no_return": "void no_return()",
-    "returns_list": "list<str> returns_list(list<int64_t> items)",
-    "returns_dict": "dict<int64_t, str> returns_dict(dict<str, int64_t> d)",
+    "returns_list": "list<str> returns_list(const list<int64_t> &items)",
+    "returns_dict": "dict<int64_t, str> returns_dict(const dict<str, int64_t> &d)",
     "no_params": "int64_t no_params()",
-    "with_optional": "str with_optional(std::optional<int64_t> x)",
-    "with_object": "B with_object(B x)",
+    "with_optional": "str with_optional(const std::optional<int64_t> &x)",
+    "with_object": "B with_object(const B &x)",
 }
 
 class_name = "A"
-method_signatures = {"method": "int64_t method(int64_t other)"}
+method_signatures = {"method": "int64_t method(const int64_t &other)"}
 
 
 class TestFunctionSignatures:
@@ -68,13 +68,16 @@ class TestFunctionSignatures:
         result = analyse(None, test_code, check_semantics=False)
         cls.tree = result.tree
         cls.types = result.types
+        cls.mutations = result.mutations
         cls.expr_translator = ExpressionCodegen(result.types)
 
     def generate_function_signature(self, func_name: str) -> str:
         """Generate C++ signature for a function."""
         sym = self.tree.names.get(func_name)
         assert sym and isinstance(sym.node, FuncDef)
-        signature = translate_func_signature(sym.node, self.expr_translator)
+        signature = translate_func_signature(
+            sym.node, self.expr_translator, mutations=self.mutations
+        )
         return signature
 
     def generate_method_signature(self, method_name: str, class_name: str) -> str:
@@ -82,7 +85,9 @@ class TestFunctionSignatures:
         assert class_info and isinstance(class_info.node, TypeInfo)
         method = class_info.node.names[method_name].node
         assert isinstance(method, FuncDef)
-        signature = translate_func_signature(method, self.expr_translator)
+        signature = translate_func_signature(
+            method, self.expr_translator, mutations=self.mutations
+        )
         return signature
 
     @pytest.mark.parametrize("func_name,expected_sig", function_signatures.items())

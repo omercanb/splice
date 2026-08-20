@@ -36,7 +36,10 @@ def write_class_declaration(codegen: StatementCodegen, class_def: ClassDef) -> N
     write_attributes(codegen, class_def)
     write_constructor(codegen, class_def)
     for method in methods(class_def):
-        codegen.emit(f"{translate_func_signature(method, codegen.expr_codegen)};")
+        signature = translate_func_signature(
+            method, codegen.expr_codegen, mutations=codegen.mutations
+        )
+        codegen.emit(f"{signature};")
 
     codegen.unindent()
     codegen.emit("};")
@@ -47,7 +50,10 @@ def write_class_bodies(codegen: StatementCodegen, class_def: ClassDef) -> None:
     """Emit all methods in the class out of line"""
     for method in methods(class_def):
         header = translate_func_signature(
-            method, codegen.expr_codegen, qualifier=f"{class_def.name}::"
+            method,
+            codegen.expr_codegen,
+            mutations=codegen.mutations,
+            qualifier=f"{class_def.name}::",
         )
         codegen.emit_function_body(f"{header} {{", method)
 
@@ -96,7 +102,7 @@ def write_constructor(codegen: StatementCodegen, class_def: ClassDef) -> None:
     own_arguments = [
         argument for argument in init.arguments if not argument.variable.is_self
     ]
-    parameters = translate_parameters(init, codegen.expr_codegen)
+    parameters = translate_parameters(init, codegen.expr_codegen, codegen.mutations)
     arguments = [argument.variable.name for argument in own_arguments]
     codegen.emit(
         f"{class_def.name}({', '.join(parameters)}) "

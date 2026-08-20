@@ -1,4 +1,6 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from mypy.nodes import CallExpr, ComparisonExpr
 from mypy.nodes import Expression
@@ -6,6 +8,8 @@ from mypy.nodes import Expression as MypyExpression
 from mypy.nodes import FuncDef, LambdaExpr, NameExpr, TypeInfo
 from mypy.types import CallableType, Type, get_proper_type
 
+if TYPE_CHECKING:
+    from splice.analysis.mutation import MutationTable
 from splice.codegen.builtins import (
     BOOL_OP_MACROS,
     EXCEPTION_TYPES,
@@ -40,7 +44,10 @@ def get_argument_names(func: FuncDef) -> list[str]:
 
 
 def translate_func_signature(
-    o: FuncDef, expr_translator: Visitor[str], qualifier: str = ""
+    o: FuncDef,
+    expr_translator: Visitor[str],
+    mutations: MutationTable,
+    qualifier: str = "",
 ) -> str:
     """Generate a C++ function signature.
 
@@ -52,12 +59,18 @@ def translate_func_signature(
     name = o.name
     if name == "main":
         return_type = "int"
-    arguments = translate_parameters(o, expr_translator)
+    arguments = translate_parameters(o, expr_translator, mutations)
     signature = f"{return_type} {qualifier}{name}({', '.join(arguments)})"
     return signature
 
 
-def translate_parameters(o: FuncDef, expr_translator: Visitor[str]) -> list[str]:
+def translate_parameters(
+    o: FuncDef, expr_translator: Visitor[str], mutations: MutationTable
+) -> list[str]:
+    """Every parameter is a reference, scoped to the call - never a copy.
+
+    const unless mutations says this parameter gets written to.
+    """
     func = get_function_type(o)
     arguments: list[str] = []
     for argument, argument_type in zip(o.arguments, func.arg_types):
@@ -65,11 +78,13 @@ def translate_parameters(o: FuncDef, expr_translator: Visitor[str]) -> list[str]
             continue
         argument_name = argument.variable.name
         argument_type_cpp = cpp_type(argument_type)
+        const = "" if argument.variable in mutations else "const "
+        ref_type = f"{const}{argument_type_cpp} &"
         if argument.initializer:
             default = expr_translator.visit(argument.initializer)
-            s = f"{argument_type_cpp} {argument_name} = {default}"
+            s = f"{ref_type}{argument_name} = {default}"
         else:
-            s = f"{argument_type_cpp} {argument_name}"
+            s = f"{ref_type}{argument_name}"
         arguments.append(s)
     return arguments
 

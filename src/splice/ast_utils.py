@@ -23,6 +23,7 @@ def get_int_literal(expr: Expression) -> int | None:
 
 
 def literal_int_value(t: Type) -> int | None:
+    """A compile time integer. Stored as a type in mypys type system"""
     """The int a type resolves to, eg. N in Array[T, N] or the index in t[i].
 
     A literal shows up as one of two different shapes depending on where it
@@ -32,13 +33,15 @@ def literal_int_value(t: Type) -> int | None:
     set for an ordinary value expression's inferred type (eg. t[0]'s index).
     """
     proper = get_proper_type(t)
-    if isinstance(proper, LiteralType) and isinstance(proper.value, int):
+    if isinstance(proper, LiteralType) and isinstance(
+        proper.value, int
+    ):  # A final or literal[n]
         return proper.value
     if (
         isinstance(proper, Instance)
         and proper.last_known_value is not None
         and isinstance(proper.last_known_value.value, int)
-    ):
+    ):  # An int expressions
         return proper.last_known_value.value
     return None
 
@@ -64,7 +67,9 @@ def source_text(node: Context, source: str) -> str:
     return "\n".join([first, *middle, last])
 
 
-def replace_in_source(outer: Context, target: Context, replacement: str, source: str) -> str | None:
+def replace_in_source(
+    outer: Context, target: Context, replacement: str, source: str
+) -> str | None:
     """outer's source text, with target's span swapped for `replacement`.
 
     target must be a sub-expression of outer, both on the same line. Returns
@@ -74,7 +79,9 @@ def replace_in_source(outer: Context, target: Context, replacement: str, source:
     if outer.line != target.line or target.line != target_end_line:
         return None
     outer_text = source_text(outer, source)
-    target_end_column = target.end_column if target.end_column is not None else target.column
+    target_end_column = (
+        target.end_column if target.end_column is not None else target.column
+    )
     start = target.column - outer.column
     end = target_end_column - outer.column
     return outer_text[:start] + replacement + outer_text[end:]

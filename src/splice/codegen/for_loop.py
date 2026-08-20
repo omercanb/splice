@@ -182,16 +182,15 @@ def for_range_unknown_step(
 def for_generic(
     codegen: StatementCodegen, index: MypyExpression, iterable: MypyExpression
 ) -> LoopHeader:
-    """Translate: for var in iterable (generic iterator protocol)"""
+    """Translate: for var in iterable (standard begin()/end() protocol)"""
     target = codegen.get_expr(index, lvalue=True)
     # `for x in [1, 2, 3]:` iterates a temporary; the containers' iterators
     # hold only a reference, which would dangle once this statement ends.
     # Binding it to auto&& first extends its lifetime for the whole loop.
     range_var = _hoist(codegen, codegen.get_expr(iterable), "auto &&", "range")
-    iter_var = temp_name("iter")
-    # TODO itervar shouldnt be declared in the loop
+    item_var = temp_name("item")
 
     return LoopHeader(
-        f"for (auto {iter_var} = iter({range_var}); !{iter_var}.done();)",
-        [f"{target} = next({iter_var});"],
+        f"for (auto &&{item_var} : {range_var})",
+        [f"{target} = {item_var};"],
     )

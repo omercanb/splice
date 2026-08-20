@@ -1,10 +1,9 @@
 #pragma once
 
 // Python builtins that aren't methods on a container. Anything over an
-// iterable goes through iter()/done()/next(), the same protocol a for loop
-// uses, so any of our containers - or a user class with iter() - work here.
+// iterable goes through begin()/end(), the same protocol a for loop uses,
+// so any of our containers - or a user class with begin()/end() - work here.
 
-#include "iter.h"
 #include "mathops.h"
 #include "str.h"
 #include "truthy.h"
@@ -17,53 +16,50 @@
 namespace py {
 
 template <typename Container> auto sum(Container &&c) {
-    auto iterator = iter(c);
+    auto it = c.begin();
+    auto end = c.end();
     // Value initialised, so an empty iterable sums to 0 as in Python.
-    std::decay_t<decltype(next(iterator))> total{};
-    while (!iterator.done())
-        total = total + next(iterator);
+    std::decay_t<decltype(*it)> total{};
+    for (; it != end; ++it)
+        total = total + *it;
     return total;
 }
 
 template <typename Container> bool any(Container &&c) {
-    auto iterator = iter(c);
-    while (!iterator.done())
-        if (to_bool(next(iterator)))
+    for (auto &&item : c)
+        if (to_bool(item))
             return true;
     return false;
 }
 
 template <typename Container> bool all(Container &&c) {
-    auto iterator = iter(c);
-    while (!iterator.done())
-        if (!to_bool(next(iterator)))
+    for (auto &&item : c)
+        if (!to_bool(item))
             return false;
     return true;
 }
 
 template <typename Container> auto min(Container &&c) {
-    auto iterator = iter(c);
-    if (iterator.done())
+    auto it = c.begin();
+    auto end = c.end();
+    if (it == end)
         throw ValueError("min() iterable argument is empty");
-    auto best = next(iterator);
-    while (!iterator.done()) {
-        auto item = next(iterator);
-        if (item < best)
-            best = item;
-    }
+    auto best = *it;
+    for (++it; it != end; ++it)
+        if (*it < best)
+            best = *it;
     return best;
 }
 
 template <typename Container> auto max(Container &&c) {
-    auto iterator = iter(c);
-    if (iterator.done())
+    auto it = c.begin();
+    auto end = c.end();
+    if (it == end)
         throw ValueError("max() iterable argument is empty");
-    auto best = next(iterator);
-    while (!iterator.done()) {
-        auto item = next(iterator);
-        if (best < item)
-            best = item;
-    }
+    auto best = *it;
+    for (++it; it != end; ++it)
+        if (best < *it)
+            best = *it;
     return best;
 }
 

@@ -45,8 +45,8 @@ int run() {
     print(str("Test 5 - fill:"), b.__getitem__(0LL), b.__getitem__(1LL), b.__getitem__(2LL), b.__getitem__(3LL));
     total = 0LL;
     auto && __range_0 = b;
-    for (auto __iter_0 = iter(__range_0); !__iter_0.done();) {
-        v = next(__iter_0);
+    for (auto &&__item_0 : __range_0) {
+        v = __item_0;
         total = (total + v);
     }
     print(str("Test 6 - iteration sum:"), total);
@@ -56,14 +56,14 @@ int run() {
 }
 
 namespace prog_boolops {
-int64_t side(int64_t v);
+int64_t side(const int64_t &v);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-int64_t side(int64_t v) {
+int64_t side(const int64_t &v) {
     print(str("SIDE"));
     return v;
 }
@@ -144,20 +144,20 @@ int run() {
 }
 
 namespace prog_builtin_functions {
-list<int64_t> __list_comprehension_0(list<int64_t> numbers);
+list<int64_t> __list_comprehension_0(const list<int64_t> &numbers);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-list<int64_t> __list_comprehension_0(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_0(const list<int64_t> &numbers) {
     list<int64_t> __tmp_0;
     int64_t v;
     __tmp_0 = list<int64_t>();
     auto && __range_1 = numbers;
-    for (auto __iter_1 = iter(__range_1); !__iter_1.done();) {
-        v = next(__iter_1);
+    for (auto &&__item_1 : __range_1) {
+        v = __item_1;
         __tmp_0.append((v * 2LL));
     }
     return __tmp_0;
@@ -265,15 +265,15 @@ int run() {
     print(bytes(list<int64_t>({65LL, 66LL, 67LL})));
     total = 0LL;
     auto && __range_2 = bytes(std::string("abc", 3));
-    for (auto __iter_2 = iter(__range_2); !__iter_2.done();) {
-        byte = next(__iter_2);
+    for (auto &&__item_2 : __range_2) {
+        byte = __item_2;
         total += byte;
     }
     print(total);
     joined = bytes(std::string("", 0));
     auto && __range_3 = bytes(std::string("abc", 3));
-    for (auto __iter_3 = iter(__range_3); !__iter_3.done();) {
-        byte = next(__iter_3);
+    for (auto &&__item_3 : __range_3) {
+        byte = __item_3;
         joined = ((joined + bytes(list<int64_t>({byte}))) + bytes(std::string(".", 1)));
     }
     print(joined);
@@ -323,12 +323,12 @@ class Counter {
   public:
     int64_t count;
 
-    Counter(int64_t start) { __init__(start); }
+    Counter(const int64_t &start) { __init__(start); }
 
     Counter() = default;
 
-    void __init__(int64_t start);
-    void bump(int64_t by);
+    void __init__(const int64_t &start);
+    void bump(const int64_t &by);
     int64_t doubled();
 };
 
@@ -337,13 +337,13 @@ class Point {
     int64_t x;
     int64_t y;
 
-    Point(int64_t x, int64_t y) { __init__(x, y); }
+    Point(const int64_t &x, const int64_t &y) { __init__(x, y); }
 
     Point() = default;
 
-    void __init__(int64_t x, int64_t y);
+    void __init__(const int64_t &x, const int64_t &y);
     int64_t norm();
-    Point moved(int64_t dx, int64_t dy);
+    Point moved(const int64_t &dx, const int64_t &dy);
     str __str__();
     int64_t __len__();
     bool __bool__();
@@ -353,11 +353,11 @@ class Empty {
   public:
 };
 
-void Counter::__init__(int64_t start) {
+void Counter::__init__(const int64_t &start) {
     this->count = start;
 }
 
-void Counter::bump(int64_t by) {
+void Counter::bump(const int64_t &by) {
     this->count = (this->count + by);
 }
 
@@ -365,7 +365,7 @@ int64_t Counter::doubled() {
     return (this->count * 2LL);
 }
 
-void Point::__init__(int64_t x, int64_t y) {
+void Point::__init__(const int64_t &x, const int64_t &y) {
     this->x = x;
     this->y = y;
 }
@@ -374,7 +374,7 @@ int64_t Point::norm() {
     return ((this->x * this->x) + (this->y * this->y));
 }
 
-Point Point::moved(int64_t dx, int64_t dy) {
+Point Point::moved(const int64_t &dx, const int64_t &dy) {
     return Point((this->x + dx), (this->y + dy));
 }
 
@@ -415,8 +415,8 @@ int run() {
     print(p.x, p.norm());
     points = list<Point>({Point(1LL, 1LL), Point(2LL, 2LL)});
     auto && __range_4 = points;
-    for (auto __iter_4 = iter(__range_4); !__iter_4.done();) {
-        point = next(__iter_4);
+    for (auto &&__item_4 : __range_4) {
+        point = __item_4;
         print(point, point.norm());
     }
     print(len(points));
@@ -453,63 +453,63 @@ int run() {
 }
 
 namespace prog_comprehensions {
-list<int64_t> __list_comprehension_1(list<int64_t> values, int64_t factor, int64_t offset);
-list<int64_t> scaled(list<int64_t> values, int64_t factor);
-list<int64_t> __list_comprehension_2(list<int64_t> numbers);
-list<int64_t> __list_comprehension_3(list<int64_t> numbers);
+list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t &factor, const int64_t &offset);
+list<int64_t> scaled(const list<int64_t> &values, const int64_t &factor);
+list<int64_t> __list_comprehension_2(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_3(const list<int64_t> &numbers);
 list<int64_t> __list_comprehension_4();
 list<int64_t> __list_comprehension_5();
-list<int64_t> __list_comprehension_6(list<int64_t> numbers);
-set<int64_t> __set_comprehension_0(list<int64_t> numbers);
-dict<int64_t, int64_t> __dict_comprehension_0(list<int64_t> numbers);
-list<int64_t> __list_comprehension_7(list<int64_t> numbers);
-list<int64_t> __list_comprehension_11(int64_t v);
-list<int64_t> __list_comprehension_8(list<int64_t> numbers);
-list<int64_t> __list_comprehension_9(list<int64_t> numbers);
-list<int64_t> __list_comprehension_10(list<int64_t> doubled);
+list<int64_t> __list_comprehension_6(const list<int64_t> &numbers);
+set<int64_t> __set_comprehension_0(const list<int64_t> &numbers);
+dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_7(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_11(const int64_t &v);
+list<int64_t> __list_comprehension_8(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_9(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_10(const list<int64_t> &doubled);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-list<int64_t> __list_comprehension_1(list<int64_t> values, int64_t factor, int64_t offset) {
+list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t &factor, const int64_t &offset) {
     list<int64_t> __tmp_1;
     int64_t v;
     __tmp_1 = list<int64_t>();
     auto && __range_5 = values;
-    for (auto __iter_5 = iter(__range_5); !__iter_5.done();) {
-        v = next(__iter_5);
+    for (auto &&__item_5 : __range_5) {
+        v = __item_5;
         __tmp_1.append(((v * factor) + offset));
     }
     return __tmp_1;
 }
 
-list<int64_t> scaled(list<int64_t> values, int64_t factor) {
+list<int64_t> scaled(const list<int64_t> &values, const int64_t &factor) {
     int64_t offset;
     offset = 1LL;
     return __list_comprehension_1(values, factor, offset);
 }
 
-list<int64_t> __list_comprehension_2(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_2(const list<int64_t> &numbers) {
     list<int64_t> __tmp_2;
     int64_t v;
     __tmp_2 = list<int64_t>();
     auto && __range_6 = numbers;
-    for (auto __iter_6 = iter(__range_6); !__iter_6.done();) {
-        v = next(__iter_6);
+    for (auto &&__item_6 : __range_6) {
+        v = __item_6;
         __tmp_2.append(v);
     }
     return __tmp_2;
 }
 
-list<int64_t> __list_comprehension_3(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_3(const list<int64_t> &numbers) {
     list<int64_t> __tmp_3;
     int64_t v;
     __tmp_3 = list<int64_t>();
     auto && __range_7 = numbers;
-    for (auto __iter_7 = iter(__range_7); !__iter_7.done();) {
-        v = next(__iter_7);
+    for (auto &&__item_7 : __range_7) {
+        v = __item_7;
         if (to_bool(((v > 2LL)))) {
             __tmp_3.append(v);
         }
@@ -539,7 +539,7 @@ list<int64_t> __list_comprehension_5() {
     return __tmp_5;
 }
 
-list<int64_t> __list_comprehension_6(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_6(const list<int64_t> &numbers) {
     list<int64_t> __tmp_6;
     int64_t i;
     __tmp_6 = list<int64_t>();
@@ -550,25 +550,25 @@ list<int64_t> __list_comprehension_6(list<int64_t> numbers) {
     return __tmp_6;
 }
 
-set<int64_t> __set_comprehension_0(list<int64_t> numbers) {
+set<int64_t> __set_comprehension_0(const list<int64_t> &numbers) {
     set<int64_t> __tmp_7;
     int64_t v;
     __tmp_7 = set<int64_t>();
     auto && __range_8 = numbers;
-    for (auto __iter_8 = iter(__range_8); !__iter_8.done();) {
-        v = next(__iter_8);
+    for (auto &&__item_8 : __range_8) {
+        v = __item_8;
         __tmp_7.add((v * v));
     }
     return __tmp_7;
 }
 
-dict<int64_t, int64_t> __dict_comprehension_0(list<int64_t> numbers) {
+dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &numbers) {
     dict<int64_t, int64_t> __tmp_8;
     int64_t v;
     __tmp_8 = dict<int64_t, int64_t>();
     auto && __range_9 = numbers;
-    for (auto __iter_9 = iter(__range_9); !__iter_9.done();) {
-        v = next(__iter_9);
+    for (auto &&__item_9 : __range_9) {
+        v = __item_9;
         if (to_bool(((v > 1LL)))) {
             __tmp_8.__setitem__(v, (v * v));
         }
@@ -576,17 +576,17 @@ dict<int64_t, int64_t> __dict_comprehension_0(list<int64_t> numbers) {
     return __tmp_8;
 }
 
-list<int64_t> __list_comprehension_7(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_7(const list<int64_t> &numbers) {
     list<int64_t> __tmp_9;
     int64_t x;
     int64_t y;
     __tmp_9 = list<int64_t>();
     auto && __range_10 = numbers;
-    for (auto __iter_10 = iter(__range_10); !__iter_10.done();) {
-        x = next(__iter_10);
+    for (auto &&__item_10 : __range_10) {
+        x = __item_10;
         auto && __range_11 = numbers;
-        for (auto __iter_11 = iter(__range_11); !__iter_11.done();) {
-            y = next(__iter_11);
+        for (auto &&__item_11 : __range_11) {
+            y = __item_11;
             if (to_bool(((x < y)))) {
                 __tmp_9.append((x * y));
             }
@@ -595,7 +595,7 @@ list<int64_t> __list_comprehension_7(list<int64_t> numbers) {
     return __tmp_9;
 }
 
-list<int64_t> __list_comprehension_11(int64_t v) {
+list<int64_t> __list_comprehension_11(const int64_t &v) {
     list<int64_t> __tmp_13;
     int64_t w;
     __tmp_13 = list<int64_t>();
@@ -606,37 +606,37 @@ list<int64_t> __list_comprehension_11(int64_t v) {
     return __tmp_13;
 }
 
-list<int64_t> __list_comprehension_8(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_8(const list<int64_t> &numbers) {
     list<int64_t> __tmp_10;
     int64_t v;
     __tmp_10 = list<int64_t>();
     auto && __range_12 = numbers;
-    for (auto __iter_12 = iter(__range_12); !__iter_12.done();) {
-        v = next(__iter_12);
+    for (auto &&__item_12 : __range_12) {
+        v = __item_12;
         __tmp_10.append(len(__list_comprehension_11(v)));
     }
     return __tmp_10;
 }
 
-list<int64_t> __list_comprehension_9(list<int64_t> numbers) {
+list<int64_t> __list_comprehension_9(const list<int64_t> &numbers) {
     list<int64_t> __tmp_11;
     int64_t v;
     __tmp_11 = list<int64_t>();
     auto && __range_13 = numbers;
-    for (auto __iter_13 = iter(__range_13); !__iter_13.done();) {
-        v = next(__iter_13);
+    for (auto &&__item_13 : __range_13) {
+        v = __item_13;
         __tmp_11.append((v * 2LL));
     }
     return __tmp_11;
 }
 
-list<int64_t> __list_comprehension_10(list<int64_t> doubled) {
+list<int64_t> __list_comprehension_10(const list<int64_t> &doubled) {
     list<int64_t> __tmp_12;
     int64_t v;
     __tmp_12 = list<int64_t>();
     auto && __range_14 = doubled;
-    for (auto __iter_14 = iter(__range_14); !__iter_14.done();) {
-        v = next(__iter_14);
+    for (auto &&__item_14 : __range_14) {
+        v = __item_14;
         __tmp_12.append((v + 1LL));
     }
     return __tmp_12;
@@ -715,14 +715,14 @@ int run() {
 }
 
 namespace prog_exceptions {
-int64_t guarded_parse(str text);
-int64_t parse_or(str text, int64_t fallback);
+int64_t guarded_parse(const str &text);
+int64_t parse_or(const str &text, const int64_t &fallback);
 int64_t nested();
 int64_t handler_raises();
-int64_t check_positive(int64_t n);
-int64_t reraise(int64_t n);
-int64_t raise_bare_class(str key);
-int64_t siblings(str first, str second);
+int64_t check_positive(const int64_t &n);
+int64_t reraise(const int64_t &n);
+int64_t raise_bare_class(const str &key);
+int64_t siblings(const str &first, const str &second);
 int64_t relay();
 int run();
 void __init_module__();
@@ -730,7 +730,7 @@ void __init_module__();
 void __init_module__() {
 }
 
-int64_t guarded_parse(str text) {
+int64_t guarded_parse(const str &text) {
     {
         Finally __finally([&] {
             print(str("cleanup"), text);
@@ -739,7 +739,7 @@ int64_t guarded_parse(str text) {
     }
 }
 
-int64_t parse_or(str text, int64_t fallback) {
+int64_t parse_or(const str &text, const int64_t &fallback) {
     int64_t value;
     {
         bool __thrown = false;
@@ -800,14 +800,14 @@ int64_t handler_raises() {
     return 0LL;
 }
 
-int64_t check_positive(int64_t n) {
+int64_t check_positive(const int64_t &n) {
     if (to_bool(((n < 0LL)))) {
         throw ValueError(str("negative"));
     }
     return n;
 }
 
-int64_t reraise(int64_t n) {
+int64_t reraise(const int64_t &n) {
     {
         Finally __finally([&] {
             print(str("reraise finally"));
@@ -821,11 +821,11 @@ int64_t reraise(int64_t n) {
     }
 }
 
-int64_t raise_bare_class(str key) {
+int64_t raise_bare_class(const str &key) {
     throw KeyError("");
 }
 
-int64_t siblings(str first, str second) {
+int64_t siblings(const str &first, const str &second) {
     {
         bool __thrown = false;
         try {
@@ -972,8 +972,8 @@ int run() {
     print(len(stepped.readlines()));
     lines = open(SAMPLE);
     auto && __range_15 = lines;
-    for (auto __iter_15 = iter(__range_15); !__iter_15.done();) {
-        line = next(__iter_15);
+    for (auto &&__item_15 : __range_15) {
+        line = __item_15;
         print(len(line), line.strip());
     }
     out = open(str("tests/test_files/sample_out.txt"), str("w"));
@@ -992,19 +992,19 @@ int run() {
 }
 
 namespace prog_fixed_width_int_promotion {
-uint16_t scale(uint16_t value, uint16_t factor);
-int32_t clamp(int32_t value, int32_t low, int32_t high);
+uint16_t scale(const uint16_t &value, const uint16_t &factor);
+int32_t clamp(const int32_t &value, const int32_t &low, const int32_t &high);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-uint16_t scale(uint16_t value, uint16_t factor) {
+uint16_t scale(const uint16_t &value, const uint16_t &factor) {
     return (value * factor);
 }
 
-int32_t clamp(int32_t value, int32_t low, int32_t high) {
+int32_t clamp(const int32_t &value, const int32_t &low, const int32_t &high) {
     if (to_bool(((value < low)))) {
         return low;
     }
@@ -1035,14 +1035,14 @@ int run() {
 }
 
 namespace prog_fixed_width_ints {
-uint16_t add_u16(uint16_t a, uint16_t b);
+uint16_t add_u16(const uint16_t &a, const uint16_t &b);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-uint16_t add_u16(uint16_t a, uint16_t b) {
+uint16_t add_u16(const uint16_t &a, const uint16_t &b) {
     return uint16_t((a + b));
 }
 
@@ -1106,21 +1106,21 @@ int run() {
     a = list<int64_t>(map([](auto x) { return (x * 2LL); }, nums));
     print(a);
     auto && __range_16 = map([](auto x) { return to_str(x); }, nums);
-    for (auto __iter_16 = iter(__range_16); !__iter_16.done();) {
-        s = next(__iter_16);
+    for (auto &&__item_16 : __range_16) {
+        s = __item_16;
         print(s);
     }
     filtered = list<int64_t>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));
     print(filtered);
     auto && __range_17 = zip(nums, a);
-    for (auto __iter_17 = iter(__range_17); !__iter_17.done();) {
-        destructure(x, y) = next(__iter_17);
+    for (auto &&__item_17 : __range_17) {
+        destructure(x, y) = __item_17;
         print(x, y);
     }
     nums = copy(a);
     auto && __range_18 = enumerate(nums);
-    for (auto __iter_18 = iter(__range_18); !__iter_18.done();) {
-        destructure(i, n) = next(__iter_18);
+    for (auto &&__item_18 : __range_18) {
+        destructure(i, n) = __item_18;
         print(i, n);
     }
     return 0LL;
@@ -1128,14 +1128,14 @@ int run() {
 }
 
 namespace prog_list {
-list<int64_t> give_list(list<int64_t> l);
+list<int64_t> give_list(list<int64_t> &l);
 int run();
 void __init_module__();
 
 void __init_module__() {
 }
 
-list<int64_t> give_list(list<int64_t> l) {
+list<int64_t> give_list(list<int64_t> &l) {
     print(l);
     l.append(2LL);
     print(l);
@@ -1282,13 +1282,13 @@ int run() {
         print(str("sixth"), i);
     }
     auto && __range_19 = l;
-    for (auto __iter_19 = iter(__range_19); !__iter_19.done();) {
-        n = next(__iter_19);
+    for (auto &&__item_19 : __range_19) {
+        n = __item_19;
         print(str("seventh"), n);
     }
     auto && __range_20 = l;
-    for (auto __iter_20 = iter(__range_20); !__iter_20.done();) {
-        n = next(__iter_20);
+    for (auto &&__item_20 : __range_20) {
+        n = __item_20;
         print(str("eight"), n);
     }
     return 0LL;
@@ -1379,8 +1379,8 @@ int run() {
     }
     count = 0LL;
     auto && __range_21 = list<int64_t>({1LL, 2LL, 3LL, 4LL});
-    for (auto __iter_21 = iter(__range_21); !__iter_21.done();) {
-        x = next(__iter_21);
+    for (auto &&__item_21 : __range_21) {
+        x = __item_21;
         if (to_bool((s.__contains__(x)))) {
             count = (count + 1LL);
         }
@@ -1495,8 +1495,8 @@ int run() {
     print(len(d));
     total = 0LL;
     auto && __range_22 = set<int64_t>({1LL, 2LL, 3LL});
-    for (auto __iter_22 = iter(__range_22); !__iter_22.done();) {
-        x = next(__iter_22);
+    for (auto &&__item_22 : __range_22) {
+        x = __item_22;
         total = (total + x);
     }
     print(total);
@@ -1653,8 +1653,8 @@ int run() {
     print(to_float(str("0.5")));
     joined = str("");
     auto && __range_23 = str("abc");
-    for (auto __iter_23 = iter(__range_23); !__iter_23.done();) {
-        c = next(__iter_23);
+    for (auto &&__item_23 : __range_23) {
+        c = __item_23;
         joined = ((joined + c) + str("."));
     }
     print(joined);

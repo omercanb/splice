@@ -112,19 +112,31 @@ class file {
                    "'>");
     }
 
+    // begin()/end() share iter_lines_ - both need the same read, done once
+    // by begin(). Standard range-for calls begin() before end(), so
+    // iter_lines_ is already populated by the time end() reads its size.
     class file_iterator {
       public:
-        file_iterator(file &f) : lines_(_split_keepends(f.remaining())), i_(0) {}
-        bool done() const { return i_ >= lines_.size(); }
-        str current() { return str(lines_[i_]); }
-        str next() { return str(lines_[i_++]); }
+        file_iterator(const std::vector<std::string> *lines, size_t i)
+            : lines_(lines), i_(i) {}
+        str operator*() const { return str((*lines_)[i_]); }
+        file_iterator &operator++() {
+            ++i_;
+            return *this;
+        }
+        bool operator!=(const file_iterator &o) const { return i_ != o.i_; }
+        bool operator==(const file_iterator &o) const { return i_ == o.i_; }
 
       private:
-        std::vector<std::string> lines_;
+        const std::vector<std::string> *lines_;
         size_t i_;
     };
 
-    file_iterator iter() { return file_iterator(*this); }
+    file_iterator begin() {
+        iter_lines_ = _split_keepends(remaining());
+        return file_iterator(&iter_lines_, 0);
+    }
+    file_iterator end() { return file_iterator(&iter_lines_, iter_lines_.size()); }
 
     // Consumes what is left, so iterating twice yields nothing the second
     // time, matching a Python file object.
@@ -141,12 +153,11 @@ class file {
     std::string content_;
     size_t position_ = 0;
     std::ofstream out_;
+    std::vector<std::string> iter_lines_;
 };
 
 inline file open(const str &path, const str &mode = str("r")) {
     return file(path, mode);
 }
-
-inline auto iter(file &f) { return f.iter(); }
 
 } // namespace py

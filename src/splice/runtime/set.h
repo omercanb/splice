@@ -35,11 +35,8 @@ template <typename T> class set {
               typename = std::enable_if_t<
                   !std::is_same_v<std::decay_t<IterableType>, set<T>>>>
     set(IterableType &&iterable) {
-        auto it = py::iter(iterable);
-        while (!it.done()) {
-            data_.insert(it.current());
-            it.next();
-        }
+        for (auto &&item : iterable)
+            data_.insert(item);
     }
 
     size_type __len__() const noexcept {
@@ -154,18 +151,9 @@ template <typename T> class set {
     bool operator>=(const set<T> &o) const { return o <= *this; }
     bool operator>(const set<T> &o) const { return o < *this; }
 
-    class set_iterator {
-      public:
-        using data_type = std::unordered_set<T, hasher<T>>;
-        const data_type &s;
-        typename data_type::const_iterator it;
-
-        set_iterator(const data_type &s) : s(s), it(s.begin()) {}
-        T current() { return *it; }
-        T next() { return *it++; }
-        bool done() { return it == s.end(); }
-    };
-    set_iterator iter() const { return set_iterator(data_); }
+    using const_iterator = typename std::unordered_set<T, hasher<T>>::const_iterator;
+    const_iterator begin() const { return data_.begin(); }
+    const_iterator end() const { return data_.end(); }
 
     const std::unordered_set<T, hasher<T>> &raw() const noexcept {
         return data_;
@@ -188,8 +176,6 @@ template <typename T> class set {
   private:
     std::unordered_set<T, hasher<T>> data_;
 };
-
-template <typename T> auto iter(const set<T> &s) { return s.iter(); }
 
 template <typename T> inline _int len(const set<T> &s) { return s.__len__(); }
 

@@ -54,6 +54,7 @@ class str {
     str __getitem__(size_type i) const {
         return str(std::string(1, data_[normIndex(i)]));
     }
+    str operator[](size_type i) const { return __getitem__(i); }
     // s[-1] -- a length-1 str, same as __getitem__.
     str back() const {
         if (data_.empty())
@@ -237,17 +238,22 @@ class str {
     bool operator>=(const str &o) const { return data_ >= o.data_; }
 
     // Iterating a string yields its characters as length-1 strs.
-    // Holds the bytes rather than a str, since str is incomplete here.
     class str_iterator {
       public:
-        std::string s;
-        _int i = 0;
-        str_iterator(std::string s) : s(std::move(s)) {}
-        str current() { return str(std::string(1, s[i])); }
-        str next() { return str(std::string(1, s[i++])); }
-        bool done() { return i >= static_cast<_int>(s.size()); }
+        explicit str_iterator(std::string::const_iterator it) : it_(it) {}
+        str operator*() const { return str(std::string(1, *it_)); }
+        str_iterator &operator++() {
+            ++it_;
+            return *this;
+        }
+        bool operator!=(const str_iterator &o) const { return it_ != o.it_; }
+        bool operator==(const str_iterator &o) const { return it_ == o.it_; }
+
+      private:
+        std::string::const_iterator it_;
     };
-    str_iterator iter() const { return str_iterator(data_); }
+    str_iterator begin() const { return str_iterator(data_.begin()); }
+    str_iterator end() const { return str_iterator(data_.end()); }
 
   private:
     std::string data_;
@@ -325,7 +331,6 @@ template <class T, class = std::enable_if_t<detail::has_len_method<T>::value>>
 inline _int len(const T &x) {
     return const_cast<T &>(x).__len__();
 }
-inline auto iter(const str &s) { return s.iter(); }
 inline str operator+(const char *a, const str &b) { return str(a) + b; }
 inline std::ostream &operator<<(std::ostream &os, const str &s) {
     return os << s.raw();

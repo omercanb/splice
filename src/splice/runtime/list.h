@@ -115,11 +115,8 @@ class list {
               typename = std::enable_if_t<
                   !std::is_same_v<std::decay_t<IterableType>, list<T>>>>
     list(IterableType &&iterable) {
-        auto it = py::iter(iterable);
-        while (!it.done()) {
-            data_.push_back(it.current());
-            it.next();
-        }
+        for (auto &&item : iterable)
+            data_.push_back(item);
     }
 
     size_type __len__() const noexcept {
@@ -320,17 +317,6 @@ class list {
         return data_;
     } // escape hatch
 
-    class list_iterator {
-      public:
-        list<T> &l;
-        size_t i;
-        list_iterator(list<T> &l) : l(l), i(0) {}
-        T current() { return l[i]; }
-        T next() { return l[i++]; }
-        bool done() { return i >= l.__len__(); }
-    };
-    list_iterator iter() { return list_iterator(*this); }
-
     str __str__() const {
         str result = "[";
         for (size_type i = 0; i < __len__(); ++i) {
@@ -354,11 +340,6 @@ class list {
         return static_cast<std::size_t>(i);
     }
 };
-
-template <typename T>
-auto iter(list<T> &l) { return l.iter(); }
-template <typename It>
-auto next(It &it) { return it.next(); }
 
 // n * a  (mirror of a * n)
 template <typename T>
@@ -389,6 +370,6 @@ list<T> _sorted_kwargs(bool reverse, const list<T> &l) {
 // Deduction guide
 template <typename IterableType>
 list(IterableType &&)
-    -> list<decltype(iter(std::declval<IterableType &>()).current())>;
+    -> list<std::decay_t<decltype(*std::declval<IterableType &>().begin())>>;
 
 } // namespace py
