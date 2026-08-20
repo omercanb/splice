@@ -8,6 +8,7 @@ src/splice/runtime/.pch.h.pch
 .mypy_cache/
 tests/test_files/sample_out.txt
 *.egg-info/
+/build/
 tests/benchmarks/microbenchmarks/strings
 tests/benchmarks/microbenchmarks/sets
 tests/benchmarks/microbenchmarks/sequences
