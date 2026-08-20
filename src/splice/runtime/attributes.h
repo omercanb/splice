@@ -10,3 +10,13 @@
 #else
 #define ALWAYS_INLINE inline
 #endif
+
+// Non-aliasing hint. `restrict` itself is C99, not valid C++; `__restrict` is
+// the one spelling GCC, Clang and MSVC all accept (GCC/Clang also take
+// `__restrict__`, MSVC doesn't). Safe to no-op on an unrecognized compiler -
+// unlike ALWAYS_INLINE, this is only ever an optimization hint.
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
+#define RESTRICT __restrict
+#else
+#define RESTRICT
+#endif

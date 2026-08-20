@@ -45,19 +45,19 @@ class A:
 """
 
 function_signatures = {
-    "simple": "int64_t simple(const int64_t &x)",
-    "with_defaults": 'str with_defaults(const int64_t &a, const str &b = str("hello"), const double &c = 3.14)',
-    "multiple_params": "str multiple_params(const int64_t &x, const double &y, const bool &z)",
+    "simple": "int64_t simple(const int64_t &RESTRICT x)",
+    "with_defaults": 'str with_defaults(const int64_t &RESTRICT a, const str &RESTRICT b = str("hello"), const double &RESTRICT c = 3.14)',
+    "multiple_params": "str multiple_params(const int64_t &RESTRICT x, const double &RESTRICT y, const bool &RESTRICT z)",
     "no_return": "void no_return()",
-    "returns_list": "list<str> returns_list(const list<int64_t> &items)",
-    "returns_dict": "dict<int64_t, str> returns_dict(const dict<str, int64_t> &d)",
+    "returns_list": "list<str> returns_list(const list<int64_t> &RESTRICT items)",
+    "returns_dict": "dict<int64_t, str> returns_dict(const dict<str, int64_t> &RESTRICT d)",
     "no_params": "int64_t no_params()",
-    "with_optional": "str with_optional(const std::optional<int64_t> &x)",
-    "with_object": "B with_object(const B &x)",
+    "with_optional": "str with_optional(const std::optional<int64_t> &RESTRICT x)",
+    "with_object": "B with_object(const B &RESTRICT x)",
 }
 
 class_name = "A"
-method_signatures = {"method": "int64_t method(const int64_t &other)"}
+method_signatures = {"method": "int64_t method(const int64_t &RESTRICT other)"}
 
 
 class TestFunctionSignatures:

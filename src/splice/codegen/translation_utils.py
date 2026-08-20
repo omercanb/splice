@@ -10,6 +10,7 @@ from mypy.types import CallableType, Type, get_proper_type
 
 if TYPE_CHECKING:
     from splice.analysis.mutation import MutationTable
+
 from splice.codegen.builtins import (
     BOOL_OP_MACROS,
     EXCEPTION_TYPES,
@@ -67,10 +68,7 @@ def translate_func_signature(
 def translate_parameters(
     o: FuncDef, expr_translator: Visitor[str], mutations: MutationTable
 ) -> list[str]:
-    """Every parameter is a reference, scoped to the call - never a copy.
-
-    const unless mutations says this parameter gets written to.
-    """
+    """Every parameter is a reference and restrict. This is the whole advantage of using mutable value semantics"""
     func = get_function_type(o)
     arguments: list[str] = []
     for argument, argument_type in zip(o.arguments, func.arg_types):
@@ -79,7 +77,7 @@ def translate_parameters(
         argument_name = argument.variable.name
         argument_type_cpp = cpp_type(argument_type)
         const = "" if argument.variable in mutations else "const "
-        ref_type = f"{const}{argument_type_cpp} &"
+        ref_type = f"{const}{argument_type_cpp} &RESTRICT "
         if argument.initializer:
             default = expr_translator.visit(argument.initializer)
             s = f"{ref_type}{argument_name} = {default}"

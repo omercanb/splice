@@ -52,10 +52,10 @@ int run() {
 
 namespace prog_boolops {
 
-int64_t side(const int64_t &v);
+int64_t side(const int64_t &RESTRICT v);
 int run();
 
-int64_t side(const int64_t &v) {
+int64_t side(const int64_t &RESTRICT v) {
     print(str("SIDE"));
     return v;
 }
@@ -136,10 +136,10 @@ int run() {
 
 namespace prog_builtin_functions {
 
-list<int64_t> __list_comprehension_0(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_0(const list<int64_t> &RESTRICT numbers);
 int run();
 
-list<int64_t> __list_comprehension_0(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_0(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_0;
     int64_t v;
     __tmp_0 = list<int64_t>();
@@ -302,12 +302,12 @@ class Counter {
   public:
     int64_t count;
 
-    Counter(const int64_t &start) { __init__(start); }
+    Counter(const int64_t &RESTRICT start) { __init__(start); }
 
     Counter() = default;
 
-    void __init__(const int64_t &start);
-    void bump(const int64_t &by);
+    void __init__(const int64_t &RESTRICT start);
+    void bump(const int64_t &RESTRICT by);
     int64_t doubled();
 };
 
@@ -316,13 +316,13 @@ class Point {
     int64_t x;
     int64_t y;
 
-    Point(const int64_t &x, const int64_t &y) { __init__(x, y); }
+    Point(const int64_t &RESTRICT x, const int64_t &RESTRICT y) { __init__(x, y); }
 
     Point() = default;
 
-    void __init__(const int64_t &x, const int64_t &y);
+    void __init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y);
     int64_t norm();
-    Point moved(const int64_t &dx, const int64_t &dy);
+    Point moved(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy);
     str __str__();
     int64_t __len__();
     bool __bool__();
@@ -332,11 +332,11 @@ class Empty {
   public:
 };
 
-void Counter::__init__(const int64_t &start) {
+void Counter::__init__(const int64_t &RESTRICT start) {
     this->count = start;
 }
 
-void Counter::bump(const int64_t &by) {
+void Counter::bump(const int64_t &RESTRICT by) {
     this->count = (this->count + by);
 }
 
@@ -344,7 +344,7 @@ int64_t Counter::doubled() {
     return (this->count * 2LL);
 }
 
-void Point::__init__(const int64_t &x, const int64_t &y) {
+void Point::__init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y) {
     this->x = x;
     this->y = y;
 }
@@ -353,7 +353,7 @@ int64_t Point::norm() {
     return ((this->x * this->x) + (this->y * this->y));
 }
 
-Point Point::moved(const int64_t &dx, const int64_t &dy) {
+Point Point::moved(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy) {
     return Point((this->x + dx), (this->y + dy));
 }
 
@@ -425,23 +425,23 @@ int run() {
 
 namespace prog_comprehensions {
 
-list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t &factor, const int64_t &offset);
-list<int64_t> scaled(const list<int64_t> &values, const int64_t &factor);
-list<int64_t> __list_comprehension_2(const list<int64_t> &numbers);
-list<int64_t> __list_comprehension_3(const list<int64_t> &numbers);
+list<int64_t> __list_comprehension_1(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor, const int64_t &RESTRICT offset);
+list<int64_t> scaled(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor);
+list<int64_t> __list_comprehension_2(const list<int64_t> &RESTRICT numbers);
+list<int64_t> __list_comprehension_3(const list<int64_t> &RESTRICT numbers);
 list<int64_t> __list_comprehension_4();
 list<int64_t> __list_comprehension_5();
-list<int64_t> __list_comprehension_6(const list<int64_t> &numbers);
-set<int64_t> __set_comprehension_0(const list<int64_t> &numbers);
-dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &numbers);
-list<int64_t> __list_comprehension_7(const list<int64_t> &numbers);
-list<int64_t> __list_comprehension_11(const int64_t &v);
-list<int64_t> __list_comprehension_8(const list<int64_t> &numbers);
-list<int64_t> __list_comprehension_9(const list<int64_t> &numbers);
-list<int64_t> __list_comprehension_10(const list<int64_t> &doubled);
+list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers);
+set<int64_t> __set_comprehension_0(const list<int64_t> &RESTRICT numbers);
+dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numbers);
+list<int64_t> __list_comprehension_7(const list<int64_t> &RESTRICT numbers);
+list<int64_t> __list_comprehension_11(const int64_t &RESTRICT v);
+list<int64_t> __list_comprehension_8(const list<int64_t> &RESTRICT numbers);
+list<int64_t> __list_comprehension_9(const list<int64_t> &RESTRICT numbers);
+list<int64_t> __list_comprehension_10(const list<int64_t> &RESTRICT doubled);
 int run();
 
-list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t &factor, const int64_t &offset) {
+list<int64_t> __list_comprehension_1(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor, const int64_t &RESTRICT offset) {
     list<int64_t> __tmp_1;
     int64_t v;
     __tmp_1 = list<int64_t>();
@@ -453,13 +453,13 @@ list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t 
     return __tmp_1;
 }
 
-list<int64_t> scaled(const list<int64_t> &values, const int64_t &factor) {
+list<int64_t> scaled(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor) {
     int64_t offset;
     offset = 1LL;
     return __list_comprehension_1(values, factor, offset);
 }
 
-list<int64_t> __list_comprehension_2(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_2(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_2;
     int64_t v;
     __tmp_2 = list<int64_t>();
@@ -471,7 +471,7 @@ list<int64_t> __list_comprehension_2(const list<int64_t> &numbers) {
     return __tmp_2;
 }
 
-list<int64_t> __list_comprehension_3(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_3(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_3;
     int64_t v;
     __tmp_3 = list<int64_t>();
@@ -507,7 +507,7 @@ list<int64_t> __list_comprehension_5() {
     return __tmp_5;
 }
 
-list<int64_t> __list_comprehension_6(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_6;
     int64_t i;
     __tmp_6 = list<int64_t>();
@@ -518,7 +518,7 @@ list<int64_t> __list_comprehension_6(const list<int64_t> &numbers) {
     return __tmp_6;
 }
 
-set<int64_t> __set_comprehension_0(const list<int64_t> &numbers) {
+set<int64_t> __set_comprehension_0(const list<int64_t> &RESTRICT numbers) {
     set<int64_t> __tmp_7;
     int64_t v;
     __tmp_7 = set<int64_t>();
@@ -530,7 +530,7 @@ set<int64_t> __set_comprehension_0(const list<int64_t> &numbers) {
     return __tmp_7;
 }
 
-dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &numbers) {
+dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numbers) {
     dict<int64_t, int64_t> __tmp_8;
     int64_t v;
     __tmp_8 = dict<int64_t, int64_t>();
@@ -544,7 +544,7 @@ dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &numbers) {
     return __tmp_8;
 }
 
-list<int64_t> __list_comprehension_7(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_7(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_9;
     int64_t x;
     int64_t y;
@@ -563,7 +563,7 @@ list<int64_t> __list_comprehension_7(const list<int64_t> &numbers) {
     return __tmp_9;
 }
 
-list<int64_t> __list_comprehension_11(const int64_t &v) {
+list<int64_t> __list_comprehension_11(const int64_t &RESTRICT v) {
     list<int64_t> __tmp_13;
     int64_t w;
     __tmp_13 = list<int64_t>();
@@ -574,7 +574,7 @@ list<int64_t> __list_comprehension_11(const int64_t &v) {
     return __tmp_13;
 }
 
-list<int64_t> __list_comprehension_8(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_8(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_10;
     int64_t v;
     __tmp_10 = list<int64_t>();
@@ -586,7 +586,7 @@ list<int64_t> __list_comprehension_8(const list<int64_t> &numbers) {
     return __tmp_10;
 }
 
-list<int64_t> __list_comprehension_9(const list<int64_t> &numbers) {
+list<int64_t> __list_comprehension_9(const list<int64_t> &RESTRICT numbers) {
     list<int64_t> __tmp_11;
     int64_t v;
     __tmp_11 = list<int64_t>();
@@ -598,7 +598,7 @@ list<int64_t> __list_comprehension_9(const list<int64_t> &numbers) {
     return __tmp_11;
 }
 
-list<int64_t> __list_comprehension_10(const list<int64_t> &doubled) {
+list<int64_t> __list_comprehension_10(const list<int64_t> &RESTRICT doubled) {
     list<int64_t> __tmp_12;
     int64_t v;
     __tmp_12 = list<int64_t>();
@@ -679,18 +679,18 @@ int run() {
 
 namespace prog_exceptions {
 
-int64_t guarded_parse(const str &text);
-int64_t parse_or(const str &text, const int64_t &fallback);
+int64_t guarded_parse(const str &RESTRICT text);
+int64_t parse_or(const str &RESTRICT text, const int64_t &RESTRICT fallback);
 int64_t nested();
 int64_t handler_raises();
-int64_t check_positive(const int64_t &n);
-int64_t reraise(const int64_t &n);
-int64_t raise_bare_class(const str &key);
-int64_t siblings(const str &first, const str &second);
+int64_t check_positive(const int64_t &RESTRICT n);
+int64_t reraise(const int64_t &RESTRICT n);
+int64_t raise_bare_class(const str &RESTRICT key);
+int64_t siblings(const str &RESTRICT first, const str &RESTRICT second);
 int64_t relay();
 int run();
 
-int64_t guarded_parse(const str &text) {
+int64_t guarded_parse(const str &RESTRICT text) {
     {
         Finally __finally([&] {
             print(str("cleanup"), text);
@@ -699,7 +699,7 @@ int64_t guarded_parse(const str &text) {
     }
 }
 
-int64_t parse_or(const str &text, const int64_t &fallback) {
+int64_t parse_or(const str &RESTRICT text, const int64_t &RESTRICT fallback) {
     int64_t value;
     {
         bool __thrown = false;
@@ -760,14 +760,14 @@ int64_t handler_raises() {
     return 0LL;
 }
 
-int64_t check_positive(const int64_t &n) {
+int64_t check_positive(const int64_t &RESTRICT n) {
     if (((n < 0LL))) {
         throw ValueError(str("negative"));
     }
     return n;
 }
 
-int64_t reraise(const int64_t &n) {
+int64_t reraise(const int64_t &RESTRICT n) {
     {
         Finally __finally([&] {
             print(str("reraise finally"));
@@ -781,11 +781,11 @@ int64_t reraise(const int64_t &n) {
     }
 }
 
-int64_t raise_bare_class(const str &key) {
+int64_t raise_bare_class(const str &RESTRICT key) {
     throw KeyError("");
 }
 
-int64_t siblings(const str &first, const str &second) {
+int64_t siblings(const str &RESTRICT first, const str &RESTRICT second) {
     {
         bool __thrown = false;
         try {
@@ -948,15 +948,15 @@ int run() {
 
 namespace prog_fixed_width_int_promotion {
 
-uint16_t scale(const uint16_t &value, const uint16_t &factor);
-int32_t clamp(const int32_t &value, const int32_t &low, const int32_t &high);
+uint16_t scale(const uint16_t &RESTRICT value, const uint16_t &RESTRICT factor);
+int32_t clamp(const int32_t &RESTRICT value, const int32_t &RESTRICT low, const int32_t &RESTRICT high);
 int run();
 
-uint16_t scale(const uint16_t &value, const uint16_t &factor) {
+uint16_t scale(const uint16_t &RESTRICT value, const uint16_t &RESTRICT factor) {
     return (value * factor);
 }
 
-int32_t clamp(const int32_t &value, const int32_t &low, const int32_t &high) {
+int32_t clamp(const int32_t &RESTRICT value, const int32_t &RESTRICT low, const int32_t &RESTRICT high) {
     if (((value < low))) {
         return low;
     }
@@ -987,10 +987,10 @@ int run() {
 
 namespace prog_fixed_width_ints {
 
-uint16_t add_u16(const uint16_t &a, const uint16_t &b);
+uint16_t add_u16(const uint16_t &RESTRICT a, const uint16_t &RESTRICT b);
 int run();
 
-uint16_t add_u16(const uint16_t &a, const uint16_t &b) {
+uint16_t add_u16(const uint16_t &RESTRICT a, const uint16_t &RESTRICT b) {
     return uint16_t((a + b));
 }
 
@@ -1094,10 +1094,10 @@ int run() {
 
 namespace prog_list {
 
-list<int64_t> give_list(list<int64_t> &l);
+list<int64_t> give_list(list<int64_t> &RESTRICT l);
 int run();
 
-list<int64_t> give_list(list<int64_t> &l) {
+list<int64_t> give_list(list<int64_t> &RESTRICT l) {
     print(l);
     l.append(2LL);
     print(l);
