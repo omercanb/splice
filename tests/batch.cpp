@@ -103,26 +103,26 @@ int run() {
     print(_or(_and(a, b), 3LL));
     print(_or(zero, _and(b, 3LL)));
     print((_and(a, b) + 1LL));
-    if ((to_bool(a) && to_bool(text))) {
+    if ((a && to_bool(text))) {
         print(str("cond and"));
     }
-    if ((to_bool(empty) || to_bool(a))) {
+    if ((to_bool(empty) || a)) {
         print(str("cond or"));
     }
-    if ((!(to_bool(empty) || to_bool(zero)))) {
+    if ((!(to_bool(empty) || zero))) {
         print(str("cond not"));
     }
-    if ((to_bool(a) && (to_bool(text) && to_bool(b)))) {
+    if ((a && (to_bool(text) && b))) {
         print(str("cond chained"));
     }
     if ((to_bool(no_items) || to_bool(text))) {
         print(str("cond mixed"));
     }
-    if ((to_bool(zero) && to_bool(side(9LL)))) {
+    if ((zero && side(9LL))) {
         print(str("unreachable"));
     }
     n = 0LL;
-    while ((to_bool(((n < 2LL))) && to_bool(text))) {
+    while ((((n < 2LL)) && to_bool(text))) {
         n = (n + 1LL);
     }
     print(n);
@@ -478,7 +478,7 @@ list<int64_t> __list_comprehension_3(const list<int64_t> &numbers) {
     auto && __range_7 = numbers;
     for (auto &&__item_7 : __range_7) {
         v = __item_7;
-        if (to_bool(((v > 2LL)))) {
+        if (((v > 2LL))) {
             __tmp_3.append(v);
         }
     }
@@ -537,7 +537,7 @@ dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &numbers) {
     auto && __range_9 = numbers;
     for (auto &&__item_9 : __range_9) {
         v = __item_9;
-        if (to_bool(((v > 1LL)))) {
+        if (((v > 1LL))) {
             __tmp_8.__setitem__(v, (v * v));
         }
     }
@@ -555,7 +555,7 @@ list<int64_t> __list_comprehension_7(const list<int64_t> &numbers) {
         auto && __range_11 = numbers;
         for (auto &&__item_11 : __range_11) {
             y = __item_11;
-            if (to_bool(((x < y)))) {
+            if (((x < y))) {
                 __tmp_9.append((x * y));
             }
         }
@@ -761,7 +761,7 @@ int64_t handler_raises() {
 }
 
 int64_t check_positive(const int64_t &n) {
-    if (to_bool(((n < 0LL)))) {
+    if (((n < 0LL))) {
         throw ValueError(str("negative"));
     }
     return n;
@@ -888,7 +888,7 @@ int run() {
             Finally __finally([&] {
                 print(str("loop finally"), i);
             });
-            if (to_bool(((i == 1LL)))) {
+            if (((i == 1LL))) {
                 break;
             }
             print(str("loop"), i);
@@ -957,10 +957,10 @@ uint16_t scale(const uint16_t &value, const uint16_t &factor) {
 }
 
 int32_t clamp(const int32_t &value, const int32_t &low, const int32_t &high) {
-    if (to_bool(((value < low)))) {
+    if (((value < low))) {
         return low;
     }
-    if (to_bool(((value > high)))) {
+    if (((value > high))) {
         return high;
     }
     return value;
@@ -1175,17 +1175,17 @@ int run() {
     n = len(l2);
     print(n);
     print(l2.__getitem__(0LL), l2.back());
-    if (!(to_bool(((l2.back() == l2.__getitem__((n - 1LL))))))) throw AssertionError("");
+    if (!(((l2.back() == l2.__getitem__((n - 1LL)))))) throw AssertionError("");
     l4 = list<int64_t>({1LL, 2LL, 3LL});
     print(l4.back());
     l4.back() += 10LL;
-    if (!(to_bool(((l4.back() == 13LL))))) throw AssertionError("");
+    if (!(((l4.back() == 13LL)))) throw AssertionError("");
     print(l4);
     l5 = (list<int64_t>({1LL, 2LL}) * 3LL);
     print(l5);
     l5 = (3LL * list<int64_t>({1LL, 2LL}));
     print(l5);
-    if (!(to_bool(((l5 == (list<int64_t>({1LL, 2LL}) * 3LL)))))) throw AssertionError("");
+    if (!(((l5 == (list<int64_t>({1LL, 2LL}) * 3LL))))) throw AssertionError("");
     l5 *= 2LL;
     print(l5);
     return 0LL;
@@ -1321,7 +1321,7 @@ int run() {
     print((mixed.__contains__(tuple(str("a"), 1LL))), (mixed.__contains__(tuple(str("a"), 2LL))));
     strs = list<str>({str("a"), str("b")});
     print((strs.__contains__(str("a"))), (strs.__contains__(str("z"))));
-    if (to_bool((l.__contains__(2LL)))) {
+    if ((l.__contains__(2LL))) {
         print(str("found"));
     } else {
         print(str("missing"));
@@ -1330,7 +1330,7 @@ int run() {
     auto && __range_21 = list<int64_t>({1LL, 2LL, 3LL, 4LL});
     for (auto &&__item_21 : __range_21) {
         x = __item_21;
-        if (to_bool((s.__contains__(x)))) {
+        if ((s.__contains__(x))) {
             count = (count + 1LL);
         }
     }
@@ -1609,12 +1609,12 @@ int run() {
     int64_t n;
     a = 0LL;
     b = 5LL;
-    if (to_bool(a)) {
+    if (a) {
         print(str("a truthy"));
     } else {
         print(str("a falsy"));
     }
-    if (to_bool(b)) {
+    if (b) {
         print(str("b truthy"));
     } else {
         print(str("b falsy"));
@@ -1652,7 +1652,7 @@ int run() {
     print(to_bool(true));
     print(to_bool(false));
     n = 3LL;
-    while (to_bool(n)) {
+    while (n) {
         print(n);
         n = (n - 1LL);
     }

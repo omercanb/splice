@@ -92,6 +92,15 @@ FIXED_WIDTH_INT_TYPES = {
     "splice.stdlib.uint64": "uint64_t",
 }
 
+# Scalars are numbers and bools (so copying one is free)
+# We do various special cases for these like not needing copy functions
+SCALAR_FULLNAMES = {
+    "builtins.int",
+    "builtins.float",
+    "builtins.bool",
+    *FIXED_WIDTH_INT_TYPES,
+}
+
 # Exceptions catchable by an except clause (runtime/exceptions.h). Flat
 # hierarchy, so a base like LookupError has no equivalent and is rejected
 # rather than mapped to PyException, which would over-catch.

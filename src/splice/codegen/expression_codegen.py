@@ -20,8 +20,9 @@ from mypy.nodes import (
     UnaryExpr,
     Var,
 )
-from mypy.types import TupleType, Type, UnionType, get_proper_type
+from mypy.types import Instance, TupleType, Type, UnionType, get_proper_type
 
+from splice.codegen.builtins import SCALAR_FULLNAMES
 from splice.codegen.translation_utils import (
     call_method,
     is_truthy,
@@ -198,7 +199,11 @@ class ExpressionCodegen(Visitor[str]):
             return f"({self.condition(o.left)} {cpp_op} {self.condition(o.right)})"
         if isinstance(o, UnaryExpr) and o.op == "not":
             return f"(!{self.condition(o.expr)})"
-        return is_truthy(self.visit(o))
+        expr = self.visit(o)
+        t = get_proper_type(self.types.get(o))
+        if isinstance(t, Instance) and t.type.fullname in SCALAR_FULLNAMES:
+            return expr
+        return is_truthy(expr)
 
     def visit_unary_expr(self, o: UnaryExpr) -> str:
         operand = self.visit(o.expr)

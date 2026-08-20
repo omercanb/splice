@@ -36,27 +36,17 @@ from splice.analysis.structural_aliasing import (
     is_access_path_structural_alias,
 )
 from splice.ast_utils import replace_in_source, source_text
+from splice.codegen.builtins import SCALAR_FULLNAMES
 from splice.frontend.validate import Diagnostic, diagnostic
 from splice.visitor import Traverser
 
 # Marker used raise a diagnostic to check if positions in the transformed ast match the original positions
 _MARKER_FULLNAME = "splice.stdlib._error_after_tree_transform"
 _COPY_FULLNAME = "splice.stdlib.copy"
-# A scalar is a plain C++ value with no indirection - copying one is free
-# and there's nothing for it to alias, so copy() adds nothing here.
-_SCALAR_TYPES = {
-    "int",
-    "float",
-    "bool",
-    "int8",
-    "uint8",
-    "int16",
-    "uint16",
-    "int32",
-    "uint32",
-    "int64",
-    "uint64",
-}
+
+
+# Short names of scalars
+_SCALAR_TYPES = {fullname.rsplit(".", 1)[-1] for fullname in SCALAR_FULLNAMES}
 
 
 def _is_copy_call(expr: Expression) -> bool:
@@ -86,7 +76,11 @@ class _SemanticsValidator(Traverser):
 
     def visit_mypy_file(self, o: MypyFile) -> None:
         for name, item in o.names.items():
-            if not isinstance(item.node, Var) or name.startswith("__") or item.module_hidden:
+            if (
+                not isinstance(item.node, Var)
+                or name.startswith("__")
+                or item.module_hidden
+            ):
                 continue
             if type_name(item.node.type) not in _SCALAR_TYPES:
                 self.report(
