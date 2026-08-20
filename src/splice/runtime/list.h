@@ -124,13 +124,13 @@ class list {
     }
     bool empty() const noexcept { return data_.empty(); }
 
-    T &operator[](size_type i) { return data_[normIndex(i)]; }
-    const T &operator[](size_type i) const { return data_[normIndex(i)]; }
+    T &operator[](size_type i) { return data_[checkIndex(i)]; }
+    const T &operator[](size_type i) const { return data_[checkIndex(i)]; }
 
     // What generated code calls for a[i] and a[i] = x. Strict, unlike
     // dict's insert-on-write.
-    T &__getitem__(size_type i) { return data_[normIndex(i)]; }
-    const T &__getitem__(size_type i) const { return data_[normIndex(i)]; }
+    T &__getitem__(size_type i) { return data_[checkIndex(i)]; }
+    const T &__getitem__(size_type i) const { return data_[checkIndex(i)]; }
 
     // a[-1] and a[-1] = x. A reference, like operator[], so both read and
     // write go through the same call.
@@ -146,7 +146,7 @@ class list {
     }
 
     // a[i:j:k] -- a new list, like Python. Out of range bounds clamp rather
-    // than raising, which is why this does not go through normIndex.
+    // than raising, which is why this does not go through checkIndex.
     list<T> __getitem__(const slice &s) const {
         tuple<_int, _int, _int> bounds = s.indices(__len__());
         _int start = bounds.get<0>(), stop = bounds.get<1>(),
@@ -163,11 +163,11 @@ class list {
         return out;
     }
     void __setitem__(size_type i, const T &value) {
-        data_[normIndex(i)] = value;
+        data_[checkIndex(i)] = value;
     }
 
     void __delitem__(size_type i) { // del a[i]  (strict)
-        data_.erase(data_.begin() + normIndex(i));
+        data_.erase(data_.begin() + checkIndex(i));
     }
 
     void append(const T &x) { data_.push_back(x); }
@@ -330,11 +330,10 @@ class list {
   private:
     typename detail::list_storage<T>::type data_;
 
-    // strict integer-index normalization shared by [], delItem
-    std::size_t normIndex(_int i) const {
+    // strict bounds check shared by [], delItem - no negative-index
+    // wraparound, since only -1 (handled separately via back()) is supported
+    std::size_t checkIndex(_int i) const {
         _int n = __len__();
-        if (i < 0)
-            i += n;
         if (i < 0 || i >= n)
             throw IndexError("list index out of range");
         return static_cast<std::size_t>(i);
