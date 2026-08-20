@@ -185,6 +185,17 @@
   
   '''
 # ---
+# name: test_error_message[global_declaration.py]
+  '''
+  global_declaration.py:5:5: error: the global keyword is not supported
+  
+    5 |     global x
+      |     ^^^^^^^^
+  
+    help: globals are constexpr and can't be reassigned - pass x in as a parameter instead
+  
+  '''
+# ---
 # name: test_error_message[identity_comparison.py]
   '''
   identity_comparison.py:4:8: error: `is` doesn't make sense once compiled to C++
@@ -242,6 +253,17 @@
       | ^^^^^^
   
     help: only scalars are allowed at module scope - move it inside a class, threaded through self/parameters instead
+  
+  '''
+# ---
+# name: test_error_message[nonlocal_declaration.py]
+  '''
+  nonlocal_declaration.py:5:9: error: the nonlocal keyword is not supported
+  
+    5 |         nonlocal y
+      |         ^^^^^^^^^^
+  
+    help: return the new value instead of writing through an outer scope
   
   '''
 # ---

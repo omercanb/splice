@@ -25,6 +25,7 @@ from mypy.nodes import (
     ForStmt,
     FuncDef,
     GeneratorExpr,
+    GlobalDecl,
     IfStmt,
     Decorator,
     IndexExpr,
@@ -36,6 +37,7 @@ from mypy.nodes import (
     MemberExpr,
     MypyFile,
     NameExpr,
+    NonlocalDecl,
     OperatorAssignmentStmt,
     OpExpr,
     PassStmt,
@@ -555,6 +557,23 @@ class _Validator(Traverser):
 
     def visit_yield_from_expr(self, o: YieldFromExpr) -> None:
         self.visit_yield_expr(o)
+
+    def visit_global_decl(self, o: GlobalDecl) -> None:
+        self.report(
+            o,
+            "global-declaration",
+            "the global keyword is not supported",
+            "globals are constexpr and can't be reassigned - pass "
+            f"{', '.join(o.names)} in as a parameter instead",
+        )
+
+    def visit_nonlocal_decl(self, o: NonlocalDecl) -> None:
+        self.report(
+            o,
+            "nonlocal-declaration",
+            "the nonlocal keyword is not supported",
+            "return the new value instead of writing through an outer scope",
+        )
 
     def visit_list_expr(self, o: ListExpr) -> None:
         self.check_inferred_type(o)

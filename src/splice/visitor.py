@@ -200,6 +200,12 @@ class Traverser(Visitor[T]):
     def visit_import_all(self, o) -> None:
         pass
 
+    def visit_global_decl(self, o) -> None:
+        pass
+
+    def visit_nonlocal_decl(self, o) -> None:
+        pass
+
     def visit_name_expr(self, o) -> None:
         pass
 
