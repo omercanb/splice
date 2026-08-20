@@ -66,6 +66,7 @@ from mypy.types import (
 )
 
 from splice.analysis.free_variables import get_free_variables
+from splice.ast_utils import literal_int_value
 from splice.codegen.builtins import EXCEPTION_TYPES, OP_MAP
 from splice.codegen.exceptions import names_a_class
 from splice.codegen.typegen import UnsupportedType, cpp_type, cpp_type_name
@@ -566,7 +567,8 @@ class _Validator(Traverser):
     def visit_index_expr(self, o: IndexExpr) -> None:
         base_type = get_proper_type(self.types.get(o.base))
         if isinstance(base_type, TupleType):
-            if not isinstance(o.index, IntExpr):
+            value = literal_int_value(self.types.get(o.index))
+            if value is None or value < 0:
                 self.report(
                     o.index,
                     "tuple-index",

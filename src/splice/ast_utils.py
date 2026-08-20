@@ -1,7 +1,7 @@
 """Small stand-alone helpers for working with mypy AST nodes."""
 
 from mypy.nodes import Context, Expression, IntExpr, UnaryExpr
-from mypy.types import Type
+from mypy.types import Instance, LiteralType, Type, get_proper_type
 
 type TypeTable = dict[Expression, Type]
 
@@ -19,6 +19,27 @@ def get_int_literal(expr: Expression) -> int | None:
             return -expr.expr.value
         if expr.op == "+":
             return expr.expr.value
+    return None
+
+
+def literal_int_value(t: Type) -> int | None:
+    """The int a type resolves to, eg. N in Array[T, N] or the index in t[i].
+
+    A literal shows up as one of two different shapes depending on where it
+    was resolved: a bare LiteralType in type-annotation position (Array[T, N],
+    including a Final int constant - the mypy fork resolves that to a
+    LiteralType too, see typeanal.py), or an Instance with last_known_value
+    set for an ordinary value expression's inferred type (eg. t[0]'s index).
+    """
+    proper = get_proper_type(t)
+    if isinstance(proper, LiteralType) and isinstance(proper.value, int):
+        return proper.value
+    if (
+        isinstance(proper, Instance)
+        and proper.last_known_value is not None
+        and isinstance(proper.last_known_value.value, int)
+    ):
+        return proper.last_known_value.value
     return None
 
 

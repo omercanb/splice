@@ -11,6 +11,7 @@ from mypy.types import (
     get_proper_type,
 )
 
+from splice.ast_utils import literal_int_value
 from splice.codegen.builtins import FIXED_WIDTH_INT_TYPES
 
 
@@ -79,6 +80,16 @@ def cpp_type_name(t: Type) -> str:
             ):
                 elem_type = cpp_type(args[0])
                 return f"set<{elem_type}>"
+
+            case Instance(type=type_info, args=args) if (
+                type_info.fullname == "splice.stdlib.Array" and len(args) == 2
+            ):
+                elem_type = cpp_type(args[0])
+                n = literal_int_value(args[1])
+                if n is None:
+                    current_error = UnsupportedType(t)
+                    raise current_error
+                return f"Array<{elem_type}, {n}>"
 
             # Tuple with fixed elements
             case TupleType(items=items):

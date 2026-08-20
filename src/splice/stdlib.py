@@ -42,6 +42,9 @@ class Array(Generic[T, N]):
     def __len__(self):
         return len(self.data)
 
+    def __iter__(self):
+        return iter(self.data)
+
     def __str__(self):
         return str(self.data)
 

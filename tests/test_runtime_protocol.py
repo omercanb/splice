@@ -33,6 +33,7 @@ NOT_PRINTABLE = {
     "dict_iterator": "iteration state, never reachable from Python",
     "file_iterator": "iteration state, never reachable from Python",
     "list_iterator": "iteration state, never reachable from Python",
+    "array_iterator": "iteration state, never reachable from Python",
     "set_iterator": "iteration state, never reachable from Python",
     "str_iterator": "iteration state, never reachable from Python",
     "bytes_iterator": "iteration state, never reachable from Python",

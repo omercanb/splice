@@ -41,7 +41,7 @@ from splice.codegen.translation_utils import (
     translate_qualified_builtin,
     translate_tuple_access,
 )
-from splice.ast_utils import get_int_literal
+from splice.ast_utils import get_int_literal, literal_int_value
 from splice.codegen.typegen import cpp_type_name
 from splice.visitor import Visitor
 
@@ -136,6 +136,16 @@ class ExpressionCodegen(Visitor[str]):
                 return f"{back_call} = {value}"
             return back_call
 
+        # special case for Array[T, N]
+        if (
+            isinstance(o.callee, IndexExpr)
+            and isinstance(o.callee.base, NameExpr)
+            and o.callee.base.fullname == "splice.stdlib.Array"
+        ):
+            array_type = cpp_type_name(self.types[o])
+            args = ", ".join(self.visit(arg) for arg in o.args)
+            return f"{array_type}({args})"
+
         callee = self.visit(o.callee)
 
         # Handle special case for builtins with kwargs (like print)
@@ -200,7 +210,9 @@ class ExpressionCodegen(Visitor[str]):
         base = self.visit(o.base)
         base_type = get_proper_type(self.types[o.base])
         if isinstance(base_type, TupleType):
-            return translate_tuple_access(o, base)
+            i = literal_int_value(self.types[o.index])
+            assert i is not None  # validate.py already guarantees this
+            return translate_tuple_access(i, base)
         index = self.visit(o.index)
         return call_method(base, "__getitem__", index)
 

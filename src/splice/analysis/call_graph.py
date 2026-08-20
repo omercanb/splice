@@ -7,6 +7,7 @@ from mypy.nodes import (
     CallExpr,
     Expression,
     FuncDef,
+    IndexExpr,
     MemberExpr,
     MypyFile,
     NameExpr,
@@ -17,6 +18,7 @@ from mypy.nodes import (
 from mypy.types import Instance, get_proper_type
 
 from splice.ast_utils import TypeTable
+from splice.convert_to_python import convert_to_python
 from splice.visitor import Traverser
 
 
@@ -134,15 +136,13 @@ def is_call_builtin(o: CallExpr, types: TypeTable):
         t = types[o.callee.expr]
         assert isinstance(t, Instance)
         return t.type.fullname.startswith("builtins.")
-    assert False
+    return False
 
 
 def is_call_splice_intrinsic(o: CallExpr) -> bool:
-    """A call to something defined in splice.stdlib (eg. copy()). These
-    have a real Python body for running under plain CPython, but are never
-    actually compiled from it - codegen emits a hand-written C++
-    implementation instead, the same way a real builtin does.
-    """
-    return isinstance(o.callee, NameExpr) and o.callee.fullname.startswith(
-        "splice.stdlib."
-    )
+    """A call to something defined in splice.stdlib"""
+    if isinstance(o.callee, NameExpr):
+        return o.callee.fullname.startswith("splice.stdlib.")
+    if isinstance(o.callee, IndexExpr) and isinstance(o.callee.base, NameExpr):
+        return o.callee.base.fullname.startswith("splice.stdlib.")
+    return False

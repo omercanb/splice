@@ -2,8 +2,8 @@
 
 `a[i]` becomes `a.__getitem__(i)`, `a[i] = v` becomes `a.__setitem__(i, v)`,
 and a slice index `a[i:j:k]` becomes `a.__getitem__(slice(i, j, k))`, with a
-missing bound passed as `None`. `-1` gets no special casing here; codegen
-swaps it for back() right before emitting C++.
+missing bound passed as `None`.
+For `-1` specifically it stays a -1 here but turns into back() at codegen time
 """
 
 from mypy.nodes import (
@@ -63,6 +63,9 @@ class IndexTransformer(Transformer):
         # type-checks it as a value, so it has no entry in self.types.
         # Leave it exactly as-is - it isn't a runtime operation to lower.
         if o not in self.types:
+            return o
+        # Special case for Array[T, N]
+        if isinstance(o.base, NameExpr) and o.base.fullname == "splice.stdlib.Array":
             return o
         o.base = self.visit(o.base)
         if self._is_tuple(o.base):

@@ -1,3 +1,4 @@
+#include "array.h"
 #include "builtins.h"
 #include "bytes.h"
 #include "copy.h"
@@ -17,6 +18,42 @@
 #include "tuple.h"
 #include "types.h"
 using namespace py;
+
+namespace prog_array {
+int64_t numInstruments;
+int run();
+void __init_module__();
+
+void __init_module__() {
+    numInstruments = 3LL;
+}
+
+int run() {
+    Array<uint32_t, 3> a;
+    Array<uint32_t, 4> b;
+    int64_t total;
+    uint32_t v;
+    __init_module__();
+    a = Array<uint32_t, 3>(0LL);
+    a.__setitem__(1LL, 5LL);
+    print(str("Test 1 - index/assign:"), a.__getitem__(0LL), a.__getitem__(1LL), a.__getitem__(2LL));
+    b = Array<uint32_t, 4>(uint32_t(9LL));
+    print(str("Test 2 - Literal size:"), b.__getitem__(0LL), b.__getitem__(3LL));
+    print(str("Test 3 - last element:"), a.back());
+    print(str("Test 4 - len:"), len(a), len(b));
+    b.fill(uint32_t(1LL));
+    print(str("Test 5 - fill:"), b.__getitem__(0LL), b.__getitem__(1LL), b.__getitem__(2LL), b.__getitem__(3LL));
+    total = 0LL;
+    auto && __range_0 = b;
+    for (auto __iter_0 = iter(__range_0); !__iter_0.done();) {
+        v = next(__iter_0);
+        total = (total + v);
+    }
+    print(str("Test 6 - iteration sum:"), total);
+    print(str("Test 7 - str:"), a);
+    return 0LL;
+}
+}
 
 namespace prog_boolops {
 int64_t side(int64_t v);
@@ -118,9 +155,9 @@ list<int64_t> __list_comprehension_0(list<int64_t> numbers) {
     list<int64_t> __tmp_0;
     int64_t v;
     __tmp_0 = list<int64_t>();
-    auto && __range_0 = numbers;
-    for (auto __iter_0 = iter(__range_0); !__iter_0.done();) {
-        v = next(__iter_0);
+    auto && __range_1 = numbers;
+    for (auto __iter_1 = iter(__range_1); !__iter_1.done();) {
+        v = next(__iter_1);
         __tmp_0.append((v * 2LL));
     }
     return __tmp_0;
@@ -227,16 +264,16 @@ int run() {
     print(bytes(3LL));
     print(bytes(list<int64_t>({65LL, 66LL, 67LL})));
     total = 0LL;
-    auto && __range_1 = bytes(std::string("abc", 3));
-    for (auto __iter_1 = iter(__range_1); !__iter_1.done();) {
-        byte = next(__iter_1);
+    auto && __range_2 = bytes(std::string("abc", 3));
+    for (auto __iter_2 = iter(__range_2); !__iter_2.done();) {
+        byte = next(__iter_2);
         total += byte;
     }
     print(total);
     joined = bytes(std::string("", 0));
-    auto && __range_2 = bytes(std::string("abc", 3));
-    for (auto __iter_2 = iter(__range_2); !__iter_2.done();) {
-        byte = next(__iter_2);
+    auto && __range_3 = bytes(std::string("abc", 3));
+    for (auto __iter_3 = iter(__range_3); !__iter_3.done();) {
+        byte = next(__iter_3);
         joined = ((joined + bytes(list<int64_t>({byte}))) + bytes(std::string(".", 1)));
     }
     print(joined);
@@ -377,9 +414,9 @@ int run() {
     p.x = 10LL;
     print(p.x, p.norm());
     points = list<Point>({Point(1LL, 1LL), Point(2LL, 2LL)});
-    auto && __range_3 = points;
-    for (auto __iter_3 = iter(__range_3); !__iter_3.done();) {
-        point = next(__iter_3);
+    auto && __range_4 = points;
+    for (auto __iter_4 = iter(__range_4); !__iter_4.done();) {
+        point = next(__iter_4);
         print(point, point.norm());
     }
     print(len(points));
@@ -440,9 +477,9 @@ list<int64_t> __list_comprehension_1(list<int64_t> values, int64_t factor, int64
     list<int64_t> __tmp_1;
     int64_t v;
     __tmp_1 = list<int64_t>();
-    auto && __range_4 = values;
-    for (auto __iter_4 = iter(__range_4); !__iter_4.done();) {
-        v = next(__iter_4);
+    auto && __range_5 = values;
+    for (auto __iter_5 = iter(__range_5); !__iter_5.done();) {
+        v = next(__iter_5);
         __tmp_1.append(((v * factor) + offset));
     }
     return __tmp_1;
@@ -458,9 +495,9 @@ list<int64_t> __list_comprehension_2(list<int64_t> numbers) {
     list<int64_t> __tmp_2;
     int64_t v;
     __tmp_2 = list<int64_t>();
-    auto && __range_5 = numbers;
-    for (auto __iter_5 = iter(__range_5); !__iter_5.done();) {
-        v = next(__iter_5);
+    auto && __range_6 = numbers;
+    for (auto __iter_6 = iter(__range_6); !__iter_6.done();) {
+        v = next(__iter_6);
         __tmp_2.append(v);
     }
     return __tmp_2;
@@ -470,9 +507,9 @@ list<int64_t> __list_comprehension_3(list<int64_t> numbers) {
     list<int64_t> __tmp_3;
     int64_t v;
     __tmp_3 = list<int64_t>();
-    auto && __range_6 = numbers;
-    for (auto __iter_6 = iter(__range_6); !__iter_6.done();) {
-        v = next(__iter_6);
+    auto && __range_7 = numbers;
+    for (auto __iter_7 = iter(__range_7); !__iter_7.done();) {
+        v = next(__iter_7);
         if (to_bool(((v > 2LL)))) {
             __tmp_3.append(v);
         }
@@ -517,9 +554,9 @@ set<int64_t> __set_comprehension_0(list<int64_t> numbers) {
     set<int64_t> __tmp_7;
     int64_t v;
     __tmp_7 = set<int64_t>();
-    auto && __range_7 = numbers;
-    for (auto __iter_7 = iter(__range_7); !__iter_7.done();) {
-        v = next(__iter_7);
+    auto && __range_8 = numbers;
+    for (auto __iter_8 = iter(__range_8); !__iter_8.done();) {
+        v = next(__iter_8);
         __tmp_7.add((v * v));
     }
     return __tmp_7;
@@ -529,9 +566,9 @@ dict<int64_t, int64_t> __dict_comprehension_0(list<int64_t> numbers) {
     dict<int64_t, int64_t> __tmp_8;
     int64_t v;
     __tmp_8 = dict<int64_t, int64_t>();
-    auto && __range_8 = numbers;
-    for (auto __iter_8 = iter(__range_8); !__iter_8.done();) {
-        v = next(__iter_8);
+    auto && __range_9 = numbers;
+    for (auto __iter_9 = iter(__range_9); !__iter_9.done();) {
+        v = next(__iter_9);
         if (to_bool(((v > 1LL)))) {
             __tmp_8.__setitem__(v, (v * v));
         }
@@ -544,12 +581,12 @@ list<int64_t> __list_comprehension_7(list<int64_t> numbers) {
     int64_t x;
     int64_t y;
     __tmp_9 = list<int64_t>();
-    auto && __range_9 = numbers;
-    for (auto __iter_9 = iter(__range_9); !__iter_9.done();) {
-        x = next(__iter_9);
-        auto && __range_10 = numbers;
-        for (auto __iter_10 = iter(__range_10); !__iter_10.done();) {
-            y = next(__iter_10);
+    auto && __range_10 = numbers;
+    for (auto __iter_10 = iter(__range_10); !__iter_10.done();) {
+        x = next(__iter_10);
+        auto && __range_11 = numbers;
+        for (auto __iter_11 = iter(__range_11); !__iter_11.done();) {
+            y = next(__iter_11);
             if (to_bool(((x < y)))) {
                 __tmp_9.append((x * y));
             }
@@ -573,9 +610,9 @@ list<int64_t> __list_comprehension_8(list<int64_t> numbers) {
     list<int64_t> __tmp_10;
     int64_t v;
     __tmp_10 = list<int64_t>();
-    auto && __range_11 = numbers;
-    for (auto __iter_11 = iter(__range_11); !__iter_11.done();) {
-        v = next(__iter_11);
+    auto && __range_12 = numbers;
+    for (auto __iter_12 = iter(__range_12); !__iter_12.done();) {
+        v = next(__iter_12);
         __tmp_10.append(len(__list_comprehension_11(v)));
     }
     return __tmp_10;
@@ -585,9 +622,9 @@ list<int64_t> __list_comprehension_9(list<int64_t> numbers) {
     list<int64_t> __tmp_11;
     int64_t v;
     __tmp_11 = list<int64_t>();
-    auto && __range_12 = numbers;
-    for (auto __iter_12 = iter(__range_12); !__iter_12.done();) {
-        v = next(__iter_12);
+    auto && __range_13 = numbers;
+    for (auto __iter_13 = iter(__range_13); !__iter_13.done();) {
+        v = next(__iter_13);
         __tmp_11.append((v * 2LL));
     }
     return __tmp_11;
@@ -597,9 +634,9 @@ list<int64_t> __list_comprehension_10(list<int64_t> doubled) {
     list<int64_t> __tmp_12;
     int64_t v;
     __tmp_12 = list<int64_t>();
-    auto && __range_13 = doubled;
-    for (auto __iter_13 = iter(__range_13); !__iter_13.done();) {
-        v = next(__iter_13);
+    auto && __range_14 = doubled;
+    for (auto __iter_14 = iter(__range_14); !__iter_14.done();) {
+        v = next(__iter_14);
         __tmp_12.append((v + 1LL));
     }
     return __tmp_12;
@@ -934,9 +971,9 @@ int run() {
     print(len(rest), rest.__getitem__(0LL).strip());
     print(len(stepped.readlines()));
     lines = open(SAMPLE);
-    auto && __range_14 = lines;
-    for (auto __iter_14 = iter(__range_14); !__iter_14.done();) {
-        line = next(__iter_14);
+    auto && __range_15 = lines;
+    for (auto __iter_15 = iter(__range_15); !__iter_15.done();) {
+        line = next(__iter_15);
         print(len(line), line.strip());
     }
     out = open(str("tests/test_files/sample_out.txt"), str("w"));
@@ -1068,22 +1105,22 @@ int run() {
     nums = list<int64_t>({1LL, 2LL, 3LL, 4LL, 5LL});
     a = list<int64_t>(map([](auto x) { return (x * 2LL); }, nums));
     print(a);
-    auto && __range_15 = map([](auto x) { return to_str(x); }, nums);
-    for (auto __iter_15 = iter(__range_15); !__iter_15.done();) {
-        s = next(__iter_15);
+    auto && __range_16 = map([](auto x) { return to_str(x); }, nums);
+    for (auto __iter_16 = iter(__range_16); !__iter_16.done();) {
+        s = next(__iter_16);
         print(s);
     }
     filtered = list<int64_t>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));
     print(filtered);
-    auto && __range_16 = zip(nums, a);
-    for (auto __iter_16 = iter(__range_16); !__iter_16.done();) {
-        destructure(x, y) = next(__iter_16);
+    auto && __range_17 = zip(nums, a);
+    for (auto __iter_17 = iter(__range_17); !__iter_17.done();) {
+        destructure(x, y) = next(__iter_17);
         print(x, y);
     }
     nums = copy(a);
-    auto && __range_17 = enumerate(nums);
-    for (auto __iter_17 = iter(__range_17); !__iter_17.done();) {
-        destructure(i, n) = next(__iter_17);
+    auto && __range_18 = enumerate(nums);
+    for (auto __iter_18 = iter(__range_18); !__iter_18.done();) {
+        destructure(i, n) = next(__iter_18);
         print(i, n);
     }
     return 0LL;
@@ -1244,14 +1281,14 @@ int run() {
         if ((__step_1 > 0 && i >= __stop_9) || (__step_1 < 0 && i <= __stop_9)) break;
         print(str("sixth"), i);
     }
-    auto && __range_18 = l;
-    for (auto __iter_18 = iter(__range_18); !__iter_18.done();) {
-        n = next(__iter_18);
-        print(str("seventh"), n);
-    }
     auto && __range_19 = l;
     for (auto __iter_19 = iter(__range_19); !__iter_19.done();) {
         n = next(__iter_19);
+        print(str("seventh"), n);
+    }
+    auto && __range_20 = l;
+    for (auto __iter_20 = iter(__range_20); !__iter_20.done();) {
+        n = next(__iter_20);
         print(str("eight"), n);
     }
     return 0LL;
@@ -1341,9 +1378,9 @@ int run() {
         print(str("missing"));
     }
     count = 0LL;
-    auto && __range_20 = list<int64_t>({1LL, 2LL, 3LL, 4LL});
-    for (auto __iter_20 = iter(__range_20); !__iter_20.done();) {
-        x = next(__iter_20);
+    auto && __range_21 = list<int64_t>({1LL, 2LL, 3LL, 4LL});
+    for (auto __iter_21 = iter(__range_21); !__iter_21.done();) {
+        x = next(__iter_21);
         if (to_bool((s.__contains__(x)))) {
             count = (count + 1LL);
         }
@@ -1457,9 +1494,9 @@ int run() {
     d.clear();
     print(len(d));
     total = 0LL;
-    auto && __range_21 = set<int64_t>({1LL, 2LL, 3LL});
-    for (auto __iter_21 = iter(__range_21); !__iter_21.done();) {
-        x = next(__iter_21);
+    auto && __range_22 = set<int64_t>({1LL, 2LL, 3LL});
+    for (auto __iter_22 = iter(__range_22); !__iter_22.done();) {
+        x = next(__iter_22);
         total = (total + x);
     }
     print(total);
@@ -1615,9 +1652,9 @@ int run() {
     print(to_int(str("100")));
     print(to_float(str("0.5")));
     joined = str("");
-    auto && __range_22 = str("abc");
-    for (auto __iter_22 = iter(__range_22); !__iter_22.done();) {
-        c = next(__iter_22);
+    auto && __range_23 = str("abc");
+    for (auto __iter_23 = iter(__range_23); !__iter_23.done();) {
+        c = next(__iter_23);
         joined = ((joined + c) + str("."));
     }
     print(joined);
@@ -1734,6 +1771,7 @@ int run() {
 #include <cstring>
 
 int main(int argc, char** argv) {
+    if (argc > 1 && std::strcmp(argv[1], "array.py") == 0) return prog_array::run();
     if (argc > 1 && std::strcmp(argv[1], "boolops.py") == 0) return prog_boolops::run();
     if (argc > 1 && std::strcmp(argv[1], "builtin_functions.py") == 0) return prog_builtin_functions::run();
     if (argc > 1 && std::strcmp(argv[1], "bytes.py") == 0) return prog_bytes::run();

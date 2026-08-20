@@ -3,7 +3,7 @@ from typing import Optional
 from mypy.nodes import CallExpr, ComparisonExpr
 from mypy.nodes import Expression
 from mypy.nodes import Expression as MypyExpression
-from mypy.nodes import FuncDef, IndexExpr, IntExpr, LambdaExpr, NameExpr, TypeInfo
+from mypy.nodes import FuncDef, LambdaExpr, NameExpr, TypeInfo
 from mypy.types import CallableType, Type, get_proper_type
 
 from splice.codegen.builtins import (
@@ -176,11 +176,9 @@ def translate_constructor_special_cases(callee: Expression) -> Optional[str]:
     return
 
 
-def translate_tuple_access(expr: IndexExpr, base: str):
+def translate_tuple_access(i: int, base: str):
     # A tuple's elements have different types, so the index has to be a
-    # compile-time one: t[0] becomes get<0>(), and only literals work.
-    assert isinstance(expr.index, IntExpr)
-    i = expr.index.value
+    # compile-time one: t[0] becomes get<0>().
     return f"{member_access(base, f'get<{i}>')}()"
 
 
