@@ -1054,6 +1054,132 @@ int run() {
 }
 }
 
+namespace prog_hotpath {
+
+class Vector;
+
+int64_t clamp(const int64_t &RESTRICT x, const int64_t &RESTRICT low, const int64_t &RESTRICT high);
+int64_t normalize_price(const int64_t &RESTRICT raw, const int64_t &RESTRICT tick_size);
+FLATTEN int64_t process_order(const int64_t &RESTRICT bid, const int64_t &RESTRICT ask, const int64_t &RESTRICT qty, const int64_t &RESTRICT tick_size);
+int64_t square(const int64_t &RESTRICT x);
+int64_t add(const int64_t &RESTRICT a, const int64_t &RESTRICT b);
+FLATTEN int64_t distance_squared(const int64_t &RESTRICT x1, const int64_t &RESTRICT y1, const int64_t &RESTRICT x2, const int64_t &RESTRICT y2);
+FLATTEN int64_t sum_up_to(const int64_t &RESTRICT n);
+int run();
+
+class Vector {
+  public:
+    int64_t x;
+    int64_t y;
+
+    Vector(const int64_t &RESTRICT x, const int64_t &RESTRICT y) { __init__(x, y); }
+
+    Vector() = default;
+
+    void __init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y);
+    Vector scaled(const int64_t &RESTRICT factor);
+    FLATTEN int64_t length_squared();
+    FLATTEN void move(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy);
+};
+
+void Vector::__init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y) {
+    this->x = x;
+    this->y = y;
+}
+
+Vector Vector::scaled(const int64_t &RESTRICT factor) {
+    return Vector((this->x * factor), (this->y * factor));
+}
+
+FLATTEN int64_t Vector::length_squared() {
+    return distance_squared(0LL, 0LL, this->x, this->y);
+}
+
+FLATTEN void Vector::move(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy) {
+    this->x = clamp((this->x + dx), (-100LL), 100LL);
+    this->y = clamp((this->y + dy), (-100LL), 100LL);
+}
+
+int64_t clamp(const int64_t &RESTRICT x, const int64_t &RESTRICT low, const int64_t &RESTRICT high) {
+    if (((x < low))) {
+        return low;
+    }
+    if (((x > high))) {
+        return high;
+    }
+    return x;
+}
+
+int64_t normalize_price(const int64_t &RESTRICT raw, const int64_t &RESTRICT tick_size) {
+    int64_t rounded;
+    rounded = (idiv(raw, tick_size) * tick_size);
+    return clamp(rounded, 0LL, 1000000LL);
+}
+
+FLATTEN int64_t process_order(const int64_t &RESTRICT bid, const int64_t &RESTRICT ask, const int64_t &RESTRICT qty, const int64_t &RESTRICT tick_size) {
+    int64_t norm_bid;
+    int64_t norm_ask;
+    int64_t spread;
+    int64_t total;
+    norm_bid = normalize_price(bid, tick_size);
+    norm_ask = normalize_price(ask, tick_size);
+    spread = (norm_ask - norm_bid);
+    if (((spread < 0LL))) {
+        spread = 0LL;
+    }
+    total = (spread * qty);
+    if (((qty > 0LL))) {
+        total = (total + qty);
+    } else {
+        total = (total - qty);
+    }
+    return total;
+}
+
+int64_t square(const int64_t &RESTRICT x) {
+    return (x * x);
+}
+
+int64_t add(const int64_t &RESTRICT a, const int64_t &RESTRICT b) {
+    return (a + b);
+}
+
+FLATTEN int64_t distance_squared(const int64_t &RESTRICT x1, const int64_t &RESTRICT y1, const int64_t &RESTRICT x2, const int64_t &RESTRICT y2) {
+    int64_t dx;
+    int64_t dy;
+    dx = square((x2 - x1));
+    dy = square((y2 - y1));
+    return add(dx, dy);
+}
+
+FLATTEN int64_t sum_up_to(const int64_t &RESTRICT n) {
+    int64_t total;
+    int64_t i;
+    total = 0LL;
+    int64_t __stop_4 = n;
+    for (i = 0; i < __stop_4; ++i) {
+        total = add(total, i);
+    }
+    return total;
+}
+
+int run() {
+    Vector v;
+    Vector scaled;
+    print(str("Test 1 - process_order:"), process_order(10007LL, 10023LL, 5LL, 5LL));
+    print(str("Test 1b - process_order (sell):"), process_order(9998LL, 10001LL, (-3LL), 5LL));
+    print(str("Test 2 - distance_squared:"), distance_squared(0LL, 0LL, 3LL, 4LL));
+    print(str("Test 3 - sum_up_to:"), sum_up_to(5LL));
+    v = Vector(3LL, 4LL);
+    print(str("Test 4 - length_squared:"), v.length_squared());
+    v.move(200LL, (-200LL));
+    print(str("Test 5 - move (clamped):"), v.x, v.y);
+    scaled = v.scaled(2LL);
+    print(str("Test 6 - scaled:"), scaled.x, scaled.y);
+    return 0LL;
+}
+}
+
 namespace prog_iter {
 
 int run();
@@ -1208,34 +1334,34 @@ int run() {
     for (i = 0; i < __len_1; ++i) {
         print(l);
     }
-    int64_t __stop_4 = x;
-    for (i = 0; i < __stop_4; ++i) {
+    int64_t __stop_5 = x;
+    for (i = 0; i < __stop_5; ++i) {
         print(str("first"), i);
     }
-    int64_t __stop_5 = (x + 5LL);
-    for (i = x; i < __stop_5; ++i) {
+    int64_t __stop_6 = (x + 5LL);
+    for (i = x; i < __stop_6; ++i) {
         print(str("second"), i);
     }
-    int64_t __stop_6 = (x + 10LL);
-    for (i = x; i < __stop_6; i += 2) {
+    int64_t __stop_7 = (x + 10LL);
+    for (i = x; i < __stop_7; i += 2) {
         print(str("third"), i);
     }
-    int64_t __stop_7 = (x - 7LL);
-    for (i = x; i > __stop_7; i += -2) {
+    int64_t __stop_8 = (x - 7LL);
+    for (i = x; i > __stop_8; i += -2) {
         print(str("fourth"), i);
     }
     step = x;
-    int64_t __stop_8 = (10LL * x);
+    int64_t __stop_9 = (10LL * x);
     int64_t __step_0 = step;
     for (i = x;; i += __step_0) {
-        if ((__step_0 > 0 && i >= __stop_8) || (__step_0 < 0 && i <= __stop_8)) break;
+        if ((__step_0 > 0 && i >= __stop_9) || (__step_0 < 0 && i <= __stop_9)) break;
         print(str("fifth"), i);
     }
     step = (-2LL);
-    int64_t __stop_9 = (10LL * x);
+    int64_t __stop_10 = (10LL * x);
     int64_t __step_1 = step;
     for (i = (5LL * x);; i += __step_1) {
-        if ((__step_1 > 0 && i >= __stop_9) || (__step_1 < 0 && i <= __stop_9)) break;
+        if ((__step_1 > 0 && i >= __stop_10) || (__step_1 < 0 && i <= __stop_10)) break;
         print(str("sixth"), i);
     }
     auto && __range_19 = l;
@@ -1710,6 +1836,7 @@ int main(int argc, char** argv) {
     if (argc > 1 && std::strcmp(argv[1], "fixed_width_int_promotion.py") == 0) return prog_fixed_width_int_promotion::run();
     if (argc > 1 && std::strcmp(argv[1], "fixed_width_ints.py") == 0) return prog_fixed_width_ints::run();
     if (argc > 1 && std::strcmp(argv[1], "global_constexpr.py") == 0) return prog_global_constexpr::run();
+    if (argc > 1 && std::strcmp(argv[1], "hotpath.py") == 0) return prog_hotpath::run();
     if (argc > 1 && std::strcmp(argv[1], "iter.py") == 0) return prog_iter::run();
     if (argc > 1 && std::strcmp(argv[1], "list.py") == 0) return prog_list::run();
     if (argc > 1 && std::strcmp(argv[1], "loops.py") == 0) return prog_loops::run();

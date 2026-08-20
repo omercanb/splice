@@ -5,6 +5,7 @@ from typing import Optional
 
 from mypy.nodes import (
     CallExpr,
+    Decorator,
     Expression,
     FuncDef,
     IndexExpr,
@@ -91,6 +92,8 @@ def _usable_funcdef(node) -> Optional[FuncDef]:
     to read .arguments instead of checking the node's type, since that's
     the only way that covers both cases.
     """
+    if isinstance(node, Decorator):
+        node = node.func
     if not isinstance(node, FuncDef) or isinstance(node, OverloadedFuncDef):
         return None
     if getattr(node, "arguments", None) is None:
@@ -108,6 +111,9 @@ def resolve_funcdef(o: CallExpr, types: TypeTable) -> Optional[FuncDef]:
 
     if isinstance(o.callee, NameExpr):
         node = o.callee.node
+        # A decorated function's symbol resolves to the Decorator, not the FuncDef.
+        if isinstance(node, Decorator):
+            node = node.func
         if isinstance(node, FuncDef):
             return _usable_funcdef(node)
 

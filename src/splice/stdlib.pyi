@@ -1,9 +1,11 @@
-from typing import Generic, Iterator, SupportsInt, TypeVar, Union
+from typing import Callable, Generic, Iterator, SupportsInt, TypeVar, Union
 
 _T = TypeVar("_T")
 _N = TypeVar("_N", bound=int)
+_F = TypeVar("_F", bound=Callable)
 
 def copy(value: _T) -> _T: ...
+def hotpath(func: _F) -> _F: ...
 
 class Array(Generic[_T, _N]):
     def __init__(self, fill_value: _T) -> None: ...

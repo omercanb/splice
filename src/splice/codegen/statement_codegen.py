@@ -28,6 +28,7 @@ from mypy.nodes import (
 from mypy.types import Type
 
 from splice.analysis.find_declarations import get_declarations
+from splice.analysis.hotpath import collect_hotpath_funcs
 from splice.analysis.mutation import MutationTable
 from splice.codegen.class_def import write_class_bodies, write_class_declaration
 from splice.codegen.exceptions import translate_raise_stmt, translate_try_stmt
@@ -36,6 +37,7 @@ from splice.codegen.for_loop import translate_for_stmt
 from splice.codegen.translation_utils import translate_func_signature
 from splice.codegen.typegen import cpp_type
 from splice.visitor import Traverser
+
 
 includes = [
     "types.h",
@@ -72,6 +74,7 @@ class StatementCodegen(Traverser):
         self.tree = tree
         self.types = types_dict
         self.mutations = mutations
+        self.hotpath_funcs = collect_hotpath_funcs(tree)
         self.expr_codegen = ExpressionCodegen(types_dict)
         self.indent_level = 0
         self.output: list[str] = []
@@ -149,8 +152,7 @@ class StatementCodegen(Traverser):
           5. emit every free function's body
         """
         classes = [d for d in o.defs if isinstance(d, ClassDef)]
-        # A decorator is ignored - the function underneath is translated as
-        # if it were never decorated.
+        # A decorator's identity is dropped, except @hotpath's effect on the signature (self.hotpath_funcs).
         functions = [
             d.func if isinstance(d, Decorator) else d
             for d in o.defs
@@ -165,9 +167,13 @@ class StatementCodegen(Traverser):
         # A default like `def f(x: Other = Other())` would need Other's full
         # definition here, not just a forward declaration - a known gap.
         for function in functions:
-            self.emit(
-                f"{translate_func_signature(function, self.expr_codegen, mutations=self.mutations)};"
+            signature = translate_func_signature(
+                function,
+                self.expr_codegen,
+                mutations=self.mutations,
+                flatten=function in self.hotpath_funcs,
             )
+            self.emit(f"{signature};")
         self.emit("")
 
         for class_def in classes:
@@ -212,7 +218,9 @@ class StatementCodegen(Traverser):
 
     def visit_func_def(self, o: FuncDef):
         """Generate a function or method definition"""
-        signature = translate_func_signature(o, self.expr_codegen, mutations=self.mutations)
+        signature = translate_func_signature(
+            o, self.expr_codegen, mutations=self.mutations, flatten=o in self.hotpath_funcs
+        )
         self.emit_function_body(f"{signature} {{", o)
 
     def visit_assignment_stmt(self, o: AssignmentStmt):

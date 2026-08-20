@@ -12,6 +12,7 @@ from mypy.nodes import (
     Block,
     CallExpr,
     ClassDef,
+    Decorator,
     DictExpr,
     Expression,
     FuncDef,
@@ -100,6 +101,8 @@ def compute_function_effects(
     for definition in tree.defs:
         if isinstance(definition, FuncDef):
             funcdefs.append(definition)
+        elif isinstance(definition, Decorator):
+            funcdefs.append(definition.func)
         elif isinstance(definition, ClassDef):
             funcdefs.extend(class_methods(definition))
 

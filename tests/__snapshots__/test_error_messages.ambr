@@ -23,6 +23,24 @@
   
   '''
 # ---
+# name: test_error_message[aliasing_arguments_transitive.py]
+  '''
+  aliasing_arguments_transitive.py:14:5: error: `matrix[0]` and `matrix[0][0]` could alias, and aliasing is not permitted for mutable parameters
+  
+    14 |     level0(matrix[0], matrix[0][0])
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  
+    help: pass a copy so they can't alias:
+            level0(matrix[0], copy(matrix[0][0]))
+            
+            `matrix[0]` is mutable because:
+            line 10: level1(values)
+            line 6: mutate_directly(values)
+            line 2, mutates here:
+            values[0] = 99
+  
+  '''
+# ---
 # name: test_error_message[aliasing_loop_container.py]
   '''
   aliasing_loop_container.py:3:9: error: `items` could alias `items`, which this loop is iterating
@@ -193,6 +211,32 @@
       |     ^^^^^^^^
   
     help: globals are constexpr and can't be reassigned - pass x in as a parameter instead
+  
+  '''
+# ---
+# name: test_error_message[hotpath_allocation.py]
+  '''
+  hotpath_allocation.py:6:12: warning: `make_list` is @hotpath but allocates here
+  
+    6 |     return [x, x + 1]
+      |            ^^^^^^^^^^
+  
+    help: allocation will be too slow for a hot path, please consider another option
+  
+  '''
+# ---
+# name: test_error_message[hotpath_allocation_transitive.py]
+  '''
+  hotpath_allocation_transitive.py:13:1: warning: `level0_alloc` is @hotpath but allocates transitively
+  
+    13 | def level0_alloc(x: int) -> int:
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  
+    help: allocation will be too slow for a hot path, please consider another option:
+            line 14: level1_alloc(x, x + 1)
+            line 9: alloc_leaf(a, b)
+            line 5, allocates here:
+            [a, b]
   
   '''
 # ---

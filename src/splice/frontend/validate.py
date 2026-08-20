@@ -8,6 +8,7 @@ walk so a program reports all of its problems at once.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -731,6 +732,11 @@ class _Validator(Traverser):
         super().visit_comparison_expr(o)
 
 
+class Severity(StrEnum):
+    ERROR = "error"
+    WARNING = "warning"
+
+
 @dataclass(frozen=True)
 class Diagnostic:
     """One unsupported construct and the source span it occupies."""
@@ -742,6 +748,8 @@ class Diagnostic:
     column: int
     end_line: int
     end_column: int
+    # WARNING reports but never blocks compilation, unlike the default.
+    severity: Severity = Severity.ERROR
 
     @property
     def position(self) -> tuple[int, int]:
@@ -764,7 +772,13 @@ def validate(tree: MypyFile, types: TypeTable) -> list[Diagnostic]:
     return sorted(unique.values(), key=lambda d: d.position)
 
 
-def diagnostic(node: Context, kind: str, message: str, hint: str) -> Diagnostic:
+def diagnostic(
+    node: Context,
+    kind: str,
+    message: str,
+    hint: str,
+    severity: Severity = Severity.ERROR,
+) -> Diagnostic:
     """Build a diagnostic from any mypy node, which carries its own span."""
     end_line = node.end_line if node.end_line is not None else node.line
     end_column = node.end_column if node.end_column is not None else node.column + 1
@@ -776,6 +790,7 @@ def diagnostic(node: Context, kind: str, message: str, hint: str) -> Diagnostic:
         column=node.column,
         end_line=end_line,
         end_column=end_column,
+        severity=severity,
     )
 
 
@@ -806,7 +821,7 @@ def _render_one(diagnostic: Diagnostic, lines: list[str], path: str) -> str:
     # mypy columns are 0 based, editors and compilers count from 1.
     header = (
         f"{path}:{diagnostic.line}:{diagnostic.column + 1}: "
-        f"error: {diagnostic.message}"
+        f"{diagnostic.severity}: {diagnostic.message}"
     )
     hint_lines = diagnostic.hint.splitlines()
     hint = "\n".join(

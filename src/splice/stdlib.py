@@ -16,6 +16,11 @@ def copy(value: T) -> T:
     return deepcopy(value)
 
 
+def hotpath(func: T) -> T:
+    """Marks a function/method as hot codegen emits it with FLATTEN. Does nothing when run as Python"""
+    return func
+
+
 class Array(Generic[T, N]):
     """A fixed size array"""
 

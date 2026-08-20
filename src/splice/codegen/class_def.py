@@ -37,7 +37,10 @@ def write_class_declaration(codegen: StatementCodegen, class_def: ClassDef) -> N
     write_constructor(codegen, class_def)
     for method in methods(class_def):
         signature = translate_func_signature(
-            method, codegen.expr_codegen, mutations=codegen.mutations
+            method,
+            codegen.expr_codegen,
+            mutations=codegen.mutations,
+            flatten=method in codegen.hotpath_funcs,
         )
         codegen.emit(f"{signature};")
 
@@ -54,6 +57,7 @@ def write_class_bodies(codegen: StatementCodegen, class_def: ClassDef) -> None:
             codegen.expr_codegen,
             mutations=codegen.mutations,
             qualifier=f"{class_def.name}::",
+            flatten=method in codegen.hotpath_funcs,
         )
         codegen.emit_function_body(f"{header} {{", method)
 
@@ -71,11 +75,7 @@ def attributes(class_def: ClassDef) -> list[tuple[str, Type]]:
 
 
 def methods(class_def: ClassDef) -> list[FuncDef]:
-    """The methods, in the order they were written.
-
-    A decorated method is ignored, not translated - the FuncDef underneath
-    is used as if it were never decorated.
-    """
+    """The methods, in the order they were written. A decorator's identity is dropped, except @hotpath's effect on the signature (StatementCodegen.hotpath_funcs)."""
     return [
         statement.func if isinstance(statement, Decorator) else statement
         for statement in class_def.defs.body

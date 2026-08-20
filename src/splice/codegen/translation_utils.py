@@ -49,19 +49,17 @@ def translate_func_signature(
     expr_translator: Visitor[str],
     mutations: MutationTable,
     qualifier: str = "",
+    flatten: bool = False,
 ) -> str:
-    """Generate a C++ function signature.
-
-    `qualifier` prefixes the name, eg. "ClassName::" for a method's
-    out-of-line definition.
-    """
+    """Generate a C++ function signature. `qualifier` prefixes the name for a method's out-of-line definition; `flatten` is set for an @hotpath function."""
     func = get_function_type(o)
     return_type = cpp_type(func.ret_type)
     name = o.name
     if name == "main":
         return_type = "int"
     arguments = translate_parameters(o, expr_translator, mutations)
-    signature = f"{return_type} {qualifier}{name}({', '.join(arguments)})"
+    prefix = "FLATTEN " if flatten else ""
+    signature = f"{prefix}{return_type} {qualifier}{name}({', '.join(arguments)})"
     return signature
 
 

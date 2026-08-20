@@ -1,5 +1,5 @@
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from mypy import build
 from mypy.main import define_options
@@ -13,11 +13,18 @@ from mypy.options import Options
 from mypy.types import Instance, Type
 
 from splice.ast_utils import TypeTable
+from splice.analysis.allocation import compute_allocating_functions
 from splice.analysis.call_graph import compute_call_graph
 from splice.analysis.mutation import MutationTable, compute_mutating_parameters
 from splice.analysis.statement_effects import compute_function_effects
 from splice.frontend.mypy_fixes import get_resolved_types
-from splice.frontend.validate import validate, UnsupportedProgram, render
+from splice.frontend.validate import (
+    Diagnostic,
+    Severity,
+    UnsupportedProgram,
+    render,
+    validate,
+)
 from splice.frontend.validate_semantics import validate_semantics
 from splice.codegen.statement_codegen import StatementCodegen
 from splice.transform.comprehension_transformer import (
@@ -38,6 +45,8 @@ class AnalysisResult:
     mutations: MutationTable
     source: str
     path: str | None
+    # Non-fatal (warning-severity) diagnostics - empty on a clean compile.
+    diagnostics: list[Diagnostic] = field(default_factory=list)
 
 
 def mypy_options():
@@ -115,14 +124,22 @@ def analyse(
     function_effects = compute_function_effects(tree, types)
     call_graph = compute_call_graph(tree, types)
     mutations = compute_mutating_parameters(function_effects, call_graph)
+    allocating_functions = compute_allocating_functions(function_effects, call_graph)
 
+    semantics_diagnostics: list[Diagnostic] = []
     if check_semantics:
-        semantics_diagnostics = validate_semantics(tree, mutations, types, source)
+        semantics_diagnostics = validate_semantics(
+            tree, mutations, types, source, allocating_functions
+        )
         if semantics_diagnostics:
             print(render(semantics_diagnostics, source, path))
-            raise UnsupportedProgram(semantics_diagnostics)
+            errors = [d for d in semantics_diagnostics if d.severity == Severity.ERROR]
+            if errors:
+                raise UnsupportedProgram(errors)
 
-    return AnalysisResult(result.files["main"], types, mutations, source, path)
+    return AnalysisResult(
+        result.files["main"], types, mutations, source, path, semantics_diagnostics
+    )
 
 
 def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):

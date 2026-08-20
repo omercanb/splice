@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from splice.pipeline import pipeline
+from splice.pipeline import analyse
 from splice.frontend.validate import UnsupportedProgram, render
 
 error_programs_path = "tests/error_programs"
@@ -23,10 +23,13 @@ validator_paths = [
 
 
 def _diagnostics_for(path: str):
+    """A program's diagnostics, whether they were fatal or just warnings."""
     source = Path(path).read_text()
-    with pytest.raises(UnsupportedProgram) as raised:
-        pipeline(path, source)
-    return source, raised.value.diagnostics
+    try:
+        result = analyse(path, source)
+    except UnsupportedProgram as raised:
+        return source, raised.diagnostics
+    return source, result.diagnostics
 
 
 @pytest.mark.parametrize("path", paths, ids=lambda p: Path(p).name)
