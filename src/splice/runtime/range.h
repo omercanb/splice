@@ -12,6 +12,24 @@ class range_iterator;
 class range;
 std::ostream &operator<<(std::ostream &os, const range &r);
 
+class range_iterator {
+  public:
+    range_iterator(_int cur, _int step) : cur_(cur), step_(step) {}
+    _int operator*() const { return cur_; }
+    range_iterator &operator++() {
+        cur_ += step_;
+        return *this;
+    }
+    bool operator!=(const range_iterator &o) const {
+        return step_ > 0 ? cur_ < o.cur_ : cur_ > o.cur_;
+    }
+    bool operator==(const range_iterator &o) const { return !(*this != o); }
+
+  private:
+    _int cur_;
+    _int step_;
+};
+
 class range {
   public:
     _int start;
@@ -27,34 +45,10 @@ class range {
         this->stop = stop;
         this->step = step;
     }
-    range_iterator iter();
+    range_iterator begin() const { return range_iterator(start, step); }
+    range_iterator end() const { return range_iterator(stop, step); }
     str __str__() const;
 };
-
-class range_iterator {
-  public:
-    range r;
-    _int cur;
-    range_iterator(range r) : r(r), cur(r.start) {}
-    _int current() { return cur; }
-    _int next() {
-        auto temp = cur;
-        cur += r.step;
-        return temp;
-    }
-
-    bool done() {
-        if (r.step > 0) {
-            return cur >= r.stop;
-        } else {
-            return cur <= r.stop;
-        }
-    }
-};
-
-inline range_iterator range::iter() { return range_iterator(*this); }
-auto iter(range r) { return r.iter(); }
-auto next(range_iterator &r) { return r.next(); }
 
 std::ostream &operator<<(std::ostream &os, const range &r) {
     os << "range(" << r.start << ", " << r.stop;

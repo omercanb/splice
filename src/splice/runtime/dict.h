@@ -154,23 +154,26 @@ template <typename K, typename V> class dict {
     bool operator==(const dict<K, V> &o) const { return data_ == o.data_; }
     bool operator!=(const dict<K, V> &o) const { return data_ != o.data_; }
 
-    // `for k in d` iterates keys, matching Python.
+    // `for k in d` iterates keys, matching Python - dereferences to the key,
+    // not the (key, value) pair a raw std::unordered_map::iterator would.
     class dict_iterator {
       public:
         using map_type = std::unordered_map<K, V, hasher<K>>;
-        const map_type &m;
-        typename map_type::const_iterator it;
 
-        dict_iterator(const map_type &m) : m(m), it(m.begin()) {}
-        K current() { return it->first; }
-        K next() {
-            K key = it->first;
-            ++it;
-            return key;
+        explicit dict_iterator(typename map_type::const_iterator it) : it_(it) {}
+        const K &operator*() const { return it_->first; }
+        dict_iterator &operator++() {
+            ++it_;
+            return *this;
         }
-        bool done() { return it == m.end(); }
+        bool operator!=(const dict_iterator &o) const { return it_ != o.it_; }
+        bool operator==(const dict_iterator &o) const { return it_ == o.it_; }
+
+      private:
+        typename map_type::const_iterator it_;
     };
-    dict_iterator iter() const { return dict_iterator(data_); }
+    dict_iterator begin() const { return dict_iterator(data_.begin()); }
+    dict_iterator end() const { return dict_iterator(data_.end()); }
 
     const std::unordered_map<K, V, hasher<K>> &raw() const noexcept {
         return data_;
@@ -191,10 +194,6 @@ template <typename K, typename V> class dict {
   private:
     std::unordered_map<K, V, hasher<K>> data_;
 };
-
-template <typename K, typename V> auto iter(const dict<K, V> &d) {
-    return d.iter();
-}
 
 template <typename K, typename V>
 inline _int len(const dict<K, V> &d) {

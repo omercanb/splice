@@ -340,14 +340,20 @@ class bytes {
     // Iterating bytes yields byte values as ints, unlike str.
     class bytes_iterator {
       public:
-        std::string s;
-        _int i = 0;
-        bytes_iterator(std::string s) : s(std::move(s)) {}
-        _int current() { return static_cast<_int>(static_cast<unsigned char>(s[i])); }
-        _int next() { return static_cast<_int>(static_cast<unsigned char>(s[i++])); }
-        bool done() { return i >= static_cast<_int>(s.size()); }
+        explicit bytes_iterator(std::string::const_iterator it) : it_(it) {}
+        _int operator*() const { return static_cast<_int>(static_cast<unsigned char>(*it_)); }
+        bytes_iterator &operator++() {
+            ++it_;
+            return *this;
+        }
+        bool operator!=(const bytes_iterator &o) const { return it_ != o.it_; }
+        bool operator==(const bytes_iterator &o) const { return it_ == o.it_; }
+
+      private:
+        std::string::const_iterator it_;
     };
-    bytes_iterator iter() const { return bytes_iterator(data_); }
+    bytes_iterator begin() const { return bytes_iterator(data_.begin()); }
+    bytes_iterator end() const { return bytes_iterator(data_.end()); }
 
   private:
     std::string data_;
@@ -417,7 +423,6 @@ class bytes {
 
 inline bytes operator*(_int n, const bytes &b) { return b * n; }
 inline _int len(const bytes &b) { return b.__len__(); }
-inline auto iter(const bytes &b) { return b.iter(); }
 inline std::ostream &operator<<(std::ostream &os, const bytes &b) {
     return os << b.raw();
 }

@@ -14,7 +14,7 @@ from mypy.types import Instance, Type
 
 from splice.ast_utils import TypeTable
 from splice.analysis.call_graph import compute_call_graph
-from splice.analysis.mutation import compute_mutating_parameters
+from splice.analysis.mutation import MutationTable, compute_mutating_parameters
 from splice.analysis.statement_effects import compute_function_effects
 from splice.frontend.mypy_fixes import get_resolved_types
 from splice.frontend.validate import validate, UnsupportedProgram, render
@@ -35,6 +35,7 @@ function_fallback: Instance
 class AnalysisResult:
     tree: MypyFile
     types: TypeTable
+    mutations: MutationTable
     source: str
     path: str | None
 
@@ -121,7 +122,7 @@ def analyse(
             print(render(semantics_diagnostics, source, path))
             raise UnsupportedProgram(semantics_diagnostics)
 
-    return AnalysisResult(result.files["main"], types, source, path)
+    return AnalysisResult(result.files["main"], types, mutations, source, path)
 
 
 def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
@@ -132,7 +133,7 @@ def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
 
 def generate(result: AnalysisResult) -> str:
     """Translate the already-validated, already-transformed tree."""
-    return StatementCodegen(result.tree, result.types).generate()
+    return StatementCodegen(result.tree, result.types, result.mutations).generate()
 
 
 def pipeline(path: str, source: str) -> str:

@@ -86,21 +86,6 @@ template <typename... Ts> class tuple {
         data = other.data;
         return *this;
     }
-
-    // Iterator support for for loops
-    class tuple_iterator {
-      public:
-        tuple<Ts...> &t;
-        size_t i;
-
-        tuple_iterator(tuple<Ts...> &t) : t(t), i(0) {}
-
-        bool done() { return i >= t.__len__(); }
-
-        void next() { i++; }
-    };
-
-    tuple_iterator iter() { return tuple_iterator(*this); }
 };
 
 // Specialization for 2-element tuple (for enumerate, zip, etc.)
@@ -144,23 +129,9 @@ template <typename T1, typename T2> class tuple<T1, T2> {
         return *this;
     }
 
-    class tuple_iterator {
-      public:
-        tuple<T1, T2> &t;
-        size_t i;
-
-        tuple_iterator(tuple<T1, T2> &t) : t(t), i(0) {}
-
-        bool done() { return i >= 2; }
-
-        void next() { i++; }
-    };
-
     str __str__() const {
         return str("(") + repr(first()) + ", " + repr(second()) + ")";
     }
-
-    tuple_iterator iter() { return tuple_iterator(*this); }
 };
 
 // (1, 2) + (3, 4) == (1, 2, 3, 4), like Python: the operand types need not

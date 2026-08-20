@@ -1,8 +1,4 @@
-"""
-Template node visitor for C++ code generation.
-Fill in the visit_* methods to generate C++ code.
-Separated into expression and statement visitors.
-"""
+"""Main code generation module"""
 
 from mypy.nodes import (
     AssertStmt,
@@ -32,6 +28,7 @@ from mypy.nodes import (
 from mypy.types import Type
 
 from splice.analysis.find_declarations import get_declarations
+from splice.analysis.mutation import MutationTable
 from splice.codegen.class_def import write_class_bodies, write_class_declaration
 from splice.codegen.exceptions import translate_raise_stmt, translate_try_stmt
 from splice.codegen.expression_codegen import ExpressionCodegen
@@ -70,9 +67,11 @@ class StatementCodegen(Traverser):
         self,
         tree: MypyFile,
         types_dict: dict[MypyExpression, Type],
+        mutations: MutationTable,
     ):
         self.tree = tree
         self.types = types_dict
+        self.mutations = mutations
         self.expr_codegen = ExpressionCodegen(types_dict)
         self.indent_level = 0
         self.output: list[str] = []
@@ -178,7 +177,9 @@ class StatementCodegen(Traverser):
         # A default like `def f(x: Other = Other())` would need Other's full
         # definition here, not just a forward declaration - a known gap.
         for function in functions:
-            self.emit(f"{translate_func_signature(function, self.expr_codegen)};")
+            self.emit(
+                f"{translate_func_signature(function, self.expr_codegen, mutations=self.mutations)};"
+            )
         self.emit("void __init_module__();")
         self.emit("")
 
@@ -239,7 +240,7 @@ class StatementCodegen(Traverser):
 
     def visit_func_def(self, o: FuncDef):
         """Generate a function or method definition"""
-        signature = translate_func_signature(o, self.expr_codegen)
+        signature = translate_func_signature(o, self.expr_codegen, mutations=self.mutations)
         prefix = ["__init_module__();"] if o.name == "main" else []
         self.emit_function_body(f"{signature} {{", o, prefix)
 

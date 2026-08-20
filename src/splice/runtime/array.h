@@ -47,17 +47,6 @@ class Array {
     bool operator==(const Array<T, N> &o) const { return data_ == o.data_; }
     bool operator!=(const Array<T, N> &o) const { return data_ != o.data_; }
 
-    class array_iterator {
-      public:
-        Array<T, N> &a;
-        size_type i;
-        array_iterator(Array<T, N> &a) : a(a), i(0) {}
-        T &current() { return a[i]; }
-        T &next() { return a[i++]; }
-        bool done() { return i >= a.__len__(); }
-    };
-    array_iterator iter() { return array_iterator(*this); }
-
     str __str__() const {
         str result = "[";
         for (size_type i = 0; i < __len__(); ++i) {
@@ -71,11 +60,6 @@ class Array {
   private:
     std::array<T, N> data_;
 };
-
-template <typename T, std::size_t N>
-auto iter(Array<T, N> &a) {
-    return a.iter();
-}
 
 template <typename T, std::size_t N>
 inline _int len(const Array<T, N> &a) {
