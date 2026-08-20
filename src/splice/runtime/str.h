@@ -36,34 +36,34 @@ class str {
     str(const std::string &s) : data_(s) {}
     str(std::string &&s) : data_(std::move(s)) {}
 
-    const std::string &raw() const noexcept { return data_; }
+    ALWAYS_INLINE const std::string &raw() const noexcept { return data_; }
 
-    str __str__() const { return *this; }
+    ALWAYS_INLINE str __str__() const { return *this; }
     // Containers render elements with repr(), so they show 'a' rather than a.
-    str __repr__() const { return str("'" + data_ + "'"); }
+    ALWAYS_INLINE str __repr__() const { return str("'" + data_ + "'"); }
 
-    size_type __len__() const noexcept {
+    ALWAYS_INLINE size_type __len__() const noexcept {
         return static_cast<size_type>(data_.size());
     }
-    size_type len() const noexcept { return __len__(); }
-    bool empty() const noexcept { return data_.empty(); }
-    explicit operator bool() const noexcept { return !data_.empty(); }
-    size_t __hash__() const { return std::hash<std::string>{}(data_); }
+    ALWAYS_INLINE size_type len() const noexcept { return __len__(); }
+    ALWAYS_INLINE bool empty() const noexcept { return data_.empty(); }
+    ALWAYS_INLINE explicit operator bool() const noexcept { return !data_.empty(); }
+    ALWAYS_INLINE size_t __hash__() const { return std::hash<std::string>{}(data_); }
 
     // Indexing yields a length-1 str: Python has no separate char type.
-    str __getitem__(size_type i) const {
+    ALWAYS_INLINE str __getitem__(size_type i) const {
         return str(std::string(1, data_[normIndex(i)]));
     }
-    str operator[](size_type i) const { return __getitem__(i); }
+    ALWAYS_INLINE str operator[](size_type i) const { return __getitem__(i); }
     // s[-1] -- a length-1 str, same as __getitem__.
-    str back() const {
+    ALWAYS_INLINE str back() const {
         if (data_.empty())
             throw IndexError("string index out of range");
         return str(std::string(1, data_.back()));
     }
     // s[i:j:k] -- defined in slice.h, which this header cannot include.
     str __getitem__(const slice &s) const;
-    bool __contains__(const str &sub) const {
+    ALWAYS_INLINE bool __contains__(const str &sub) const {
         return data_.find(sub.data_) != std::string::npos;
     }
 
@@ -93,18 +93,18 @@ class str {
     str casefold() const { return lower(); }
 
     // find returns -1 when absent; index raises, which is the only difference.
-    _int find(const str &sub) const { return toIndex(data_.find(sub.data_)); }
-    _int find(const str &sub, size_type start) const {
+    ALWAYS_INLINE _int find(const str &sub) const { return toIndex(data_.find(sub.data_)); }
+    ALWAYS_INLINE _int find(const str &sub, size_type start) const {
         return toIndex(data_.find(sub.data_, clampStart(start)));
     }
-    _int rfind(const str &sub) const { return toIndex(data_.rfind(sub.data_)); }
-    _int index(const str &sub) const { return found(find(sub)); }
-    _int rindex(const str &sub) const { return found(rfind(sub)); }
+    ALWAYS_INLINE _int rfind(const str &sub) const { return toIndex(data_.rfind(sub.data_)); }
+    ALWAYS_INLINE _int index(const str &sub) const { return found(find(sub)); }
+    ALWAYS_INLINE _int rindex(const str &sub) const { return found(rfind(sub)); }
 
-    bool startswith(const str &prefix) const {
+    ALWAYS_INLINE bool startswith(const str &prefix) const {
         return data_.rfind(prefix.data_, 0) == 0;
     }
-    bool endswith(const str &suffix) const {
+    ALWAYS_INLINE bool endswith(const str &suffix) const {
         return data_.size() >= suffix.data_.size() &&
                data_.compare(data_.size() - suffix.data_.size(),
                              suffix.data_.size(), suffix.data_) == 0;
@@ -136,46 +136,46 @@ class str {
         return str(std::move(out));
     }
 
-    str removeprefix(const str &prefix) const {
+    ALWAYS_INLINE str removeprefix(const str &prefix) const {
         return startswith(prefix) ? str(data_.substr(prefix.data_.size()))
                                   : *this;
     }
-    str removesuffix(const str &suffix) const {
+    ALWAYS_INLINE str removesuffix(const str &suffix) const {
         return !suffix.data_.empty() && endswith(suffix)
                    ? str(data_.substr(0, data_.size() - suffix.data_.size()))
                    : *this;
     }
 
     // No argument strips whitespace, like Python.
-    str strip() const { return lstrip().rstrip(); }
-    str lstrip() const {
+    ALWAYS_INLINE str strip() const { return lstrip().rstrip(); }
+    ALWAYS_INLINE str lstrip() const {
         size_t b = data_.find_first_not_of(" \t\n\r\f\v");
         return str(b == std::string::npos ? "" : data_.substr(b));
     }
-    str rstrip() const {
+    ALWAYS_INLINE str rstrip() const {
         size_t e = data_.find_last_not_of(" \t\n\r\f\v");
         return str(e == std::string::npos ? "" : data_.substr(0, e + 1));
     }
-    str strip(const str &chars) const { return lstrip(chars).rstrip(chars); }
-    str lstrip(const str &chars) const {
+    ALWAYS_INLINE str strip(const str &chars) const { return lstrip(chars).rstrip(chars); }
+    ALWAYS_INLINE str lstrip(const str &chars) const {
         size_t b = data_.find_first_not_of(chars.data_);
         return str(b == std::string::npos ? "" : data_.substr(b));
     }
-    str rstrip(const str &chars) const {
+    ALWAYS_INLINE str rstrip(const str &chars) const {
         size_t e = data_.find_last_not_of(chars.data_);
         return str(e == std::string::npos ? "" : data_.substr(0, e + 1));
     }
 
-    str ljust(size_type width, const str &fill = " ") const {
+    ALWAYS_INLINE str ljust(size_type width, const str &fill = " ") const {
         return pad(width, fill, 0);
     }
-    str rjust(size_type width, const str &fill = " ") const {
+    ALWAYS_INLINE str rjust(size_type width, const str &fill = " ") const {
         return pad(width, fill, 1);
     }
-    str center(size_type width, const str &fill = " ") const {
+    ALWAYS_INLINE str center(size_type width, const str &fill = " ") const {
         return pad(width, fill, 2);
     }
-    str zfill(size_type width) const {
+    ALWAYS_INLINE str zfill(size_type width) const {
         _int extra = width - __len__();
         if (extra <= 0)
             return *this;
@@ -187,17 +187,17 @@ class str {
     }
 
     // All are false for the empty string, like Python.
-    bool isalpha() const { return allOf(isAlpha); }
-    bool isdigit() const { return allOf(isDigit); }
-    bool isalnum() const {
+    ALWAYS_INLINE bool isalpha() const { return allOf(isAlpha); }
+    ALWAYS_INLINE bool isdigit() const { return allOf(isDigit); }
+    ALWAYS_INLINE bool isalnum() const {
         return allOf([](char c) { return isAlpha(c) || isDigit(c); });
     }
-    bool isspace() const {
+    ALWAYS_INLINE bool isspace() const {
         return allOf([](char c) { return std::isspace((unsigned char)c) != 0; });
     }
-    bool isdecimal() const { return isdigit(); }
-    bool isnumeric() const { return isdigit(); }
-    bool isascii() const {
+    ALWAYS_INLINE bool isdecimal() const { return isdigit(); }
+    ALWAYS_INLINE bool isnumeric() const { return isdigit(); }
+    ALWAYS_INLINE bool isascii() const {
         return std::all_of(data_.begin(), data_.end(),
                            [](char c) { return (unsigned char)c < 128; });
     }
@@ -219,8 +219,8 @@ class str {
     // to_str()/repr(), which it needs to render arbitrary argument types.
     template <typename... Args> str format(const Args &...args) const;
 
-    str operator+(const str &o) const { return str(data_ + o.data_); }
-    str &operator+=(const str &o) {
+    ALWAYS_INLINE str operator+(const str &o) const { return str(data_ + o.data_); }
+    ALWAYS_INLINE str &operator+=(const str &o) {
         data_ += o.data_;
         return *this;
     }
@@ -230,40 +230,40 @@ class str {
             out += data_;
         return str(std::move(out));
     }
-    bool operator==(const str &o) const { return data_ == o.data_; }
-    bool operator!=(const str &o) const { return data_ != o.data_; }
-    bool operator<(const str &o) const { return data_ < o.data_; }
-    bool operator<=(const str &o) const { return data_ <= o.data_; }
-    bool operator>(const str &o) const { return data_ > o.data_; }
-    bool operator>=(const str &o) const { return data_ >= o.data_; }
+    ALWAYS_INLINE bool operator==(const str &o) const { return data_ == o.data_; }
+    ALWAYS_INLINE bool operator!=(const str &o) const { return data_ != o.data_; }
+    ALWAYS_INLINE bool operator<(const str &o) const { return data_ < o.data_; }
+    ALWAYS_INLINE bool operator<=(const str &o) const { return data_ <= o.data_; }
+    ALWAYS_INLINE bool operator>(const str &o) const { return data_ > o.data_; }
+    ALWAYS_INLINE bool operator>=(const str &o) const { return data_ >= o.data_; }
 
     // Iterating a string yields its characters as length-1 strs.
     class str_iterator {
       public:
         explicit str_iterator(std::string::const_iterator it) : it_(it) {}
-        str operator*() const { return str(std::string(1, *it_)); }
-        str_iterator &operator++() {
+        ALWAYS_INLINE str operator*() const { return str(std::string(1, *it_)); }
+        ALWAYS_INLINE str_iterator &operator++() {
             ++it_;
             return *this;
         }
-        bool operator!=(const str_iterator &o) const { return it_ != o.it_; }
-        bool operator==(const str_iterator &o) const { return it_ == o.it_; }
+        ALWAYS_INLINE bool operator!=(const str_iterator &o) const { return it_ != o.it_; }
+        ALWAYS_INLINE bool operator==(const str_iterator &o) const { return it_ == o.it_; }
 
       private:
         std::string::const_iterator it_;
     };
-    str_iterator begin() const { return str_iterator(data_.begin()); }
-    str_iterator end() const { return str_iterator(data_.end()); }
+    ALWAYS_INLINE str_iterator begin() const { return str_iterator(data_.begin()); }
+    ALWAYS_INLINE str_iterator end() const { return str_iterator(data_.end()); }
 
   private:
     std::string data_;
 
-    static bool isAlpha(char c) { return std::isalpha((unsigned char)c) != 0; }
-    static bool isDigit(char c) { return std::isdigit((unsigned char)c) != 0; }
-    static bool isUpper(char c) { return std::isupper((unsigned char)c) != 0; }
-    static bool isLower(char c) { return std::islower((unsigned char)c) != 0; }
-    static char up(char c) { return (char)std::toupper((unsigned char)c); }
-    static char low(char c) { return (char)std::tolower((unsigned char)c); }
+    ALWAYS_INLINE static bool isAlpha(char c) { return std::isalpha((unsigned char)c) != 0; }
+    ALWAYS_INLINE static bool isDigit(char c) { return std::isdigit((unsigned char)c) != 0; }
+    ALWAYS_INLINE static bool isUpper(char c) { return std::isupper((unsigned char)c) != 0; }
+    ALWAYS_INLINE static bool isLower(char c) { return std::islower((unsigned char)c) != 0; }
+    ALWAYS_INLINE static char up(char c) { return (char)std::toupper((unsigned char)c); }
+    ALWAYS_INLINE static char low(char c) { return (char)std::tolower((unsigned char)c); }
 
     template <typename F> str mapped(F f) const {
         std::string out = data_;
@@ -271,7 +271,7 @@ class str {
             c = (char)f((unsigned char)c);
         return str(std::move(out));
     }
-    template <typename F> bool allOf(F f) const {
+    template <typename F> ALWAYS_INLINE bool allOf(F f) const {
         return !data_.empty() && std::all_of(data_.begin(), data_.end(), f);
     }
     bool casedAllAre(bool wantUpper) const {
@@ -285,7 +285,7 @@ class str {
         }
         return seen;
     }
-    str pad(size_type width, const str &fill, int mode) const {
+    ALWAYS_INLINE str pad(size_type width, const str &fill, int mode) const {
         _int extra = width - __len__();
         if (extra <= 0 || fill.data_.empty())
             return *this;
@@ -297,21 +297,21 @@ class str {
         _int left = extra / 2;
         return str(std::string(left, f) + data_ + std::string(extra - left, f));
     }
-    static _int toIndex(size_t at) {
+    ALWAYS_INLINE static _int toIndex(size_t at) {
         return at == std::string::npos ? -1 : static_cast<_int>(at);
     }
-    static _int found(_int at) {
+    ALWAYS_INLINE static _int found(_int at) {
         if (at < 0)
             throw ValueError("substring not found");
         return at;
     }
-    size_t clampStart(size_type start) const {
+    ALWAYS_INLINE size_t clampStart(size_type start) const {
         _int n = __len__();
         if (start < 0)
             start += n;
         return static_cast<size_t>(start < 0 ? 0 : start);
     }
-    size_t normIndex(size_type i) const {
+    ALWAYS_INLINE size_t normIndex(size_type i) const {
         _int n = __len__();
         if (i < 0)
             i += n;
@@ -322,7 +322,7 @@ class str {
 };
 
 inline str operator*(_int n, const str &s) { return s * n; }
-inline _int len(const str &s) { return s.__len__(); }
+ALWAYS_INLINE _int len(const str &s) { return s.__len__(); }
 
 // Anything else that defines __len__, so a user's class gets len() the same
 // way the containers do. The per container overloads are more specialised and

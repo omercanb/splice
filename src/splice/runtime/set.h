@@ -39,23 +39,23 @@ template <typename T> class set {
             data_.insert(item);
     }
 
-    size_type __len__() const noexcept {
+    ALWAYS_INLINE size_type __len__() const noexcept {
         return static_cast<size_type>(data_.size());
     }
 
-    bool __contains__(const T &value) const {
+    ALWAYS_INLINE bool __contains__(const T &value) const {
         return data_.find(value) != data_.end();
     }
 
-    void add(const T &value) { data_.insert(value); }
+    ALWAYS_INLINE void add(const T &value) { data_.insert(value); }
 
-    void remove(const T &value) {
+    ALWAYS_INLINE void remove(const T &value) {
         if (data_.erase(value) == 0)
             throw KeyError("element not found");
     }
-    void discard(const T &value) { data_.erase(value); }
+    ALWAYS_INLINE void discard(const T &value) { data_.erase(value); }
 
-    T pop() {
+    ALWAYS_INLINE T pop() {
         if (data_.empty())
             throw KeyError("pop from an empty set");
         auto it = data_.begin();
@@ -64,7 +64,7 @@ template <typename T> class set {
         return value;
     }
 
-    void clear() noexcept { data_.clear(); }
+    ALWAYS_INLINE void clear() noexcept { data_.clear(); }
 
     void update(const set<T> &other) {
         for (const auto &v : other.data_)
@@ -116,7 +116,7 @@ template <typename T> class set {
         return out;
     }
 
-    set<T> copy() const { return *this; }
+    ALWAYS_INLINE set<T> copy() const { return *this; }
 
     bool issubset(const set<T> &other) const {
         for (const auto &v : data_)
@@ -137,8 +137,8 @@ template <typename T> class set {
         return true;
     }
 
-    bool operator==(const set<T> &o) const { return data_ == o.data_; }
-    bool operator!=(const set<T> &o) const { return data_ != o.data_; }
+    ALWAYS_INLINE bool operator==(const set<T> &o) const { return data_ == o.data_; }
+    ALWAYS_INLINE bool operator!=(const set<T> &o) const { return data_ != o.data_; }
     bool operator<=(const set<T> &o) const {
         for (const auto &v : data_)
             if (o.data_.find(v) == o.data_.end())
@@ -152,10 +152,10 @@ template <typename T> class set {
     bool operator>(const set<T> &o) const { return o < *this; }
 
     using const_iterator = typename std::unordered_set<T, hasher<T>>::const_iterator;
-    const_iterator begin() const { return data_.begin(); }
-    const_iterator end() const { return data_.end(); }
+    ALWAYS_INLINE const_iterator begin() const { return data_.begin(); }
+    ALWAYS_INLINE const_iterator end() const { return data_.end(); }
 
-    const std::unordered_set<T, hasher<T>> &raw() const noexcept {
+    ALWAYS_INLINE const std::unordered_set<T, hasher<T>> &raw() const noexcept {
         return data_;
     }
 
@@ -177,7 +177,7 @@ template <typename T> class set {
     std::unordered_set<T, hasher<T>> data_;
 };
 
-template <typename T> inline _int len(const set<T> &s) { return s.__len__(); }
+template <typename T> ALWAYS_INLINE _int len(const set<T> &s) { return s.__len__(); }
 
 template <typename T>
 set<T> operator|(const set<T> &a, const set<T> &b) {

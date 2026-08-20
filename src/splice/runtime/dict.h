@@ -37,55 +37,55 @@ template <typename K, typename V> class dict {
         }
     }
 
-    size_type __len__() const noexcept {
+    ALWAYS_INLINE size_type __len__() const noexcept {
         return static_cast<size_type>(data_.size());
     }
-    size_type len() const noexcept { return __len__(); }
-    bool empty() const noexcept { return data_.empty(); }
-    explicit operator bool() const noexcept { return !data_.empty(); }
+    ALWAYS_INLINE size_type len() const noexcept { return __len__(); }
+    ALWAYS_INLINE bool empty() const noexcept { return data_.empty(); }
+    ALWAYS_INLINE explicit operator bool() const noexcept { return !data_.empty(); }
 
     // Inserts on a missing key, like std::unordered_map::operator[].
-    V &operator[](const K &key) { return data_[key]; }
+    ALWAYS_INLINE V &operator[](const K &key) { return data_[key]; }
 
     // d[k] read: raises KeyError on a missing key.
-    V &__getitem__(const K &key) {
+    ALWAYS_INLINE V &__getitem__(const K &key) {
         auto it = data_.find(key);
         if (it == data_.end())
             throw KeyError("key not found");
         return it->second;
     }
-    const V &__getitem__(const K &key) const {
+    ALWAYS_INLINE const V &__getitem__(const K &key) const {
         auto it = data_.find(key);
         if (it == data_.end())
             throw KeyError("key not found");
         return it->second;
     }
 
-    void __setitem__(const K &key, const V &value) { data_[key] = value; }
+    ALWAYS_INLINE void __setitem__(const K &key, const V &value) { data_[key] = value; }
 
     // del d[k]
-    void __delitem__(const K &key) {
+    ALWAYS_INLINE void __delitem__(const K &key) {
         if (data_.erase(key) == 0)
             throw KeyError("key not found");
     }
 
-    bool __contains__(const K &key) const { // `k in d`
+    ALWAYS_INLINE bool __contains__(const K &key) const { // `k in d`
         return data_.find(key) != data_.end();
     }
 
     // get(key, default=None): never raises; without a default a missing
     // key yields a value-initialized V.
-    V get(const K &key) const {
+    ALWAYS_INLINE V get(const K &key) const {
         auto it = data_.find(key);
         return it == data_.end() ? V() : it->second;
     }
-    V get(const K &key, const V &fallback) const {
+    ALWAYS_INLINE V get(const K &key, const V &fallback) const {
         auto it = data_.find(key);
         return it == data_.end() ? fallback : it->second;
     }
 
     // pop(key[, default]): raises KeyError when absent and no default.
-    V pop(const K &key) {
+    ALWAYS_INLINE V pop(const K &key) {
         auto it = data_.find(key);
         if (it == data_.end())
             throw KeyError("key not found");
@@ -93,7 +93,7 @@ template <typename K, typename V> class dict {
         data_.erase(it);
         return value;
     }
-    V pop(const K &key, const V &fallback) {
+    ALWAYS_INLINE V pop(const K &key, const V &fallback) {
         auto it = data_.find(key);
         if (it == data_.end())
             return fallback;
@@ -103,7 +103,7 @@ template <typename K, typename V> class dict {
     }
 
     // CPython pops LIFO; with no insertion order we pop an arbitrary item.
-    tuple<K, V> popitem() {
+    ALWAYS_INLINE tuple<K, V> popitem() {
         if (data_.empty())
             throw KeyError("popitem(): dictionary is empty");
         auto it = data_.begin();
@@ -113,8 +113,8 @@ template <typename K, typename V> class dict {
     }
 
     // setdefault(key, default=None): insert-and-return when absent.
-    V &setdefault(const K &key) { return data_[key]; }
-    V &setdefault(const K &key, const V &fallback) {
+    ALWAYS_INLINE V &setdefault(const K &key) { return data_[key]; }
+    ALWAYS_INLINE V &setdefault(const K &key, const V &fallback) {
         auto it = data_.find(key);
         if (it == data_.end())
             it = data_.emplace(key, fallback).first;
@@ -126,9 +126,9 @@ template <typename K, typename V> class dict {
             data_[entry.first] = entry.second;
     }
 
-    void clear() noexcept { data_.clear(); }
+    ALWAYS_INLINE void clear() noexcept { data_.clear(); }
 
-    dict<K, V> copy() const { return *this; }
+    ALWAYS_INLINE dict<K, V> copy() const { return *this; }
 
     // Snapshots, not CPython's live views.
     list<K> keys() const {
@@ -151,8 +151,8 @@ template <typename K, typename V> class dict {
     }
 
     // Order-independent, like Python.
-    bool operator==(const dict<K, V> &o) const { return data_ == o.data_; }
-    bool operator!=(const dict<K, V> &o) const { return data_ != o.data_; }
+    ALWAYS_INLINE bool operator==(const dict<K, V> &o) const { return data_ == o.data_; }
+    ALWAYS_INLINE bool operator!=(const dict<K, V> &o) const { return data_ != o.data_; }
 
     // `for k in d` iterates keys, matching Python - dereferences to the key,
     // not the (key, value) pair a raw std::unordered_map::iterator would.
@@ -161,21 +161,21 @@ template <typename K, typename V> class dict {
         using map_type = std::unordered_map<K, V, hasher<K>>;
 
         explicit dict_iterator(typename map_type::const_iterator it) : it_(it) {}
-        const K &operator*() const { return it_->first; }
-        dict_iterator &operator++() {
+        ALWAYS_INLINE const K &operator*() const { return it_->first; }
+        ALWAYS_INLINE dict_iterator &operator++() {
             ++it_;
             return *this;
         }
-        bool operator!=(const dict_iterator &o) const { return it_ != o.it_; }
-        bool operator==(const dict_iterator &o) const { return it_ == o.it_; }
+        ALWAYS_INLINE bool operator!=(const dict_iterator &o) const { return it_ != o.it_; }
+        ALWAYS_INLINE bool operator==(const dict_iterator &o) const { return it_ == o.it_; }
 
       private:
         typename map_type::const_iterator it_;
     };
-    dict_iterator begin() const { return dict_iterator(data_.begin()); }
-    dict_iterator end() const { return dict_iterator(data_.end()); }
+    ALWAYS_INLINE dict_iterator begin() const { return dict_iterator(data_.begin()); }
+    ALWAYS_INLINE dict_iterator end() const { return dict_iterator(data_.end()); }
 
-    const std::unordered_map<K, V, hasher<K>> &raw() const noexcept {
+    ALWAYS_INLINE const std::unordered_map<K, V, hasher<K>> &raw() const noexcept {
         return data_;
     }
 
@@ -196,7 +196,7 @@ template <typename K, typename V> class dict {
 };
 
 template <typename K, typename V>
-inline _int len(const dict<K, V> &d) {
+ALWAYS_INLINE _int len(const dict<K, V> &d) {
     return d.__len__();
 }
 

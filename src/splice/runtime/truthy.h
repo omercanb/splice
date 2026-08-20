@@ -12,14 +12,14 @@ namespace py {
 // to operator bool(), then __bool__(), then __len__() != 0, then True -
 // mirroring CPython's resolution order.
 
-inline bool to_bool(_int x) { return x != 0; }
-inline bool to_bool(_float x) { return x != 0.0; }
-inline bool to_bool(bool x) { return x; }
-inline bool to_bool(const std::string &s) { return !s.empty(); }
+ALWAYS_INLINE bool to_bool(_int x) { return x != 0; }
+ALWAYS_INLINE bool to_bool(_float x) { return x != 0.0; }
+ALWAYS_INLINE bool to_bool(bool x) { return x; }
+ALWAYS_INLINE bool to_bool(const std::string &s) { return !s.empty(); }
 
 // None is falsy; otherwise defer to the held value's own truthiness
 template <typename T>
-inline bool to_bool(const std::optional<T> &x) {
+ALWAYS_INLINE bool to_bool(const std::optional<T> &x) {
     return x.has_value() && to_bool(*x);
 }
 
@@ -52,7 +52,7 @@ struct has_len_method<
 } // namespace detail
 
 template <typename T>
-inline bool to_bool(const T &x) {
+ALWAYS_INLINE bool to_bool(const T &x) {
     T &value = const_cast<T &>(x);
     if constexpr (detail::has_bool_conversion<T>::value) {
         return static_cast<bool>(value);

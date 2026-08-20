@@ -47,7 +47,7 @@ class bytes {
             data_[static_cast<size_t>(i)] = static_cast<char>(values[i]);
     }
 
-    const std::string &raw() const noexcept { return data_; }
+    ALWAYS_INLINE const std::string &raw() const noexcept { return data_; }
 
     // Both render as b'...': printing bytes never shows raw text. Matches
     // CPython's bytes repr exactly, including its quote-choosing rule.
@@ -80,19 +80,19 @@ class bytes {
     }
     str __str__() const { return __repr__(); }
 
-    size_type __len__() const noexcept {
+    ALWAYS_INLINE size_type __len__() const noexcept {
         return static_cast<size_type>(data_.size());
     }
-    size_type len() const noexcept { return __len__(); }
-    bool empty() const noexcept { return data_.empty(); }
-    explicit operator bool() const noexcept { return !data_.empty(); }
-    size_t __hash__() const { return std::hash<std::string>{}(data_); }
+    ALWAYS_INLINE size_type len() const noexcept { return __len__(); }
+    ALWAYS_INLINE bool empty() const noexcept { return data_.empty(); }
+    ALWAYS_INLINE explicit operator bool() const noexcept { return !data_.empty(); }
+    ALWAYS_INLINE size_t __hash__() const { return std::hash<std::string>{}(data_); }
 
     // Indexing yields the byte's value, unlike str: bytes has no character type.
-    _int __getitem__(size_type i) const {
+    ALWAYS_INLINE _int __getitem__(size_type i) const {
         return static_cast<_int>(static_cast<unsigned char>(data_[normIndex(i)]));
     }
-    _int back() const {
+    ALWAYS_INLINE _int back() const {
         if (data_.empty())
             throw IndexError("index out of range");
         return static_cast<_int>(static_cast<unsigned char>(data_.back()));
@@ -112,10 +112,10 @@ class bytes {
         }
         return bytes(std::move(out));
     }
-    bool __contains__(const bytes &sub) const {
+    ALWAYS_INLINE bool __contains__(const bytes &sub) const {
         return data_.find(sub.data_) != std::string::npos;
     }
-    bool __contains__(_int byte) const {
+    ALWAYS_INLINE bool __contains__(_int byte) const {
         return data_.find(static_cast<char>(byte)) != std::string::npos;
     }
 
@@ -143,18 +143,18 @@ class bytes {
         return bytes(std::move(out));
     }
 
-    _int find(const bytes &sub) const { return toIndex(data_.find(sub.data_)); }
-    _int find(const bytes &sub, size_type start) const {
+    ALWAYS_INLINE _int find(const bytes &sub) const { return toIndex(data_.find(sub.data_)); }
+    ALWAYS_INLINE _int find(const bytes &sub, size_type start) const {
         return toIndex(data_.find(sub.data_, clampStart(start)));
     }
-    _int rfind(const bytes &sub) const { return toIndex(data_.rfind(sub.data_)); }
-    _int index(const bytes &sub) const { return found(find(sub)); }
-    _int rindex(const bytes &sub) const { return found(rfind(sub)); }
+    ALWAYS_INLINE _int rfind(const bytes &sub) const { return toIndex(data_.rfind(sub.data_)); }
+    ALWAYS_INLINE _int index(const bytes &sub) const { return found(find(sub)); }
+    ALWAYS_INLINE _int rindex(const bytes &sub) const { return found(rfind(sub)); }
 
-    bool startswith(const bytes &prefix) const {
+    ALWAYS_INLINE bool startswith(const bytes &prefix) const {
         return data_.rfind(prefix.data_, 0) == 0;
     }
-    bool endswith(const bytes &suffix) const {
+    ALWAYS_INLINE bool endswith(const bytes &suffix) const {
         return data_.size() >= suffix.data_.size() &&
                data_.compare(data_.size() - suffix.data_.size(),
                              suffix.data_.size(), suffix.data_) == 0;
@@ -186,45 +186,45 @@ class bytes {
         return bytes(std::move(out));
     }
 
-    bytes removeprefix(const bytes &prefix) const {
+    ALWAYS_INLINE bytes removeprefix(const bytes &prefix) const {
         return startswith(prefix) ? bytes(data_.substr(prefix.data_.size()))
                                   : *this;
     }
-    bytes removesuffix(const bytes &suffix) const {
+    ALWAYS_INLINE bytes removesuffix(const bytes &suffix) const {
         return !suffix.data_.empty() && endswith(suffix)
                    ? bytes(data_.substr(0, data_.size() - suffix.data_.size()))
                    : *this;
     }
 
-    bytes strip() const { return lstrip().rstrip(); }
-    bytes lstrip() const {
+    ALWAYS_INLINE bytes strip() const { return lstrip().rstrip(); }
+    ALWAYS_INLINE bytes lstrip() const {
         size_t b = data_.find_first_not_of(" \t\n\r\f\v");
         return bytes(b == std::string::npos ? "" : data_.substr(b));
     }
-    bytes rstrip() const {
+    ALWAYS_INLINE bytes rstrip() const {
         size_t e = data_.find_last_not_of(" \t\n\r\f\v");
         return bytes(e == std::string::npos ? "" : data_.substr(0, e + 1));
     }
-    bytes strip(const bytes &chars) const { return lstrip(chars).rstrip(chars); }
-    bytes lstrip(const bytes &chars) const {
+    ALWAYS_INLINE bytes strip(const bytes &chars) const { return lstrip(chars).rstrip(chars); }
+    ALWAYS_INLINE bytes lstrip(const bytes &chars) const {
         size_t b = data_.find_first_not_of(chars.data_);
         return bytes(b == std::string::npos ? "" : data_.substr(b));
     }
-    bytes rstrip(const bytes &chars) const {
+    ALWAYS_INLINE bytes rstrip(const bytes &chars) const {
         size_t e = data_.find_last_not_of(chars.data_);
         return bytes(e == std::string::npos ? "" : data_.substr(0, e + 1));
     }
 
-    bytes ljust(size_type width, const bytes &fill = bytes(" ")) const {
+    ALWAYS_INLINE bytes ljust(size_type width, const bytes &fill = bytes(" ")) const {
         return pad(width, fill, 0);
     }
-    bytes rjust(size_type width, const bytes &fill = bytes(" ")) const {
+    ALWAYS_INLINE bytes rjust(size_type width, const bytes &fill = bytes(" ")) const {
         return pad(width, fill, 1);
     }
-    bytes center(size_type width, const bytes &fill = bytes(" ")) const {
+    ALWAYS_INLINE bytes center(size_type width, const bytes &fill = bytes(" ")) const {
         return pad(width, fill, 2);
     }
-    bytes zfill(size_type width) const {
+    ALWAYS_INLINE bytes zfill(size_type width) const {
         _int extra = width - __len__();
         if (extra <= 0)
             return *this;
@@ -235,15 +235,15 @@ class bytes {
         return bytes(std::move(out));
     }
 
-    bool isalpha() const { return allOf(isAlpha); }
-    bool isdigit() const { return allOf(isDigit); }
-    bool isalnum() const {
+    ALWAYS_INLINE bool isalpha() const { return allOf(isAlpha); }
+    ALWAYS_INLINE bool isdigit() const { return allOf(isDigit); }
+    ALWAYS_INLINE bool isalnum() const {
         return allOf([](char c) { return isAlpha(c) || isDigit(c); });
     }
-    bool isspace() const {
+    ALWAYS_INLINE bool isspace() const {
         return allOf([](char c) { return std::isspace((unsigned char)c) != 0; });
     }
-    bool isascii() const {
+    ALWAYS_INLINE bool isascii() const {
         return std::all_of(data_.begin(), data_.end(),
                            [](char c) { return (unsigned char)c < 128; });
     }
@@ -304,14 +304,14 @@ class bytes {
         }
         return bytes(std::move(out));
     }
-    tuple<bytes, bytes, bytes> partition(const bytes &sep) const {
+    ALWAYS_INLINE tuple<bytes, bytes, bytes> partition(const bytes &sep) const {
         size_t at = data_.find(sep.data_);
         if (at == std::string::npos)
             return tuple<bytes, bytes, bytes>(*this, bytes(""), bytes(""));
         return tuple<bytes, bytes, bytes>(bytes(data_.substr(0, at)), sep,
                                           bytes(data_.substr(at + sep.data_.size())));
     }
-    tuple<bytes, bytes, bytes> rpartition(const bytes &sep) const {
+    ALWAYS_INLINE tuple<bytes, bytes, bytes> rpartition(const bytes &sep) const {
         size_t at = data_.rfind(sep.data_);
         if (at == std::string::npos)
             return tuple<bytes, bytes, bytes>(bytes(""), bytes(""), *this);
@@ -319,8 +319,8 @@ class bytes {
                                           bytes(data_.substr(at + sep.data_.size())));
     }
 
-    bytes operator+(const bytes &o) const { return bytes(data_ + o.data_); }
-    bytes &operator+=(const bytes &o) {
+    ALWAYS_INLINE bytes operator+(const bytes &o) const { return bytes(data_ + o.data_); }
+    ALWAYS_INLINE bytes &operator+=(const bytes &o) {
         data_ += o.data_;
         return *this;
     }
@@ -330,40 +330,40 @@ class bytes {
             out += data_;
         return bytes(std::move(out));
     }
-    bool operator==(const bytes &o) const { return data_ == o.data_; }
-    bool operator!=(const bytes &o) const { return data_ != o.data_; }
-    bool operator<(const bytes &o) const { return data_ < o.data_; }
-    bool operator<=(const bytes &o) const { return data_ <= o.data_; }
-    bool operator>(const bytes &o) const { return data_ > o.data_; }
-    bool operator>=(const bytes &o) const { return data_ >= o.data_; }
+    ALWAYS_INLINE bool operator==(const bytes &o) const { return data_ == o.data_; }
+    ALWAYS_INLINE bool operator!=(const bytes &o) const { return data_ != o.data_; }
+    ALWAYS_INLINE bool operator<(const bytes &o) const { return data_ < o.data_; }
+    ALWAYS_INLINE bool operator<=(const bytes &o) const { return data_ <= o.data_; }
+    ALWAYS_INLINE bool operator>(const bytes &o) const { return data_ > o.data_; }
+    ALWAYS_INLINE bool operator>=(const bytes &o) const { return data_ >= o.data_; }
 
     // Iterating bytes yields byte values as ints, unlike str.
     class bytes_iterator {
       public:
         explicit bytes_iterator(std::string::const_iterator it) : it_(it) {}
-        _int operator*() const { return static_cast<_int>(static_cast<unsigned char>(*it_)); }
-        bytes_iterator &operator++() {
+        ALWAYS_INLINE _int operator*() const { return static_cast<_int>(static_cast<unsigned char>(*it_)); }
+        ALWAYS_INLINE bytes_iterator &operator++() {
             ++it_;
             return *this;
         }
-        bool operator!=(const bytes_iterator &o) const { return it_ != o.it_; }
-        bool operator==(const bytes_iterator &o) const { return it_ == o.it_; }
+        ALWAYS_INLINE bool operator!=(const bytes_iterator &o) const { return it_ != o.it_; }
+        ALWAYS_INLINE bool operator==(const bytes_iterator &o) const { return it_ == o.it_; }
 
       private:
         std::string::const_iterator it_;
     };
-    bytes_iterator begin() const { return bytes_iterator(data_.begin()); }
-    bytes_iterator end() const { return bytes_iterator(data_.end()); }
+    ALWAYS_INLINE bytes_iterator begin() const { return bytes_iterator(data_.begin()); }
+    ALWAYS_INLINE bytes_iterator end() const { return bytes_iterator(data_.end()); }
 
   private:
     std::string data_;
 
-    static bool isAlpha(char c) { return std::isalpha((unsigned char)c) != 0; }
-    static bool isDigit(char c) { return std::isdigit((unsigned char)c) != 0; }
-    static bool isUpper(char c) { return std::isupper((unsigned char)c) != 0; }
-    static bool isLower(char c) { return std::islower((unsigned char)c) != 0; }
-    static char up(char c) { return (char)std::toupper((unsigned char)c); }
-    static char low(char c) { return (char)std::tolower((unsigned char)c); }
+    ALWAYS_INLINE static bool isAlpha(char c) { return std::isalpha((unsigned char)c) != 0; }
+    ALWAYS_INLINE static bool isDigit(char c) { return std::isdigit((unsigned char)c) != 0; }
+    ALWAYS_INLINE static bool isUpper(char c) { return std::isupper((unsigned char)c) != 0; }
+    ALWAYS_INLINE static bool isLower(char c) { return std::islower((unsigned char)c) != 0; }
+    ALWAYS_INLINE static char up(char c) { return (char)std::toupper((unsigned char)c); }
+    ALWAYS_INLINE static char low(char c) { return (char)std::tolower((unsigned char)c); }
 
     template <typename F> bytes mapped(F f) const {
         std::string out = data_;
@@ -371,7 +371,7 @@ class bytes {
             c = (char)f((unsigned char)c);
         return bytes(std::move(out));
     }
-    template <typename F> bool allOf(F f) const {
+    template <typename F> ALWAYS_INLINE bool allOf(F f) const {
         return !data_.empty() && std::all_of(data_.begin(), data_.end(), f);
     }
     bool casedAllAre(bool wantUpper) const {
@@ -385,7 +385,7 @@ class bytes {
         }
         return seen;
     }
-    bytes pad(size_type width, const bytes &fill, int mode) const {
+    ALWAYS_INLINE bytes pad(size_type width, const bytes &fill, int mode) const {
         _int extra = width - __len__();
         if (extra <= 0 || fill.data_.empty())
             return *this;
@@ -397,21 +397,21 @@ class bytes {
         _int left = extra / 2;
         return bytes(std::string(left, f) + data_ + std::string(extra - left, f));
     }
-    static _int toIndex(size_t at) {
+    ALWAYS_INLINE static _int toIndex(size_t at) {
         return at == std::string::npos ? -1 : static_cast<_int>(at);
     }
-    static _int found(_int at) {
+    ALWAYS_INLINE static _int found(_int at) {
         if (at < 0)
             throw ValueError("subsection not found");
         return at;
     }
-    size_t clampStart(size_type start) const {
+    ALWAYS_INLINE size_t clampStart(size_type start) const {
         _int n = __len__();
         if (start < 0)
             start += n;
         return static_cast<size_t>(start < 0 ? 0 : start);
     }
-    size_t normIndex(size_type i) const {
+    ALWAYS_INLINE size_t normIndex(size_type i) const {
         _int n = __len__();
         if (i < 0)
             i += n;
@@ -422,8 +422,8 @@ class bytes {
 };
 
 inline bytes operator*(_int n, const bytes &b) { return b * n; }
-inline _int len(const bytes &b) { return b.__len__(); }
-inline std::ostream &operator<<(std::ostream &os, const bytes &b) {
+ALWAYS_INLINE _int len(const bytes &b) { return b.__len__(); }
+ALWAYS_INLINE std::ostream &operator<<(std::ostream &os, const bytes &b) {
     return os << b.raw();
 }
 

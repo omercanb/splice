@@ -10,12 +10,12 @@
 #include <string>
 #include <type_traits>
 
-inline _int to_int(_int v) { return v; }
-inline _int to_int(_float v) { return static_cast<_int>(v); }
-inline _int to_int(bool v) { return v ? 1 : 0; }
+ALWAYS_INLINE _int to_int(_int v) { return v; }
+ALWAYS_INLINE _int to_int(_float v) { return static_cast<_int>(v); }
+ALWAYS_INLINE _int to_int(bool v) { return v ? 1 : 0; }
 
 template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-inline _int to_int(T v) {
+ALWAYS_INLINE _int to_int(T v) {
     return static_cast<_int>(v);
 }
 
@@ -36,12 +36,12 @@ inline _int to_int(const py::str &s, _int base = 10) {
     return result;
 }
 
-inline _float to_float(_int v) { return v; }
-inline _float to_float(_float v) { return v; }
-inline _float to_float(bool v) { return v ? 1.0 : 0.0; }
+ALWAYS_INLINE _float to_float(_int v) { return v; }
+ALWAYS_INLINE _float to_float(_float v) { return v; }
+ALWAYS_INLINE _float to_float(bool v) { return v ? 1.0 : 0.0; }
 
 template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-inline _float to_float(T v) {
+ALWAYS_INLINE _float to_float(T v) {
     return static_cast<_float>(v);
 }
 

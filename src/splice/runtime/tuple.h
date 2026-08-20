@@ -33,10 +33,10 @@ template <typename... Ts> class tuple {
   public:
     std::tuple<Ts...> data;
     // Default constructor - creates with default-initialized values
-    tuple() : data() {}
+    ALWAYS_INLINE tuple() : data() {}
 
     // Regular constructor - takes arguments
-    tuple(Ts... args) : data(args...) {}
+    ALWAYS_INLINE tuple(Ts... args) : data(args...) {}
 
     str __str__() const {
         str result = "(";
@@ -59,16 +59,16 @@ template <typename... Ts> class tuple {
     }
 
     // Get element by compile-time index
-    template <size_t I> auto get() {
+    template <size_t I> ALWAYS_INLINE auto get() {
         return std::get<I>(data);
     }
 
-    template <size_t I> const auto get() const {
+    template <size_t I> ALWAYS_INLINE const auto get() const {
         return std::get<I>(data);
     }
 
     // Python-like __len__()
-    int __len__() const { return sizeof...(Ts); }
+    ALWAYS_INLINE int __len__() const { return sizeof...(Ts); }
 
     template <typename U> bool __contains__(const U &value) const {
         bool found = false;
@@ -82,7 +82,7 @@ template <typename... Ts> class tuple {
 
     // Assignment operator - forwards to underlying std::tuple
     template <typename... Us>
-    tuple& operator=(const tuple<Us...>& other) {
+    ALWAYS_INLINE tuple& operator=(const tuple<Us...>& other) {
         data = other.data;
         return *this;
     }
@@ -92,18 +92,18 @@ template <typename... Ts> class tuple {
 template <typename T1, typename T2> class tuple<T1, T2> {
   public:
     std::tuple<T1, T2> data;
-    tuple() : data() {}
-    tuple(T1 a, T2 b) : data(a, b) {}
+    ALWAYS_INLINE tuple() : data() {}
+    ALWAYS_INLINE tuple(T1 a, T2 b) : data(a, b) {}
 
-    template <size_t I> auto get() {
+    template <size_t I> ALWAYS_INLINE auto get() {
         return std::get<I>(data);
     }
 
-    template <size_t I> const auto get() const {
+    template <size_t I> ALWAYS_INLINE const auto get() const {
         return std::get<I>(data);
     }
 
-    int __len__() const { return 2; }
+    ALWAYS_INLINE int __len__() const { return 2; }
 
     template <typename U> bool __contains__(const U &value) const {
         bool found = false;
@@ -116,15 +116,15 @@ template <typename T1, typename T2> class tuple<T1, T2> {
     }
 
     // Direct access for convenience
-    T1 &first() { return std::get<0>(data); }
-    T2 &second() { return std::get<1>(data); }
+    ALWAYS_INLINE T1 &first() { return std::get<0>(data); }
+    ALWAYS_INLINE T2 &second() { return std::get<1>(data); }
 
-    const T1 &first() const { return std::get<0>(data); }
-    const T2 &second() const { return std::get<1>(data); }
+    ALWAYS_INLINE const T1 &first() const { return std::get<0>(data); }
+    ALWAYS_INLINE const T2 &second() const { return std::get<1>(data); }
 
     // Assignment operator - forwards to underlying std::tuple
     template <typename U1, typename U2>
-    tuple& operator=(const tuple<U1, U2>& other) {
+    ALWAYS_INLINE tuple& operator=(const tuple<U1, U2>& other) {
         data = other.data;
         return *this;
     }
@@ -137,7 +137,7 @@ template <typename T1, typename T2> class tuple<T1, T2> {
 // (1, 2) + (3, 4) == (1, 2, 3, 4), like Python: the operand types need not
 // match, and the result's pack is the two operands' packs joined.
 template <typename... Ts, typename... Us>
-tuple<Ts..., Us...> operator+(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE tuple<Ts..., Us...> operator+(const tuple<Ts...> &a, const tuple<Us...> &b) {
     tuple<Ts..., Us...> out;
     out.data = std::tuple_cat(a.data, b.data);
     return out;
@@ -146,29 +146,29 @@ tuple<Ts..., Us...> operator+(const tuple<Ts...> &a, const tuple<Us...> &b) {
 // Needed both for `t1 == t2` and for tuples used as dict keys / set elements.
 // std::tuple already compares element-wise.
 template <typename... Ts, typename... Us>
-bool operator==(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE bool operator==(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return a.data == b.data;
 }
 template <typename... Ts, typename... Us>
-bool operator!=(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE bool operator!=(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return !(a == b);
 }
 
 // Lexicographic, like Python: compares element by element, left to right.
 template <typename... Ts, typename... Us>
-bool operator<(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE bool operator<(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return a.data < b.data;
 }
 template <typename... Ts, typename... Us>
-bool operator<=(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE bool operator<=(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return a.data <= b.data;
 }
 template <typename... Ts, typename... Us>
-bool operator>(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE bool operator>(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return a.data > b.data;
 }
 template <typename... Ts, typename... Us>
-bool operator>=(const tuple<Ts...> &a, const tuple<Us...> &b) {
+ALWAYS_INLINE bool operator>=(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return a.data >= b.data;
 }
 
@@ -181,7 +181,7 @@ template <typename... Ts> inline size_t hash(const tuple<Ts...> &t) {
 
 // Destructuring - creates a tuple of references
 // Usage: destructure(a, b) = some_tuple;
-template <typename... Ts> tuple<Ts&...> destructure(Ts&... args) {
+template <typename... Ts> ALWAYS_INLINE tuple<Ts&...> destructure(Ts&... args) {
     return tuple<Ts&...>(args...);
 }
 

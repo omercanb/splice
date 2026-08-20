@@ -20,20 +20,15 @@
 using namespace py;
 
 namespace prog_array {
-int64_t numInstruments;
-int run();
-void __init_module__();
+constexpr int64_t numInstruments = 3LL;
 
-void __init_module__() {
-    numInstruments = 3LL;
-}
+int run();
 
 int run() {
     Array<uint32_t, 3> a;
     Array<uint32_t, 4> b;
     int64_t total;
     uint32_t v;
-    __init_module__();
     a = Array<uint32_t, 3>(0LL);
     a.__setitem__(1LL, 5LL);
     print(str("Test 1 - index/assign:"), a.__getitem__(0LL), a.__getitem__(1LL), a.__getitem__(2LL));
@@ -56,12 +51,9 @@ int run() {
 }
 
 namespace prog_boolops {
+
 int64_t side(const int64_t &v);
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 int64_t side(const int64_t &v) {
     print(str("SIDE"));
@@ -78,7 +70,6 @@ int run() {
     double f;
     double g;
     int64_t n;
-    __init_module__();
     a = 1LL;
     b = 2LL;
     zero = 0LL;
@@ -144,12 +135,9 @@ int run() {
 }
 
 namespace prog_builtin_functions {
+
 list<int64_t> __list_comprehension_0(const list<int64_t> &numbers);
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 list<int64_t> __list_comprehension_0(const list<int64_t> &numbers) {
     list<int64_t> __tmp_0;
@@ -168,7 +156,6 @@ int run() {
     list<int64_t> empty;
     list<int64_t> zeros;
     list<int64_t> with_zero;
-    __init_module__();
     numbers = list<int64_t>({4LL, 1LL, 7LL, 3LL});
     empty = list<int64_t>();
     print(sum(numbers), sum(empty));
@@ -193,11 +180,8 @@ int run() {
 }
 
 namespace prog_bytes {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     bytes b;
@@ -207,7 +191,6 @@ int run() {
     int64_t total;
     int64_t byte;
     bytes joined;
-    __init_module__();
     b = bytes(std::string("Hello World", 11));
     print(b);
     print(len(b));
@@ -282,11 +265,8 @@ int run() {
 }
 
 namespace prog_casts {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     double a;
@@ -297,7 +277,6 @@ int run() {
     str int_str;
     int64_t i1;
     int64_t i2;
-    __init_module__();
     a = 2.0;
     b = to_int(a);
     c = to_float(b);
@@ -312,12 +291,12 @@ int run() {
 }
 
 namespace prog_classes {
+
 class Counter;
 class Point;
 class Empty;
 
 int run();
-void __init_module__();
 
 class Counter {
   public:
@@ -390,9 +369,6 @@ bool Point::__bool__() {
     return _or(((this->x != 0LL)), ((this->y != 0LL)));
 }
 
-void __init_module__() {
-}
-
 int run() {
     Counter counter;
     Point p;
@@ -400,7 +376,6 @@ int run() {
     list<Point> points;
     Point point;
     Empty e;
-    __init_module__();
     counter = Counter(5LL);
     counter.bump(3LL);
     print(counter.count, counter.doubled());
@@ -426,18 +401,14 @@ int run() {
 }
 
 namespace prog_comparison {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     int64_t a;
     int64_t b;
     int64_t c;
     int64_t d;
-    __init_module__();
     a = 1LL;
     b = 2LL;
     c = 3LL;
@@ -453,6 +424,7 @@ int run() {
 }
 
 namespace prog_comprehensions {
+
 list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t &factor, const int64_t &offset);
 list<int64_t> scaled(const list<int64_t> &values, const int64_t &factor);
 list<int64_t> __list_comprehension_2(const list<int64_t> &numbers);
@@ -468,10 +440,6 @@ list<int64_t> __list_comprehension_8(const list<int64_t> &numbers);
 list<int64_t> __list_comprehension_9(const list<int64_t> &numbers);
 list<int64_t> __list_comprehension_10(const list<int64_t> &doubled);
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 list<int64_t> __list_comprehension_1(const list<int64_t> &values, const int64_t &factor, const int64_t &offset) {
     list<int64_t> __tmp_1;
@@ -647,7 +615,6 @@ int run() {
     set<int64_t> squares;
     dict<int64_t, int64_t> lookup;
     list<int64_t> doubled;
-    __init_module__();
     numbers = list<int64_t>({1LL, 2LL, 3LL, 4LL});
     print(__list_comprehension_2(numbers));
     print(__list_comprehension_3(numbers));
@@ -669,18 +636,14 @@ int run() {
 }
 
 namespace prog_dict {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     dict<int64_t, int64_t> d;
     dict<int64_t, int64_t> e;
     dict<int64_t, int64_t> c;
     dict<str, int64_t> s;
-    __init_module__();
     d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});
     print(len(d));
     print(d.__getitem__(1LL), d.__getitem__(2LL), d.__getitem__(3LL));
@@ -715,6 +678,7 @@ int run() {
 }
 
 namespace prog_exceptions {
+
 int64_t guarded_parse(const str &text);
 int64_t parse_or(const str &text, const int64_t &fallback);
 int64_t nested();
@@ -725,10 +689,6 @@ int64_t raise_bare_class(const str &key);
 int64_t siblings(const str &first, const str &second);
 int64_t relay();
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 int64_t guarded_parse(const str &text) {
     {
@@ -866,7 +826,6 @@ int run() {
     list<int64_t> numbers;
     dict<str, int64_t> counts;
     int64_t i;
-    __init_module__();
     print(guarded_parse(str("41")));
     try {
         print(guarded_parse(str("zzz")));
@@ -940,11 +899,8 @@ int run() {
 }
 
 namespace prog_files {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     str SAMPLE;
@@ -956,7 +912,6 @@ int run() {
     str line;
     file out;
     str written;
-    __init_module__();
     SAMPLE = str("tests/test_files/sample.txt");
     handle = open(SAMPLE);
     text = handle.read();
@@ -992,13 +947,10 @@ int run() {
 }
 
 namespace prog_fixed_width_int_promotion {
+
 uint16_t scale(const uint16_t &value, const uint16_t &factor);
 int32_t clamp(const int32_t &value, const int32_t &low, const int32_t &high);
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 uint16_t scale(const uint16_t &value, const uint16_t &factor) {
     return (value * factor);
@@ -1019,7 +971,6 @@ int run() {
     uint8_t m;
     uint16_t doubled;
     uint16_t total;
-    __init_module__();
     n = 10LL;
     m = 200LL;
     print(n, m);
@@ -1035,12 +986,9 @@ int run() {
 }
 
 namespace prog_fixed_width_ints {
+
 uint16_t add_u16(const uint16_t &a, const uint16_t &b);
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 uint16_t add_u16(const uint16_t &a, const uint16_t &b) {
     return uint16_t((a + b));
@@ -1058,7 +1006,6 @@ int run() {
     list<uint16_t> values;
     dict<uint8_t, str> counts;
     set<int32_t> seen;
-    __init_module__();
     a = uint8_t(200LL);
     b = int8_t((-100LL));
     print(a, b);
@@ -1085,12 +1032,31 @@ int run() {
 }
 }
 
-namespace prog_iter {
-int run();
-void __init_module__();
+namespace prog_global_constexpr {
+constexpr int64_t numCores = 21LL;
+constexpr int64_t numInstruments = 3LL;
+constexpr int64_t totalSlots = (numCores + numInstruments);
+constexpr uint8_t spot = 0LL;
+constexpr uint8_t future1 = 1LL;
+constexpr uint8_t future2 = 2LL;
+constexpr uint32_t pair0_mask = ((1LL << future1) | (1LL << spot));
+constexpr uint32_t pair2_mask = ((1LL << future1) | (1LL << future2));
 
-void __init_module__() {
+int run();
+
+int run() {
+    Array<uint8_t, 24> arr;
+    print(str("Test 1 - derived global:"), totalSlots);
+    arr = Array<uint8_t, 24>(uint8_t(0LL));
+    print(str("Test 2 - array sized by derived global:"), len(arr));
+    print(str("Test 3 - shift masks:"), pair0_mask, pair2_mask);
+    return 0LL;
 }
+}
+
+namespace prog_iter {
+
+int run();
 
 int run() {
     list<int64_t> nums;
@@ -1101,7 +1067,6 @@ int run() {
     int64_t y;
     int64_t i;
     int64_t n;
-    __init_module__();
     nums = list<int64_t>({1LL, 2LL, 3LL, 4LL, 5LL});
     a = list<int64_t>(map([](auto x) { return (x * 2LL); }, nums));
     print(a);
@@ -1128,12 +1093,9 @@ int run() {
 }
 
 namespace prog_list {
+
 list<int64_t> give_list(list<int64_t> &l);
 int run();
-void __init_module__();
-
-void __init_module__() {
-}
 
 list<int64_t> give_list(list<int64_t> &l) {
     print(l);
@@ -1153,7 +1115,6 @@ int run() {
     int64_t n;
     list<int64_t> l4;
     list<int64_t> l5;
-    __init_module__();
     print(list<int64_t>(list<int64_t>({1LL, 2LL, 3LL})));
     l = list<int64_t>({1LL, 2LL, 3LL});
     print(l);
@@ -1232,11 +1193,8 @@ int run() {
 }
 
 namespace prog_loops {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     int64_t x;
@@ -1244,7 +1202,6 @@ int run() {
     int64_t i;
     int64_t step;
     int64_t n;
-    __init_module__();
     x = 2LL;
     l = list<int64_t>({2LL, 3LL, 4LL});
     int64_t __len_1 = len(l);
@@ -1296,15 +1253,11 @@ int run() {
 }
 
 namespace prog_math {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     int64_t a;
-    __init_module__();
     print(pow(10LL, 10LL));
     print(idiv((-10LL), 3LL));
     print(idiv(10LL, 3LL));
@@ -1320,11 +1273,8 @@ int run() {
 }
 
 namespace prog_membership {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     list<int64_t> l;
@@ -1340,7 +1290,6 @@ int run() {
     list<str> strs;
     int64_t count;
     int64_t x;
-    __init_module__();
     l = list<int64_t>({1LL, 2LL, 3LL});
     print((l.__contains__(2LL)), (l.__contains__(9LL)));
     print((!l.__contains__(2LL)), (!l.__contains__(9LL)));
@@ -1391,17 +1340,13 @@ int run() {
 }
 
 namespace prog_print {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     int64_t a;
     int64_t b;
     int64_t c;
-    __init_module__();
     a = 1LL;
     b = 2LL;
     c = 3LL;
@@ -1420,11 +1365,8 @@ int run() {
 }
 
 namespace prog_set {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     set<int64_t> s;
@@ -1442,7 +1384,6 @@ int run() {
     set<tuple<int64_t, int64_t>> s1;
     set<tuple<int64_t, int64_t>> s2;
     set<str> s3;
-    __init_module__();
     s = set<int64_t>({3LL, 1LL, 2LL, 1LL});
     print(len(s));
     print(sorted(s));
@@ -1511,11 +1452,8 @@ int run() {
 }
 
 namespace prog_slice {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     list<int64_t> l;
@@ -1523,7 +1461,6 @@ int run() {
     list<int64_t> original;
     list<int64_t> copied;
     str s;
-    __init_module__();
     l = list<int64_t>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});
     print(l.__getitem__(slice(0LL, 1LL, std::nullopt)));
     print(l.__getitem__(slice(1LL, 4LL, std::nullopt)));
@@ -1581,11 +1518,8 @@ int run() {
 }
 
 namespace prog_string {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     str s;
@@ -1594,7 +1528,6 @@ int run() {
     str b;
     str joined;
     str c;
-    __init_module__();
     s = str("Hello World");
     print(s);
     print(len(s));
@@ -1663,11 +1596,8 @@ int run() {
 }
 
 namespace prog_truthy {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     int64_t a;
@@ -1677,7 +1607,6 @@ int run() {
     list<int64_t> empty;
     list<int64_t> full;
     int64_t n;
-    __init_module__();
     a = 0LL;
     b = 5LL;
     if (to_bool(a)) {
@@ -1732,11 +1661,8 @@ int run() {
 }
 
 namespace prog_tuple {
-int run();
-void __init_module__();
 
-void __init_module__() {
-}
+int run();
 
 int run() {
     int64_t a;
@@ -1750,7 +1676,6 @@ int run() {
     tuple<int64_t, int64_t> t;
     tuple<int64_t, int64_t> t2;
     int64_t z;
-    __init_module__();
     destructure(a, b) = tuple(1LL, 2LL);
     print(str("Test 1 - Simple destructure:"), a, b);
     destructure(a, b) = tuple(10LL, 20LL);
@@ -1784,6 +1709,7 @@ int main(int argc, char** argv) {
     if (argc > 1 && std::strcmp(argv[1], "files.py") == 0) return prog_files::run();
     if (argc > 1 && std::strcmp(argv[1], "fixed_width_int_promotion.py") == 0) return prog_fixed_width_int_promotion::run();
     if (argc > 1 && std::strcmp(argv[1], "fixed_width_ints.py") == 0) return prog_fixed_width_ints::run();
+    if (argc > 1 && std::strcmp(argv[1], "global_constexpr.py") == 0) return prog_global_constexpr::run();
     if (argc > 1 && std::strcmp(argv[1], "iter.py") == 0) return prog_iter::run();
     if (argc > 1 && std::strcmp(argv[1], "list.py") == 0) return prog_list::run();
     if (argc > 1 && std::strcmp(argv[1], "loops.py") == 0) return prog_loops::run();

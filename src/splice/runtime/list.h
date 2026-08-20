@@ -119,27 +119,27 @@ class list {
             data_.push_back(item);
     }
 
-    size_type __len__() const noexcept {
+    ALWAYS_INLINE size_type __len__() const noexcept {
         return static_cast<size_type>(data_.size());
     }
-    bool empty() const noexcept { return data_.empty(); }
+    ALWAYS_INLINE bool empty() const noexcept { return data_.empty(); }
 
-    T &operator[](size_type i) { return data_[checkIndex(i)]; }
-    const T &operator[](size_type i) const { return data_[checkIndex(i)]; }
+    ALWAYS_INLINE T &operator[](size_type i) { return data_[checkIndex(i)]; }
+    ALWAYS_INLINE const T &operator[](size_type i) const { return data_[checkIndex(i)]; }
 
     // What generated code calls for a[i] and a[i] = x. Strict, unlike
     // dict's insert-on-write.
-    T &__getitem__(size_type i) { return data_[checkIndex(i)]; }
-    const T &__getitem__(size_type i) const { return data_[checkIndex(i)]; }
+    ALWAYS_INLINE T &__getitem__(size_type i) { return data_[checkIndex(i)]; }
+    ALWAYS_INLINE const T &__getitem__(size_type i) const { return data_[checkIndex(i)]; }
 
     // a[-1] and a[-1] = x. A reference, like operator[], so both read and
     // write go through the same call.
-    T &back() {
+    ALWAYS_INLINE T &back() {
         if (data_.empty())
             throw IndexError("list index out of range");
         return data_.back();
     }
-    const T &back() const {
+    ALWAYS_INLINE const T &back() const {
         if (data_.empty())
             throw IndexError("list index out of range");
         return data_.back();
@@ -162,19 +162,19 @@ class list {
         }
         return out;
     }
-    void __setitem__(size_type i, const T &value) {
+    ALWAYS_INLINE void __setitem__(size_type i, const T &value) {
         data_[checkIndex(i)] = value;
     }
 
-    void __delitem__(size_type i) { // del a[i]  (strict)
+    ALWAYS_INLINE void __delitem__(size_type i) { // del a[i]  (strict)
         data_.erase(data_.begin() + checkIndex(i));
     }
 
-    void append(const T &x) { data_.push_back(x); }
-    void append(T &&x) { data_.push_back(std::move(x)); }
+    ALWAYS_INLINE void append(const T &x) { data_.push_back(x); }
+    ALWAYS_INLINE void append(T &&x) { data_.push_back(std::move(x)); }
 
     // Clamps instead of raising: insert(len, x) == append.
-    void insert(_int i, const T &x) {
+    ALWAYS_INLINE void insert(_int i, const T &x) {
         _int n = __len__();
         if (i < 0) {
             i += n;
@@ -196,7 +196,7 @@ class list {
         throw ValueError("list.remove(x): x not in list");
     }
 
-    T pop(_int i = -1) {
+    ALWAYS_INLINE T pop(_int i = -1) {
         if (data_.empty())
             throw IndexError("pop from empty list");
         _int n = __len__();
@@ -216,7 +216,7 @@ class list {
         }
     }
 
-    void clear() noexcept { data_.clear(); }
+    ALWAYS_INLINE void clear() noexcept { data_.clear(); }
 
     _int index(const T &value, size_type start = 0,
                std::optional<size_type> stop = std::nullopt) const {
@@ -261,9 +261,9 @@ class list {
                              [](const T &a, const T &b) { return b < a; });
     }
 
-    void reverse() noexcept { std::reverse(data_.begin(), data_.end()); }
+    ALWAYS_INLINE void reverse() noexcept { std::reverse(data_.begin(), data_.end()); }
 
-    list<T> copy() const { return *this; }
+    ALWAYS_INLINE list<T> copy() const { return *this; }
 
     bool __contains__(const T &value) const { // `value in a`
         for (const auto &e : data_)
@@ -271,21 +271,21 @@ class list {
                 return true;
         return false;
     }
-    auto begin() { return data_.begin(); }
-    auto end() { return data_.end(); }
-    auto begin() const { return data_.begin(); }
-    auto end() const { return data_.end(); }
+    ALWAYS_INLINE auto begin() { return data_.begin(); }
+    ALWAYS_INLINE auto end() { return data_.end(); }
+    ALWAYS_INLINE auto begin() const { return data_.begin(); }
+    ALWAYS_INLINE auto end() const { return data_.end(); }
 
     // + returns a new list; += extends in place and returns *this (Python
     // semantics).
-    list<T> operator+(const list<T> &other) const {
+    ALWAYS_INLINE list<T> operator+(const list<T> &other) const {
         list<T> out;
         out.data_ = data_;
         out.data_.insert(out.data_.end(), other.data_.begin(),
                          other.data_.end());
         return out;
     }
-    list<T> &operator+=(const list<T> &other) {
+    ALWAYS_INLINE list<T> &operator+=(const list<T> &other) {
         data_.insert(data_.end(), other.data_.begin(), other.data_.end());
         return *this;
     }
@@ -306,14 +306,14 @@ class list {
     }
 
     // Lexicographic comparison (std::vector already does this element-wise).
-    bool operator==(const list<T> &o) const { return data_ == o.data_; }
-    bool operator!=(const list<T> &o) const { return data_ != o.data_; }
-    bool operator<(const list<T> &o) const { return data_ < o.data_; }
-    bool operator<=(const list<T> &o) const { return data_ <= o.data_; }
-    bool operator>(const list<T> &o) const { return data_ > o.data_; }
-    bool operator>=(const list<T> &o) const { return data_ >= o.data_; }
+    ALWAYS_INLINE bool operator==(const list<T> &o) const { return data_ == o.data_; }
+    ALWAYS_INLINE bool operator!=(const list<T> &o) const { return data_ != o.data_; }
+    ALWAYS_INLINE bool operator<(const list<T> &o) const { return data_ < o.data_; }
+    ALWAYS_INLINE bool operator<=(const list<T> &o) const { return data_ <= o.data_; }
+    ALWAYS_INLINE bool operator>(const list<T> &o) const { return data_ > o.data_; }
+    ALWAYS_INLINE bool operator>=(const list<T> &o) const { return data_ >= o.data_; }
 
-    const typename detail::list_storage<T>::type &raw() const noexcept {
+    ALWAYS_INLINE const typename detail::list_storage<T>::type &raw() const noexcept {
         return data_;
     } // escape hatch
 
@@ -332,7 +332,7 @@ class list {
 
     // strict bounds check shared by [], delItem - no negative-index
     // wraparound, since only -1 (handled separately via back()) is supported
-    std::size_t checkIndex(_int i) const {
+    ALWAYS_INLINE std::size_t checkIndex(_int i) const {
         _int n = __len__();
         if (i < 0 || i >= n)
             throw IndexError("list index out of range");
@@ -347,7 +347,7 @@ list<T> operator*(typename list<T>::size_type n, const list<T> &a) {
 }
 
 template <typename T>
-inline _int len(const list<T> &l) {
+ALWAYS_INLINE _int len(const list<T> &l) {
     return l.__len__();
 }
 

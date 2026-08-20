@@ -234,6 +234,17 @@
   
   '''
 # ---
+# name: test_error_message[non_scalar_global.py]
+  '''
+  non_scalar_global.py:1:1: error: `values` is a global of a non-scalar type
+  
+    1 | values: list[int] = [1, 2, 3]
+      | ^^^^^^
+  
+    help: only scalars are allowed at module scope - move it inside a class, threaded through self/parameters instead
+  
+  '''
+# ---
 # name: test_error_message[object_element.py]
   '''
   object_element.py:2:15: error: Type of expression is inferred as `list[object]` which contains `object`. This cannot be translated to C++.

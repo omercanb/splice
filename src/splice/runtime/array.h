@@ -17,35 +17,35 @@ class Array {
     using size_type = _int;
 
     Array() = default;
-    explicit Array(const T &fill) { data_.fill(fill); }
+    ALWAYS_INLINE explicit Array(const T &fill) { data_.fill(fill); }
 
-    size_type __len__() const noexcept { return static_cast<size_type>(N); }
+    ALWAYS_INLINE size_type __len__() const noexcept { return static_cast<size_type>(N); }
 
-    T &operator[](size_type i) { return data_[static_cast<std::size_t>(i)]; }
-    const T &operator[](size_type i) const {
+    ALWAYS_INLINE T &operator[](size_type i) { return data_[static_cast<std::size_t>(i)]; }
+    ALWAYS_INLINE const T &operator[](size_type i) const {
         return data_[static_cast<std::size_t>(i)];
     }
 
-    T &__getitem__(size_type i) { return data_[static_cast<std::size_t>(i)]; }
-    const T &__getitem__(size_type i) const {
+    ALWAYS_INLINE T &__getitem__(size_type i) { return data_[static_cast<std::size_t>(i)]; }
+    ALWAYS_INLINE const T &__getitem__(size_type i) const {
         return data_[static_cast<std::size_t>(i)];
     }
-    void __setitem__(size_type i, const T &value) {
+    ALWAYS_INLINE void __setitem__(size_type i, const T &value) {
         data_[static_cast<std::size_t>(i)] = value;
     }
 
-    T &back() { return data_.back(); }
-    const T &back() const { return data_.back(); }
+    ALWAYS_INLINE T &back() { return data_.back(); }
+    ALWAYS_INLINE const T &back() const { return data_.back(); }
 
-    void fill(const T &value) { data_.fill(value); }
+    ALWAYS_INLINE void fill(const T &value) { data_.fill(value); }
 
-    auto begin() { return data_.begin(); }
-    auto end() { return data_.end(); }
-    auto begin() const { return data_.begin(); }
-    auto end() const { return data_.end(); }
+    ALWAYS_INLINE auto begin() { return data_.begin(); }
+    ALWAYS_INLINE auto end() { return data_.end(); }
+    ALWAYS_INLINE auto begin() const { return data_.begin(); }
+    ALWAYS_INLINE auto end() const { return data_.end(); }
 
-    bool operator==(const Array<T, N> &o) const { return data_ == o.data_; }
-    bool operator!=(const Array<T, N> &o) const { return data_ != o.data_; }
+    ALWAYS_INLINE bool operator==(const Array<T, N> &o) const { return data_ == o.data_; }
+    ALWAYS_INLINE bool operator!=(const Array<T, N> &o) const { return data_ != o.data_; }
 
     str __str__() const {
         str result = "[";
@@ -62,7 +62,7 @@ class Array {
 };
 
 template <typename T, std::size_t N>
-inline _int len(const Array<T, N> &a) {
+ALWAYS_INLINE _int len(const Array<T, N> &a) {
     return a.__len__();
 }
 

@@ -18,6 +18,7 @@ from mypy.nodes import (
     NameExpr,
     OperatorAssignmentStmt,
     ReturnStmt,
+    Var,
 )
 from mypy.types import Type
 
@@ -82,6 +83,20 @@ class _SemanticsValidator(Traverser):
 
     def report(self, node, kind: str, message: str, hint: str) -> None:
         self.diagnostics.append(diagnostic(node, kind, message, hint))
+
+    def visit_mypy_file(self, o: MypyFile) -> None:
+        for name, item in o.names.items():
+            if not isinstance(item.node, Var) or name.startswith("__") or item.module_hidden:
+                continue
+            if type_name(item.node.type) not in _SCALAR_TYPES:
+                self.report(
+                    item.node,
+                    "non-scalar-global",
+                    f"`{name}` is a global of a non-scalar type",
+                    "only scalars are allowed at module scope - move it inside "
+                    "a class, threaded through self/parameters instead",
+                )
+        super().visit_mypy_file(o)
 
     def visit_call_expr(self, o: CallExpr) -> None:
         if getattr(o.callee, "fullname", None) == _MARKER_FULLNAME:
