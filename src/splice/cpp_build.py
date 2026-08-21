@@ -5,19 +5,37 @@ import subprocess
 import sys
 import tempfile
 import warnings
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Mapping
 
-# clang, not g++: only its precompiled headers pay off (0.45s -> 0.07s a compile)
-COMPILER = "clang++"
 RUNTIME_DIR = Path(__file__).parent / "runtime"
 PCH_HEADER = RUNTIME_DIR / ".pch.h"
 PCH_FILE = RUNTIME_DIR / ".pch.h.pch"
 STD = "c++17"
 
 
-def ensure_pch() -> Path | None:
-    """Build a precompiled header of runtime/*.h, refreshing it when one changes."""
+@dataclass
+class BuildConfig:
+    """Compiler config.
+    use_pch is clang specific
+    """
+
+    compiler: str = "clang++"
+    use_pch: bool = True
+    extra_flags: list[str] = field(default_factory=list)
+
+
+DEFAULT_CONFIG = BuildConfig()
+
+
+def ensure_pch(config: BuildConfig) -> Path | None:
+    """
+    Build a precompiled header of runtime/*.h, refreshing it when one changes.
+    This is important to have much faster compilation when testing
+    """
+    if not config.use_pch:
+        return None
     # Skip our own generated header, or it ends up including itself.
     headers = sorted(h for h in RUNTIME_DIR.glob("*.h") if h != PCH_HEADER)
     if not headers:
@@ -33,7 +51,7 @@ def ensure_pch() -> Path | None:
     temporary = PCH_FILE.with_suffix(f".{os.getpid()}.tmp")
     built = subprocess.run(
         [
-            COMPILER,
+            config.compiler,
             f"-std={STD}",
             f"-I{RUNTIME_DIR}",
             "-fpch-instantiate-templates",
@@ -63,61 +81,39 @@ def _is_pch_error(stderr: str) -> bool:
     return "PCH file" in stderr or "precompiled header" in stderr
 
 
-def _rebuild_pch() -> Path | None:
+def _rebuild_pch(config: BuildConfig) -> Path | None:
     """Force a fresh precompiled header, discarding whatever is on disk."""
     PCH_FILE.unlink(missing_ok=True)
-    return ensure_pch()
-
-
-def compile_cpp_source(source: str, path: str, exe: str, includes: list[str] = []):
-    """Save the source the path them compile and put the output to 'exe'"""
-    open(path).write(source)
-    directories = [str(RUNTIME_DIR)] + includes
-
-    def run(pch: Path | None):
-        command = [COMPILER, f"-std={STD}"] + [f"-I{d}" for d in directories]
-        if pch is not None:
-            command += ["-include-pch", str(pch)]
-        return subprocess.run(
-            command + [path, "-o", exe], capture_output=True, text=True
-        )
-
-    compiled = run(ensure_pch())
-    if compiled.returncode != 0 and _is_pch_error(compiled.stderr):
-        compiled = run(_rebuild_pch())
-    if compiled.returncode != 0 and _is_pch_error(compiled.stderr):
-        # Rebuilding didn't help either - drop the pch for this compile
-        # rather than fail outright.
-        warnings.warn(
-            f"precompiled header rejected, recompiling {path} without it "
-            f"(expect a ~4x slower compile):\n{compiled.stderr}",
-            stacklevel=2,
-        )
-        compiled = run(None)
-    return compiled
+    return ensure_pch(config)
 
 
 def compile_cpp(
     path: str,
     exe: str | None = None,
     includes: list[str] | None = None,
+    config: BuildConfig | None = None,
 ) -> subprocess.CompletedProcess:
     """Compile `src` to `exe` using the precompiled header."""
+    config = config or DEFAULT_CONFIG
     if exe == None:
         exe = path[: path.rfind(".")]
     directories = [str(RUNTIME_DIR)] + (includes or [])
 
     def run(pch: Path | None):
-        command = [COMPILER, f"-std={STD}"] + [f"-I{d}" for d in directories]
+        command = (
+            [config.compiler, f"-std={STD}"]
+            + [f"-I{d}" for d in directories]
+            + config.extra_flags
+        )
         if pch is not None:
             command += ["-include-pch", str(pch)]
         return subprocess.run(
             command + [path, "-o", exe], capture_output=True, text=True
         )
 
-    compiled = run(ensure_pch())
+    compiled = run(ensure_pch(config))
     if compiled.returncode != 0 and _is_pch_error(compiled.stderr):
-        compiled = run(_rebuild_pch())
+        compiled = run(_rebuild_pch(config))
     if compiled.returncode != 0 and _is_pch_error(compiled.stderr):
         # Rebuilding didn't help either - drop the pch for this compile
         # rather than fail outright.
@@ -139,12 +135,16 @@ def compile_proc(
     translated: str,
     src="main.cpp",
     exe=None,
+    config: BuildConfig | None = None,
 ) -> str:
     if exe == None:
         exe = src[: src.rfind(".")]
+    # src/exe may live in a directory that doesn't exist yet.
+    Path(src).parent.mkdir(parents=True, exist_ok=True)
+    Path(exe).parent.mkdir(parents=True, exist_ok=True)
     Path(src).write_text(translated)
 
-    compiled = compile_cpp(src, exe)
+    compiled = compile_cpp(src, exe, config=config)
     if compiled.returncode != 0:
         print("--- compile FAILED ---")
         print(compiled.stderr)
@@ -156,10 +156,12 @@ def compile_proc(
     return exe
 
 
-def build_and_run(translated: str, src="main.cpp", exe="main"):
+def build_and_run(
+    translated: str, src="main.cpp", exe="main", config: BuildConfig | None = None
+):
     """Write `translated` to a .cpp file, compile with g++, run it, print output."""
-    compile_proc(translated, src, exe)
-    run_proc = subprocess.run(["stdbuf", "-oL", f"./{exe}"])
+    compile_proc(translated, src, exe, config=config)
+    run_proc = subprocess.run(["stdbuf", "-oL", str(Path(exe).resolve())])
     # print("--- program output ---")
     # print(run_proc.stdout, end="")
     if run_proc.stderr:
@@ -169,7 +171,10 @@ def build_and_run(translated: str, src="main.cpp", exe="main"):
 
 
 def build_and_run_capture(
-    translated: str, src: str | None = None, exe: str | None = None
+    translated: str,
+    src: str | None = None,
+    exe: str | None = None,
+    config: BuildConfig | None = None,
 ) -> subprocess.CompletedProcess:
     """Write `translated` to a .cpp file, compile with g++, run it, print output.
 
@@ -180,7 +185,7 @@ def build_and_run_capture(
     with tempfile.TemporaryDirectory() as directory:
         src = src or f"{directory}/main.cpp"
         exe = exe or f"{directory}/main"
-        compile_proc(translated, src, exe)
+        compile_proc(translated, src, exe, config=config)
 
         run_proc = subprocess.run(
             ["stdbuf", "-oL", Path(exe).resolve()], capture_output=True, text=True
