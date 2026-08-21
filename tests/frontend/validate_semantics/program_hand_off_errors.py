@@ -2,10 +2,6 @@ def return_param(a: list[int]) -> list[int]:
     return a
 
 
-def return_slice_of_param(a: list[int]) -> list[int]:
-    return a[0:1]
-
-
 def assign_local_from_local() -> int:
     a: list[int] = [1, 2, 3]
     b = a

@@ -92,13 +92,14 @@ class bytes {
     ALWAYS_INLINE _int __getitem__(size_type i) const {
         return static_cast<_int>(static_cast<unsigned char>(data_[normIndex(i)]));
     }
+    ALWAYS_INLINE _int operator[](size_type i) const { return __getitem__(i); }
     ALWAYS_INLINE _int back() const {
         if (data_.empty())
             throw IndexError("index out of range");
         return static_cast<_int>(static_cast<unsigned char>(data_.back()));
     }
     // b[i:j:k] -- a new bytes.
-    bytes __getitem__(const slice &s) const {
+    bytes __getslice__(const slice &s) const {
         auto bounds = s.indices(__len__());
         _int start = bounds.get<0>(), stop = bounds.get<1>(), step = bounds.get<2>();
 
@@ -112,6 +113,7 @@ class bytes {
         }
         return bytes(std::move(out));
     }
+    ALWAYS_INLINE bytes operator[](const slice &s) const { return __getslice__(s); }
     ALWAYS_INLINE bool __contains__(const bytes &sub) const {
         return data_.find(sub.data_) != std::string::npos;
     }

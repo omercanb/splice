@@ -20,7 +20,7 @@ def test_hand_off_errors(snapshot):
     with pytest.raises(UnsupportedProgram) as raised:
         pipeline(str(errors_path), source)
     diagnostics = raised.value.diagnostics
-    assert len(diagnostics) == 4
+    assert len(diagnostics) == 3
     assert all(d.kind == "missing-copy" for d in diagnostics)
     assert render(diagnostics, source, errors_path.name) == snapshot
 

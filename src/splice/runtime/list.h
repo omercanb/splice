@@ -147,7 +147,7 @@ class list {
 
     // a[i:j:k] -- a new list, like Python. Out of range bounds clamp rather
     // than raising, which is why this does not go through checkIndex.
-    list<T> __getitem__(const slice &s) const {
+    list<T> __getslice__(const slice &s) const {
         tuple<_int, _int, _int> bounds = s.indices(__len__());
         _int start = bounds.get<0>(), stop = bounds.get<1>(),
              step = bounds.get<2>();
@@ -162,6 +162,7 @@ class list {
         }
         return out;
     }
+    ALWAYS_INLINE list<T> operator[](const slice &s) const { return __getslice__(s); }
     ALWAYS_INLINE void __setitem__(size_type i, const T &value) {
         data_[checkIndex(i)] = value;
     }

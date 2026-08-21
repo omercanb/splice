@@ -1,7 +1,7 @@
 """Rewrites subscript reads and writes into explicit dunder-method calls.
 
 `a[i]` becomes `a.__getitem__(i)`, `a[i] = v` becomes `a.__setitem__(i, v)`,
-and a slice index `a[i:j:k]` becomes `a.__getitem__(slice(i, j, k))`, with a
+and a slice index `a[i:j:k]` becomes `a.__getslice__(slice(i, j, k))`, with a
 missing bound passed as `None`.
 For `-1` specifically it stays a -1 here but turns into back() at codegen time
 """
@@ -72,7 +72,8 @@ class IndexTransformer(Transformer):
             o.index = self.visit(o.index)
             return o
         if isinstance(o.index, SliceExpr):
-            result = _method_call(o.base, "__getitem__", [self._slice_call(o.index)], o)
+            # Distinct from __getitem__ since a slice read returns a fresh copy, never an alias.
+            result = _method_call(o.base, "__getslice__", [self._slice_call(o.index)], o)
         else:
             result = _method_call(o.base, "__getitem__", [self.visit(o.index)], o)
         self.types[result] = self.types[o]

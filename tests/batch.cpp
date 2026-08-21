@@ -12,14 +12,14 @@ int run() {
     int64_t total;
     uint32_t v;
     a = Array<uint32_t, 3>();
-    a.__setitem__(1LL, 5LL);
-    print(str("Test 1 - index/assign:"), a.__getitem__(0LL), a.__getitem__(1LL), a.__getitem__(2LL));
+    a[1LL] = 5LL;
+    print(str("Test 1 - index/assign:"), a[0LL], a[1LL], a[2LL]);
     b = Array<uint32_t, 4>();
-    print(str("Test 2 - Literal size:"), b.__getitem__(0LL), b.__getitem__(3LL));
+    print(str("Test 2 - Literal size:"), b[0LL], b[3LL]);
     print(str("Test 3 - last element:"), a.back());
     print(str("Test 4 - len:"), len(a), len(b));
     b.fill(uint32_t(1LL));
-    print(str("Test 5 - fill:"), b.__getitem__(0LL), b.__getitem__(1LL), b.__getitem__(2LL), b.__getitem__(3LL));
+    print(str("Test 5 - fill:"), b[0LL], b[1LL], b[2LL], b[3LL]);
     total = 0LL;
     auto && __range_0 = b;
     for (auto &&__item_0 : __range_0) {
@@ -176,7 +176,7 @@ int run() {
     b = bytes(std::string("Hello World", 11));
     print(b);
     print(len(b));
-    print(b.__getitem__(0LL), b.back());
+    print(b[0LL], b.back());
     print(b.upper());
     print(b.lower());
     print(b.swapcase());
@@ -495,7 +495,7 @@ list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers) {
     __tmp_6 = list<int64_t>();
     int64_t __len_0 = len(numbers);
     for (i = 0; i < __len_0; ++i) {
-        __tmp_6.append(numbers.__getitem__(i));
+        __tmp_6.append(numbers[i]);
     }
     return __tmp_6;
 }
@@ -520,7 +520,7 @@ dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numb
     for (auto &&__item_9 : __range_9) {
         v = __item_9;
         if (((v > 1LL))) {
-            __tmp_8.__setitem__(v, (v * v));
+            __tmp_8[v] = (v * v);
         }
     }
     return __tmp_8;
@@ -607,7 +607,7 @@ int run() {
     squares = __set_comprehension_0(numbers);
     print(sorted(squares));
     lookup = __dict_comprehension_0(numbers);
-    print(len(lookup), lookup.__getitem__(2LL), lookup.__getitem__(4LL));
+    print(len(lookup), lookup[2LL], lookup[4LL]);
     print(sorted(lookup));
     print(__list_comprehension_7(numbers));
     print(__list_comprehension_8(numbers));
@@ -628,13 +628,13 @@ int run() {
     dict<str, int64_t> s;
     d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});
     print(len(d));
-    print(d.__getitem__(1LL), d.__getitem__(2LL), d.__getitem__(3LL));
+    print(d[1LL], d[2LL], d[3LL]);
     print(sorted(d));
     print(_sorted_kwargs(true, d));
-    d.__setitem__(4LL, 40LL);
-    print(len(d), d.__getitem__(4LL));
-    d.__setitem__(1LL, 11LL);
-    print(len(d), d.__getitem__(1LL));
+    d[4LL] = 40LL;
+    print(len(d), d[4LL]);
+    d[1LL] = 11LL;
+    print(len(d), d[1LL]);
     print(d.get(1LL));
     print(d.get(99LL, (-1LL)));
     print(d.pop(4LL));
@@ -654,7 +654,7 @@ int run() {
     print(len(c), len(d));
     s = dict<str, int64_t>({{str("b"), 2LL}, {str("a"), 1LL}});
     print(sorted(s));
-    print(s.__getitem__(str("a")), s.__getitem__(str("b")));
+    print(s[str("a")], s[str("b")]);
     return 0LL;
 }
 }
@@ -806,7 +806,7 @@ int64_t relay() {
 
 int run() {
     list<int64_t> numbers;
-    dict<str, int64_t> counts;
+    list<int64_t> items;
     int64_t i;
     print(guarded_parse(str("41")));
     try {
@@ -847,15 +847,15 @@ int run() {
     }
     numbers = list<int64_t>({1LL, 2LL, 3LL});
     try {
-        print(numbers.__getitem__(10LL));
+        print(numbers[10LL]);
     } catch (IndexError &) {
         print(str("index error wins over the base class"));
     } catch (PyException &) {
         print(str("not reached"));
     }
-    counts = dict<str, int64_t>({{str("a"), 1LL}});
+    items = list<int64_t>({1LL, 2LL, 3LL});
     try {
-        print(counts.__getitem__(str("b")));
+        print(items[10LL]);
     } catch (PyException &) {
         print(str("bare except caught it"));
     }
@@ -905,7 +905,7 @@ int run() {
     print(stepped.readline().strip());
     print(stepped.readline().strip());
     rest = stepped.readlines();
-    print(len(rest), rest.__getitem__(0LL).strip());
+    print(len(rest), rest[0LL].strip());
     print(len(stepped.readlines()));
     lines = open(SAMPLE);
     auto && __range_15 = lines;
@@ -1005,9 +1005,9 @@ int run() {
     values = list<uint16_t>({uint16_t(3LL), uint16_t(1LL), uint16_t(2LL)});
     print(values);
     counts = dict<uint8_t, str>();
-    counts.__setitem__(uint8_t(1LL), str("one"));
-    counts.__setitem__(uint8_t(2LL), str("two"));
-    print(counts.__getitem__(uint8_t(1LL)), counts.__getitem__(uint8_t(2LL)));
+    counts[uint8_t(1LL)] = str("one");
+    counts[uint8_t(2LL)] = str("two");
+    print(counts[uint8_t(1LL)], counts[uint8_t(2LL)]);
     seen = set<int32_t>({int32_t(1LL), int32_t(2LL), int32_t(2LL)});
     print(len(seen));
     return 0LL;
@@ -1232,14 +1232,14 @@ int run() {
     print(l);
     l = give_list(l);
     print(l);
-    print(l.__getitem__(1LL));
-    a = l.__getitem__(0LL);
+    print(l[1LL]);
+    a = l[0LL];
     print(l);
-    l.__setitem__(0LL, a);
+    l[0LL] = a;
     print(l);
-    l.__setitem__(0LL, 2LL);
+    l[0LL] = 2LL;
     print(l);
-    l2 = copy(l.__getitem__(slice(0LL, 1LL, std::nullopt)));
+    l2 = copy(l[slice(0LL, 1LL, std::nullopt)]);
     print(l2);
     l.insert(0LL, 100LL);
     print(l);
@@ -1282,8 +1282,8 @@ int run() {
     print(l2);
     n = len(l2);
     print(n);
-    print(l2.__getitem__(0LL), l2.back());
-    if (!(((l2.back() == l2.__getitem__((n - 1LL)))))) throw AssertionError("");
+    print(l2[0LL], l2.back());
+    if (!(((l2.back() == l2[(n - 1LL)])))) throw AssertionError("");
     l4 = list<int64_t>({1LL, 2LL, 3LL});
     print(l4.back());
     l4.back() += 10LL;
@@ -1570,57 +1570,57 @@ int run() {
     list<int64_t> copied;
     str s;
     l = list<int64_t>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});
-    print(l.__getitem__(slice(0LL, 1LL, std::nullopt)));
-    print(l.__getitem__(slice(1LL, 4LL, std::nullopt)));
-    print(l.__getitem__(slice(std::nullopt, 3LL, std::nullopt)));
-    print(l.__getitem__(slice(3LL, std::nullopt, std::nullopt)));
-    print(l.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    print(l.__getitem__(slice(std::nullopt, std::nullopt, 2LL)));
-    print(l.__getitem__(slice(1LL, 5LL, 2LL)));
-    print(l.__getitem__(slice(std::nullopt, std::nullopt, 3LL)));
-    print(l.__getitem__(slice((-3LL), std::nullopt, std::nullopt)));
-    print(l.__getitem__(slice(std::nullopt, (-2LL), std::nullopt)));
-    print(l.__getitem__(slice((-4LL), (-1LL), std::nullopt)));
-    print(l.__getitem__(slice((-1LL), std::nullopt, std::nullopt)));
-    print(l.__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
-    print(l.__getitem__(slice(4LL, 1LL, (-1LL))));
-    print(l.__getitem__(slice(std::nullopt, std::nullopt, (-2LL))));
-    print(l.__getitem__(slice((-1LL), (-4LL), (-1LL))));
-    print(l.__getitem__(slice(10LL, 20LL, std::nullopt)));
-    print(l.__getitem__(slice((-100LL), 100LL, std::nullopt)));
-    print(l.__getitem__(slice(std::nullopt, 100LL, std::nullopt)));
-    print(l.__getitem__(slice((-100LL), std::nullopt, std::nullopt)));
-    print(l.__getitem__(slice(2LL, 2LL, std::nullopt)));
-    print(l.__getitem__(slice(4LL, 1LL, std::nullopt)));
-    print(l.__getitem__(slice(1LL, 4LL, (-1LL))));
+    print(l[slice(0LL, 1LL, std::nullopt)]);
+    print(l[slice(1LL, 4LL, std::nullopt)]);
+    print(l[slice(std::nullopt, 3LL, std::nullopt)]);
+    print(l[slice(3LL, std::nullopt, std::nullopt)]);
+    print(l[slice(std::nullopt, std::nullopt, std::nullopt)]);
+    print(l[slice(std::nullopt, std::nullopt, 2LL)]);
+    print(l[slice(1LL, 5LL, 2LL)]);
+    print(l[slice(std::nullopt, std::nullopt, 3LL)]);
+    print(l[slice((-3LL), std::nullopt, std::nullopt)]);
+    print(l[slice(std::nullopt, (-2LL), std::nullopt)]);
+    print(l[slice((-4LL), (-1LL), std::nullopt)]);
+    print(l[slice((-1LL), std::nullopt, std::nullopt)]);
+    print(l[slice(std::nullopt, std::nullopt, (-1LL))]);
+    print(l[slice(4LL, 1LL, (-1LL))]);
+    print(l[slice(std::nullopt, std::nullopt, (-2LL))]);
+    print(l[slice((-1LL), (-4LL), (-1LL))]);
+    print(l[slice(10LL, 20LL, std::nullopt)]);
+    print(l[slice((-100LL), 100LL, std::nullopt)]);
+    print(l[slice(std::nullopt, 100LL, std::nullopt)]);
+    print(l[slice((-100LL), std::nullopt, std::nullopt)]);
+    print(l[slice(2LL, 2LL, std::nullopt)]);
+    print(l[slice(4LL, 1LL, std::nullopt)]);
+    print(l[slice(1LL, 4LL, (-1LL))]);
     empty = list<int64_t>();
-    print(empty.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    print(empty.__getitem__(slice(0LL, 5LL, std::nullopt)));
-    print(empty.__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
+    print(empty[slice(std::nullopt, std::nullopt, std::nullopt)]);
+    print(empty[slice(0LL, 5LL, std::nullopt)]);
+    print(empty[slice(std::nullopt, std::nullopt, (-1LL))]);
     original = list<int64_t>({1LL, 2LL, 3LL});
-    copied = copy(original.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
+    copied = copy(original[slice(std::nullopt, std::nullopt, std::nullopt)]);
     copied.append(4LL);
     print(original, copied);
     s = str("abcdef");
-    print(s.__getitem__(slice(0LL, 1LL, std::nullopt)));
-    print(s.__getitem__(slice(1LL, 4LL, std::nullopt)));
-    print(s.__getitem__(slice(std::nullopt, 3LL, std::nullopt)));
-    print(s.__getitem__(slice(3LL, std::nullopt, std::nullopt)));
-    print(s.__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    print(s.__getitem__(slice(std::nullopt, std::nullopt, 2LL)));
-    print(s.__getitem__(slice(1LL, 5LL, 2LL)));
-    print(s.__getitem__(slice((-3LL), std::nullopt, std::nullopt)));
-    print(s.__getitem__(slice(std::nullopt, (-2LL), std::nullopt)));
-    print(s.__getitem__(slice((-4LL), (-1LL), std::nullopt)));
-    print(s.__getitem__(slice(std::nullopt, std::nullopt, (-1LL))));
-    print(s.__getitem__(slice(4LL, 1LL, (-1LL))));
-    print(s.__getitem__(slice(std::nullopt, std::nullopt, (-2LL))));
-    print(s.__getitem__(slice(100LL, 200LL, std::nullopt)));
-    print(s.__getitem__(slice((-100LL), 100LL, std::nullopt)));
-    print(s.__getitem__(slice(2LL, 2LL, std::nullopt)));
-    print(s.__getitem__(slice(4LL, 1LL, std::nullopt)));
-    print(str("").__getitem__(slice(std::nullopt, std::nullopt, std::nullopt)));
-    print(str("").__getitem__(slice(0LL, 5LL, std::nullopt)));
+    print(s[slice(0LL, 1LL, std::nullopt)]);
+    print(s[slice(1LL, 4LL, std::nullopt)]);
+    print(s[slice(std::nullopt, 3LL, std::nullopt)]);
+    print(s[slice(3LL, std::nullopt, std::nullopt)]);
+    print(s[slice(std::nullopt, std::nullopt, std::nullopt)]);
+    print(s[slice(std::nullopt, std::nullopt, 2LL)]);
+    print(s[slice(1LL, 5LL, 2LL)]);
+    print(s[slice((-3LL), std::nullopt, std::nullopt)]);
+    print(s[slice(std::nullopt, (-2LL), std::nullopt)]);
+    print(s[slice((-4LL), (-1LL), std::nullopt)]);
+    print(s[slice(std::nullopt, std::nullopt, (-1LL))]);
+    print(s[slice(4LL, 1LL, (-1LL))]);
+    print(s[slice(std::nullopt, std::nullopt, (-2LL))]);
+    print(s[slice(100LL, 200LL, std::nullopt)]);
+    print(s[slice((-100LL), 100LL, std::nullopt)]);
+    print(s[slice(2LL, 2LL, std::nullopt)]);
+    print(s[slice(4LL, 1LL, std::nullopt)]);
+    print(str("")[slice(std::nullopt, std::nullopt, std::nullopt)]);
+    print(str("")[slice(0LL, 5LL, std::nullopt)]);
     return 0LL;
 }
 }
@@ -1639,7 +1639,7 @@ int run() {
     s = str("Hello World");
     print(s);
     print(len(s));
-    print(s.__getitem__(0LL), s.back());
+    print(s[0LL], s.back());
     print(s.upper());
     print(s.lower());
     print(s.swapcase());

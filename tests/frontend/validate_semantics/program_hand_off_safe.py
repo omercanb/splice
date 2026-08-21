@@ -34,3 +34,7 @@ def make() -> list[int]:
 
 def return_call_result() -> list[int]:
     return make()
+
+
+def return_slice_of_param(a: list[int]) -> list[int]:
+    return a[0:1]

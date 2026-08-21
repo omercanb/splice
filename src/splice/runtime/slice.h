@@ -71,7 +71,7 @@ class slice {
 
 // Out of line: str.h cannot include this header, because slice needs tuple and
 // tuple needs str. str only forward declares slice.
-inline str str::__getitem__(const slice &s) const {
+inline str str::__getslice__(const slice &s) const {
     auto bounds = s.indices(__len__());
     _int start = bounds.get<0>(), stop = bounds.get<1>(), step = bounds.get<2>();
 

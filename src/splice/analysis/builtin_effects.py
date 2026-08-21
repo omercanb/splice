@@ -33,6 +33,7 @@ STRUCTURALLY_IMMUTABLE_TYPES = {"str", "bytes"}
 BUILTIN_OPERATION_EFFECTS: dict[tuple[str, str], OperationEffect] = {
     # list
     ("list", "__getitem__"): READS,
+    ("list", "__getslice__"): READS,
     ("list", "index"): READS,
     ("list", "count"): READS,
     ("list", "__contains__"): READS,

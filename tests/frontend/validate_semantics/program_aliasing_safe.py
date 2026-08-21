@@ -34,6 +34,10 @@ def compound_assign_no_alias(a: list[int], b: list[int]) -> None:
     a += b
 
 
+def compound_assign_slice_no_alias(matrix: list[list[int]]) -> None:
+    matrix += matrix[0:1]
+
+
 class Item:
     value: int
 

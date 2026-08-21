@@ -137,6 +137,19 @@ class ExpressionCodegen(Visitor[str]):
                 return f"{back_call} = {value}"
             return back_call
 
+        # __getitem__/__setitem__/__getslice__ render as a[i], a[i] = v, a[s] - the .method() form doesn't scale.
+        if (
+            isinstance(o.callee, MemberExpr)
+            and o.callee.name in ("__getitem__", "__setitem__", "__getslice__")
+            and o.args
+        ):
+            base = self.visit(o.callee.expr)
+            index = self.visit(o.args[0])
+            if o.callee.name == "__setitem__":
+                value = self.visit(o.args[1])
+                return f"{base}[{index}] = {value}"
+            return f"{base}[{index}]"
+
         # special case for Array[T, N]
         if (
             isinstance(o.callee, IndexExpr)

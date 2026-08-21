@@ -23,7 +23,7 @@ def compound_assign_self_alias(items: list[int]) -> None:
 
 
 def compound_assign_nested_alias(matrix: list[list[int]]) -> None:
-    matrix += matrix[0:1]
+    matrix[0] += matrix[0]
 
 
 def loop_container_mutated_directly(items: list[int]) -> None:

@@ -46,6 +46,8 @@ template <typename K, typename V> class dict {
 
     // Inserts on a missing key, like std::unordered_map::operator[].
     ALWAYS_INLINE V &operator[](const K &key) { return data_[key]; }
+    // const can't auto-insert, so this raises KeyError instead, like __getitem__.
+    ALWAYS_INLINE const V &operator[](const K &key) const { return __getitem__(key); }
 
     // d[k] read: raises KeyError on a missing key.
     ALWAYS_INLINE V &__getitem__(const K &key) {

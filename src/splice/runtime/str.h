@@ -62,7 +62,8 @@ class str {
         return str(std::string(1, data_.back()));
     }
     // s[i:j:k] -- defined in slice.h, which this header cannot include.
-    str __getitem__(const slice &s) const;
+    str __getslice__(const slice &s) const;
+    ALWAYS_INLINE str operator[](const slice &s) const { return __getslice__(s); }
     ALWAYS_INLINE bool __contains__(const str &sub) const {
         return data_.find(sub.data_) != std::string::npos;
     }

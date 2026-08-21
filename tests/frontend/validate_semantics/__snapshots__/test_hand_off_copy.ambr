@@ -9,25 +9,17 @@
     help: wrap it in copy():
             copy(a)
   
-  program_hand_off_errors.py:6:5: error: `a[0:1]` needs an explicit copy here
+  program_hand_off_errors.py:7:5: error: `a` needs an explicit copy here
   
-    6 |     return a[0:1]
-      |     ^^^^^^^^^^^^^
-  
-    help: wrap it in copy():
-            copy(a[0:1])
-  
-  program_hand_off_errors.py:11:5: error: `a` needs an explicit copy here
-  
-    11 |     b = a
-       |     ^^^^^
+    7 |     b = a
+      |     ^^^^^
   
     help: wrap it in copy():
             copy(a)
   
-  program_hand_off_errors.py:23:5: error: `b.value` needs an explicit copy here
+  program_hand_off_errors.py:19:5: error: `b.value` needs an explicit copy here
   
-    23 |     return b.value
+    19 |     return b.value
        |     ^^^^^^^^^^^^^^
   
     help: wrap it in copy():

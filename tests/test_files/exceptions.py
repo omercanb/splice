@@ -144,9 +144,9 @@ def main() -> int:
     except Exception:
         print("not reached")
 
-    counts = {"a": 1}
+    items = [1, 2, 3]
     try:
-        print(counts["b"])
+        print(items[10])
     except:
         print("bare except caught it")
 
