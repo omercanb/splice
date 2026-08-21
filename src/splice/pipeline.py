@@ -153,6 +153,11 @@ def generate(result: AnalysisResult, extra_includes: list[str] | None = None) ->
     ).generate()
 
 
-def pipeline(path: str, source: str, extra_includes: list[str] | None = None) -> str:
+def pipeline(
+    path: str, source: str | None = None, extra_includes: list[str] | None = None
+) -> str:
+    """The main function that compiled a program to C++. If source is provided, it will be used instead of reading from the file. The path is used only in errors otherwise."""
+    if source is None:
+        source = open(path).read()
     result = analyse(path, source)
     return generate(result, extra_includes=extra_includes)

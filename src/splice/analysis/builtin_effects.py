@@ -81,6 +81,11 @@ BUILTIN_OPERATION_EFFECTS: dict[tuple[str, str], OperationEffect] = {
     ("set", "intersection"): ALLOCATES_ONLY,
     ("set", "difference"): ALLOCATES_ONLY,
     ("set", "symmetric_difference"): ALLOCATES_ONLY,
+    # Array - fixed-size, so never allocates
+    ("Array", "__getitem__"): READS,
+    ("Array", "__len__"): READS,
+    ("Array", "__setitem__"): MUTATES_ONLY,
+    ("Array", "fill"): MUTATES_ONLY,
 }
 
 

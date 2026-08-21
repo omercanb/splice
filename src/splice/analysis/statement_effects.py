@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from mypy.nodes import (
+    AssignmentStmt,
     Block,
     CallExpr,
     ClassDef,
@@ -28,6 +29,7 @@ from mypy.types import Type
 
 from splice.analysis.builtin_effects import (
     ALLOCATES_ONLY,
+    MUTATES_ONLY,
     OperationEffect,
     builtin_operation_effect,
     compound_assignment_effect,
@@ -65,6 +67,13 @@ class _StatementWalker(Traverser):
         ):
             self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
         super().visit_call_expr(o)
+
+    def visit_assignment_stmt(self, o: AssignmentStmt) -> None:
+        # A MemberExpr lvalue (obj.field = ...) mutates obj; a NameExpr one just rebinds a local.
+        for lvalue in o.lvalues:
+            if isinstance(lvalue, MemberExpr):
+                self.findings.append(ExpressionEffect(lvalue, MUTATES_ONLY))
+        super().visit_assignment_stmt(o)
 
     def visit_operator_assignment_stmt(self, o: OperatorAssignmentStmt) -> None:
         lvalue_type = type_name(self.types.get(o.lvalue))

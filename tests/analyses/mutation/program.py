@@ -1,3 +1,8 @@
+from typing import Literal
+
+from splice.stdlib import Array
+
+
 def mutates_directly(items: list[int]) -> None:
     items.append(1)
 
@@ -78,3 +83,29 @@ class Box:
 
     def relay(self, x: int) -> None:
         self.fill(x)
+
+
+class Counter:
+    count: int
+
+    def __init__(self) -> None:
+        self.count = 0
+
+
+def mutates_field_directly(c: Counter) -> None:
+    c.count = c.count + 1
+
+
+def calls_field_mutator(c: Counter) -> None:
+    mutates_field_directly(c)
+
+
+class Buffer:
+    data: Array[int, Literal[3]]
+
+    def __init__(self) -> None:
+        self.data = Array[int, Literal[3]](0)
+
+
+def mutates_array_field(b: Buffer) -> None:
+    b.data[0] = 1

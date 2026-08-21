@@ -98,7 +98,12 @@ def test_mutating_parameters(snapshot):
     assert not is_mutable("Box.fill", "x")
     assert not is_mutable("Box.relay", "x")
 
-    assert not is_mutable("Box.__init__", "self")
+    assert is_mutable("Box.__init__", "self")
+
+    assert is_mutable("mutates_field_directly", "c")
+    assert is_mutable("calls_field_mutator", "c")
+
+    assert is_mutable("mutates_array_field", "b")
 
     lines: list[str] = []
     for definition in program.tree.defs:

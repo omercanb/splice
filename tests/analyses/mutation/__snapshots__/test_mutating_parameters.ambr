@@ -1,6 +1,8 @@
 # serializer version: 1
 # name: test_mutating_parameters
   '''
+  
+  
   def mutates_directly(items: list[int]) -> None:
       items.append(1)
   mutates_directly(items):
@@ -91,10 +93,41 @@
           self.items.append(x)
       def relay(self: main.Box, x: int) -> None:
           self.fill(x)
+  Box.__init__(self):
+    direct: self.items
   Box.fill(self):
     direct: self.items.append
   Box.relay(self):
     transitive: self.fill(x)
+  
+  class Counter:
+      count: int
+      def __init__(self: main.Counter) -> None:
+          self.count = 0
+  Counter.__init__(self):
+    direct: self.count
+  
+  def mutates_field_directly(c: main.Counter) -> None:
+      c.count = (c.count + 1)
+  mutates_field_directly(c):
+    direct: c.count
+  
+  def calls_field_mutator(c: main.Counter) -> None:
+      mutates_field_directly(c)
+  calls_field_mutator(c):
+    transitive: mutates_field_directly(c)
+  
+  class Buffer:
+      data: splice.stdlib.Array[int, Literal[3]]
+      def __init__(self: main.Buffer) -> None:
+          self.data = Array[(int, Literal[3])](0)
+  Buffer.__init__(self):
+    direct: self.data
+  
+  def mutates_array_field(b: main.Buffer) -> None:
+      b.data.__setitem__(0, 1)
+  mutates_array_field(b):
+    direct: b.data.__setitem__
   
   '''
 # ---
