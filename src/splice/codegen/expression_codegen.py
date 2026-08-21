@@ -1,6 +1,6 @@
 import ast
 
-from mypy.nodes import BytesExpr, CallExpr, ComparisonExpr, DictExpr
+from mypy.nodes import BytesExpr, CallExpr, ComparisonExpr, ConditionalExpr, DictExpr
 from mypy.nodes import Expression as MypyExpression
 from mypy.nodes import (
     FloatExpr,
@@ -204,6 +204,9 @@ class ExpressionCodegen(Visitor[str]):
         if isinstance(t, Instance) and t.type.fullname in SCALAR_FULLNAMES:
             return expr
         return is_truthy(expr)
+
+    def visit_conditional_expr(self, o: ConditionalExpr) -> str:
+        return f"({self.condition(o.cond)} ? {self.visit(o.if_expr)} : {self.visit(o.else_expr)})"
 
     def visit_unary_expr(self, o: UnaryExpr) -> str:
         operand = self.visit(o.expr)

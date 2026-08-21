@@ -37,6 +37,9 @@ class Array {
     ALWAYS_INLINE T &back() { return data_.back(); }
     ALWAYS_INLINE const T &back() const { return data_.back(); }
 
+    ALWAYS_INLINE T *data() { return data_.data(); }
+    ALWAYS_INLINE const T *data() const { return data_.data(); }
+
     ALWAYS_INLINE void fill(const T &value) { data_.fill(value); }
 
     ALWAYS_INLINE auto begin() { return data_.begin(); }
