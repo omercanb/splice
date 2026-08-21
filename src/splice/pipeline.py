@@ -4,19 +4,16 @@ from dataclasses import dataclass, field
 from mypy import build
 from mypy.main import define_options
 from mypy.modulefinder import BuildSource
-from mypy.nodes import (
-    Expression,
-    MypyFile,
-    TypeInfo,
-)
+from mypy.nodes import Expression, MypyFile, TypeInfo
 from mypy.options import Options
 from mypy.types import Instance, Type
 
-from splice.ast_utils import TypeTable
 from splice.analysis.allocation import compute_allocating_functions
 from splice.analysis.call_graph import compute_call_graph
 from splice.analysis.mutation import MutationTable, compute_mutating_parameters
 from splice.analysis.statement_effects import compute_function_effects
+from splice.ast_utils import TypeTable
+from splice.codegen.statement_codegen import StatementCodegen
 from splice.frontend.mypy_fixes import get_resolved_types
 from splice.frontend.validate import (
     Diagnostic,
@@ -26,15 +23,14 @@ from splice.frontend.validate import (
     validate,
 )
 from splice.frontend.validate_semantics import validate_semantics
-from splice.codegen.statement_codegen import StatementCodegen
-from splice.transform.comprehension_transformer import (
-    apply_comprehension_transforms,
-)
+from splice.transform.comprehension_transformer import apply_comprehension_transforms
 from splice.transform.docstring_transformer import DocstringRemover
 from splice.transform.index_transformer import IndexTransformer
 
+# Mypy config
 _STRICT_ASSIGNMENTS = define_options()[2]
 
+# A base mypy object thats later used when doing ast transforms
 function_fallback: Instance
 
 
@@ -96,9 +92,7 @@ def analyse(
     Does type inference, defines classes, resolves names
     Does some additional work on top of just running mypy
 
-    check_semantics=False skips the value-semantics checks (copy(),
-    exclusivity, ...) while still returning the fully transformed tree -
-    for tools and tests that only need the tree, not a verdict on it.
+    check_semantics=False skips the value-semantics checks for easier testing
     """
     # Path is an optional parameter because it's only used for error messages
     result = build.build(
@@ -148,13 +142,17 @@ def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
     IndexTransformer(types).visit(tree)
 
 
-def generate(result: AnalysisResult) -> str:
-    """Translate the already-validated, already-transformed tree."""
-    return StatementCodegen(result.tree, result.types, result.mutations).generate()
+def generate(result: AnalysisResult, extra_includes: list[str] | None = None) -> str:
+    """Translate the already-validated, already-transformed tree.
+
+    extra_includes are headers with hand-written C++ for names the program
+    imports but never defines itself (see StatementCodegen).
+    """
+    return StatementCodegen(
+        result.tree, result.types, result.mutations, extra_includes=extra_includes
+    ).generate()
 
 
-def pipeline(path: str, source: str) -> str:
+def pipeline(path: str, source: str, extra_includes: list[str] | None = None) -> str:
     result = analyse(path, source)
-    return generate(result)
-
-
+    return generate(result, extra_includes=extra_includes)

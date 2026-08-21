@@ -1,0 +1,22 @@
+#pragma once
+
+// The whole Splice runtime API in one include
+#include "array.h"
+#include "builtins.h"
+#include "bytes.h"
+#include "copy.h"
+#include "dict.h"
+#include "exceptions.h"
+#include "file.h"
+#include "finally.h"
+#include "iter.h"
+#include "list.h"
+#include "mathops.h"
+#include "print.h"
+#include "scalars.h"
+#include "set.h"
+#include "slice.h"
+#include "strops.h"
+#include "truthy.h"
+#include "tuple.h"
+#include "types.h"

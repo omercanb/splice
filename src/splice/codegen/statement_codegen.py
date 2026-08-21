@@ -38,30 +38,6 @@ from splice.codegen.translation_utils import translate_func_signature
 from splice.codegen.typegen import cpp_type
 from splice.visitor import Traverser
 
-
-includes = [
-    "types.h",
-    "exceptions.h",
-    "finally.h",
-    "truthy.h",
-    "iter.h",
-    "tuple.h",
-    "slice.h",
-    "list.h",
-    "array.h",
-    "strops.h",
-    "bytes.h",
-    "dict.h",
-    "set.h",
-    "file.h",
-    "print.h",
-    "scalars.h",
-    "mathops.h",
-    "builtins.h",
-    "copy.h",
-]
-
-
 class StatementCodegen(Traverser):
     """Generate C++ code from mypy AST statements."""
 
@@ -70,11 +46,13 @@ class StatementCodegen(Traverser):
         tree: MypyFile,
         types_dict: dict[MypyExpression, Type],
         mutations: MutationTable,
+        extra_includes: list[str] | None = None,
     ):
         self.tree = tree
         self.types = types_dict
         self.mutations = mutations
         self.hotpath_funcs = collect_hotpath_funcs(tree)
+        self.extra_includes = extra_includes or []
         self.expr_codegen = ExpressionCodegen(types_dict)
         self.indent_level = 0
         self.output: list[str] = []
@@ -120,7 +98,8 @@ class StatementCodegen(Traverser):
         return f"{cpp} {name};"
 
     def generate_includes(self):
-        for include in includes:
+        self.emit('#include "runtime.h"')
+        for include in self.extra_includes:
             self.emit(f'#include "{include}"')
         self.emit(f"using namespace py;")
 
@@ -219,7 +198,10 @@ class StatementCodegen(Traverser):
     def visit_func_def(self, o: FuncDef):
         """Generate a function or method definition"""
         signature = translate_func_signature(
-            o, self.expr_codegen, mutations=self.mutations, flatten=o in self.hotpath_funcs
+            o,
+            self.expr_codegen,
+            mutations=self.mutations,
+            flatten=o in self.hotpath_funcs,
         )
         self.emit_function_body(f"{signature} {{", o)
 
