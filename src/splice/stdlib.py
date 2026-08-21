@@ -24,19 +24,19 @@ def hotpath(func: T) -> T:
 class Array(Generic[T, N]):
     """A fixed size array"""
 
-    # The __class_getitem__ hack is how we get Array[int, 10](0) producing an instance
-    # Array[int, 10] returns an array alias, which then gets called with a fill value
+    # The __class_getitem__ hack is how we get Array[int, 10]() producing an instance
+    # Array[int, 10] returns an array alias, which then gets called with no arguments
 
     def __class_getitem__(cls, params):
-        _, size = params
+        elem_type, size = params
         if get_args(size):
             # If N is a literal[N] extract the number
             # Otherwise its a final int
             (size,) = get_args(size)
-        return _ArrayAlias(size)
+        return _ArrayAlias(elem_type, size)
 
-    def __init__(self, fill_value, size):
-        self.data = [copy(fill_value) for _ in range(size)]
+    def __init__(self, elem_type, size):
+        self.data = [elem_type() for _ in range(size)]
 
     def __getitem__(self, index):
         return self.data[index]
@@ -59,11 +59,12 @@ class Array(Generic[T, N]):
 
 
 class _ArrayAlias:
-    def __init__(self, size):
+    def __init__(self, elem_type, size):
+        self.elem_type = elem_type
         self.size = size
 
-    def __call__(self, fill_value):
-        return Array(fill_value, self.size)
+    def __call__(self):
+        return Array(self.elem_type, self.size)
 
 
 # Fixed-width integers, shaped like mypy_extensions' i64/i32/i16/u8.

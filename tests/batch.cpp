@@ -11,10 +11,10 @@ int run() {
     Array<uint32_t, 4> b;
     int64_t total;
     uint32_t v;
-    a = Array<uint32_t, 3>(0LL);
+    a = Array<uint32_t, 3>();
     a.__setitem__(1LL, 5LL);
     print(str("Test 1 - index/assign:"), a.__getitem__(0LL), a.__getitem__(1LL), a.__getitem__(2LL));
-    b = Array<uint32_t, 4>(uint32_t(9LL));
+    b = Array<uint32_t, 4>();
     print(str("Test 2 - Literal size:"), b.__getitem__(0LL), b.__getitem__(3LL));
     print(str("Test 3 - last element:"), a.back());
     print(str("Test 4 - len:"), len(a), len(b));
@@ -1029,7 +1029,7 @@ int run();
 int run() {
     Array<uint8_t, 24> arr;
     print(str("Test 1 - derived global:"), totalSlots);
-    arr = Array<uint8_t, 24>(uint8_t(0LL));
+    arr = Array<uint8_t, 24>();
     print(str("Test 2 - array sized by derived global:"), len(arr));
     print(str("Test 3 - shift masks:"), pair0_mask, pair2_mask);
     return 0LL;

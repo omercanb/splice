@@ -6,13 +6,13 @@ numInstruments: Final = 3
 
 
 def main() -> int:
-    # Test 1: construct with a Final int size, index and assign
-    a = Array[uint32, numInstruments](0)
+    # Test 1: construct with a Final int size, default-initialized (all zero)
+    a = Array[uint32, numInstruments]()
     a[1] = 5
     print("Test 1 - index/assign:", a[0], a[1], a[2])
 
     # Test 2: construct with an explicit Literal size
-    b = Array[uint32, Literal[4]](uint32(9))
+    b = Array[uint32, Literal[4]]()
     print("Test 2 - Literal size:", b[0], b[3])
 
     # Test 3: -1 reads the last element

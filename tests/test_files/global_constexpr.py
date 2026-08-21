@@ -21,7 +21,7 @@ def main() -> int:
     print("Test 1 - derived global:", totalSlots)
 
     # Test 2: that derived global used as an Array size
-    arr = Array[uint8, totalSlots](uint8(0))
+    arr = Array[uint8, totalSlots]()
     print("Test 2 - array sized by derived global:", len(arr))
 
     # Test 3: fixed-width int globals combined via shift/or

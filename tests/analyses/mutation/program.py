@@ -104,7 +104,7 @@ class Buffer:
     data: Array[int, Literal[3]]
 
     def __init__(self) -> None:
-        self.data = Array[int, Literal[3]](0)
+        self.data = Array[int, Literal[3]]()
 
 
 def mutates_array_field(b: Buffer) -> None:
