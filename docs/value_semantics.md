@@ -1,117 +1,69 @@
-# Value semantics design
+# Value semantics
 
-**Purpose: Stay close to Python's semantics but provide native C++ performance by limiting the programs that you can write**
+Every name in Python is a reference and if a program compiled from Python would like to preserve reference semantics, they would have to wrap every value in a pointer. This leads to lots of memory allocations, prevents having a flat memory layout, and makes it very expensive to interface between Python and C++.
 
-Main Goal: Prevent aliasing.
+## Solution
+Ban all forms of aliasing, and remove any concept of a reference from Python. Concretely, splice has static checks that makes sure nothing can alias eachother.
+
+## An example
 ```python
-def f(a: list[int], b: list[int]):
-    a.append(1)
-    print(b[0])
-a = [1, 2, 3]
-b = a
-f(a, b)
+class Order:
+    def __init__(self) -> None:
+        self.fills: list[int] = []
+
+def process() -> None:
+    pending = [10, 20]
+    order = Order()
+    order.fills = pending
+    pending.append(30)
+    print(order.fills)
 ```
-Then if `a.append()` causes a to reallocate, `b[0]` will be pointing to garbage.
-By preventing any way in which this sort of aliasing can happen, we can use C++ like values in classes instead of Python like pointers. This enables us to have directly C++ like performance. 
 
-## Core Rules
-**Note: These are all checked by the Splice compiler**
-- Whenever you assign or return an lvalue (`a`, `a.field`, `a.items[i]`, etc, but not a literal `0`, `function()`, or `a.method()`) you have to assign or return it inside `copy()`. So `return copy(a)` or `b = copy(a.field)`. This return or reassign is called a 'hand-off'.
-- When passing in arguments to a function, they cannot be structural aliases. 
-    Examples of banned function calls: 
-    - `function(self, self.items)` is not allowed because `self.items` contains `self` 
-    - `function(array, array[i])` is not allowed because `array[i]` contains `array`
-    - `function(array[i], array[j])` is not allowed because `i` and `j` could be the same number (but `function(array[0], array[1]` is allowed and its also allowed if `i` and `j` are known at compile time)
-    All other calls are allowed.
-- Global variables can only be `int`s or `float`s and cannot be reassigned.
-- Function parameters cannot be reassigned. 
-- Classes cannot contain themselves as members.
+## The two obvious choices, and why both are wrong
 
-## Core model
+**Option one: make every object a `shared_ptr` (or similar) under the hood**, so assignment can keep meaning "point at the same thing," exactly like Python. This is correct — it reproduces Python's aliasing behavior perfectly — but it throws away the entire reason you wanted C++ in the first place. Every object is now a separate heap allocation. Every copy is an atomic refcount bump. Every field access is a pointer chase through memory the cache doesn't have. You've built a C++ program shaped like a Python interpreter's object model, not a fast C++ program.
 
-- All types are **value types** by default. Assignment always conceptually copies; there is no first-class reference type in ordinary code.
-- **`copy()` is a free function**, not a method — mandatory, explicit, at every genuine hand-off of an **lvalue** (a name that persists and could be read again: a variable, `a.b`, `container[i]`).
-- **Hand-off = assignment or return**, specifically. `x = source` and `return source` require `copy()` if `source` is an lvalue. Passing an lvalue as a *function argument* does **not** require `copy()` — arguments are passed as mutable references, scoped to the call, never copies.
-- **Prvalues** (fresh values with no other name: a literal, a call's return value, a constructor, anything chained directly off another prvalue) never need `copy()`, anywhere. Nothing else could ever alias them, so the compiler just constructs/moves them directly.
-- **Moves are never written by the user.** The compiler elides a `copy()` into a move whenever it can prove the source is dead afterward. (Deferred for v1 — see below.)
+**Option two: make everything a plain value**, stack-allocated, embedded directly in its container, no indirection. This is fast — it's how you'd actually write performance-sensitive C++ by hand. But now `a = b` *copies*, silently, which is a different operation than what the Python source says. If a program actually depended on that assignment aliasing — mutating through one name and reading it back through the other — the compiled program does something quietly different from the interpreted one. That's not a slow program, it's a *wrong* one, and it's wrong in a way that's invisible at the call site.
 
-## Function parameters
+Splice takes option two, but refuses to leave the gap silent. Every spot where a plain-value translation could diverge from Python's real behavior is caught at compile time and forced to be explicit.
 
-- **No visible annotation.** Mutability is inferred per parameter by the mutation analysis (see below) — direct writes, or forwarding to another mutable parameter, transitively. Codegen may still emit `T&` uniformly regardless; the inferred fact is what the exclusivity check and loop-claim check actually rely on.
-- Parameters are references **scoped strictly to the call** — never copies. This matches Python's own semantics (mutating a passed mutable object is visible to the caller) at zero cost.
-- A parameter reference can **never be named** (bound to a variable), **never returned bare**, and **never passed onward** to another function's parameter unless it passes the exclusivity check below. This is what keeps it from ever outliving the call it belongs to.
-- A **prvalue argument** is just constructed/moved directly into the parameter's storage — no reference machinery needed, since there's nothing to alias. Falls out of the lvalue/prvalue distinction for free; no separate rule.
-- **Reassigning a parameter's own name (`x = new_value`) is not allowed.** In Python this only rebinds the local name — the caller's object is untouched. Since a parameter compiles to a C++ reference, the same line there would assign *through* the reference and mutate the caller's object — the opposite of what the Python source means. Rather than detect or reconcile that mismatch, the rebind is simply rejected. Mutating *through* the parameter (`x.field = 5`) is unaffected and remains the correct, intended way to mutate the caller's object.
+## A concrete example
 
-## The exclusivity check (the core safety mechanism)
+```python
+class Order:
+    def __init__(self) -> None:
+        self.fills: list[int] = []
 
-- **Purely structural and syntactic. No dataflow analysis, no call-graph analysis needed to run the check itself** (though it now consults one precomputed fact — see "Mutation and allocation analysis" below).
-- At every call: compare all arguments — including the implicit `self` on a method — pairwise. Reject if any two share a structural base that isn't *provably* distinct **and** at least one of them binds to a mutable parameter. Two overlapping read-only accesses are fine — only a mutable one conflicts with anything.
-- `a.items[i]` alone as an argument is completely fine.
-- `a.items[i]` and `a.items[j]` as two arguments in the *same* call is only fine if `i` and `j` are provably distinct — both sides must be compile-time constants (literals or `constexpr` globals) **and** unequal. A variable or a function-call index is conservatively assumed to possibly overlap.
-- Field access (`a.b.c`) is always a fixed, distinguishable path — never confused with a different field path.
-- This composes across nested/recursive calls by induction: every call site is checked, so a function's own parameters are guaranteed non-aliased on entry, and it never has to re-derive that guarantee when passing them onward.
-- **A `for` loop adds its iterated container to the comparison set for every call inside the loop body**, as if it were one more claim alongside the call's own arguments — not a separate mechanism, the same structural comparison with a wider input set. The loop's claim is itself mutable or read-only depending on whether the loop variable is ever written to inside the body (see below) — a read-only iteration doesn't conflict with another read-only call on the same container, only with something mutable.
-- Only applies when the iterated expression is a named base (an lvalue). A fresh temporary (`for x in get_list():`) needs no claim — nothing else could have a name for it to alias.
+def process() -> None:
+    pending = [10, 20]
+    order = Order()
+    order.fills = pending
+    pending.append(30)
+    print(order.fills)
+```
 
-## Mutation and allocation analysis
+In real Python, `order.fills = pending` doesn't copy the list — it makes `order.fills` and `pending` two names for the *same* list object. So `pending.append(30)` is visible through `order.fills` too, and this prints `[10, 20, 30]`.
 
-Two facts, computed together in one pass, that the checks above and codegen both consult:
+If this got compiled straight to C++ with `fills` as a plain `std::vector<int>` member, `order.fills = pending` would compile to a real copy. `pending.append(30)` would only touch `pending`'s own storage. The program would print `[10, 20]` instead — silently wrong, and nothing about reading the Python source would tell you that.
 
-- **Per function, per parameter: `mutable` (bool).** Does this parameter ever get written to directly, or passed onward to another function's parameter that's mutable.
-- **Per function: `allocates` (bool) + a location trace.** Does this function, or anything it calls transitively, touch the allocator. Powers a `@hotpath` decorator that warns (not rejects) on allocation.
+Splice doesn't guess which behavior you meant. It rejects `order.fills = pending` outright:
 
-Computed by: seeding a fixed table of builtin facts (`append`/`extend`/etc. → mutable + allocates; `__setitem__` at an existing index → mutable only; reads → neither), walking each user function once for its direct facts, building the call graph (argument-to-parameter binding, not an argument-reordering transform — reordering would risk changing evaluation order), then propagating both facts to a fixed point.
+```
+error: `pending` needs an explicit copy here
 
-### Implementation steps for this stage
+  8 |     order.fills = pending
+    |     ^^^^^^^^^^^^^^^^^^^^^
 
-Scoped to just this analysis — structural path comparison and the exclusivity/copy/globals/parameter-reassignment checks are a separate step that consumes what's built here.
+  help: wrap it in copy():
+          copy(pending)
+```
 
-1. Builtin seed table: `(mutates, allocates)` per known operation. All flat entries — no pass-through shape needed, since lambda-parameter-mutation is banned (step 5), so a callback can never make `sorted`/`map`/`filter` mutate their container argument.
-2. `analyze_statement(stmt) -> list[Finding]`, where `Finding = (node, OperationEffect)` — the single, unified recognizer for direct, immediately-knowable facts, covering all three sources: the builtin `(type, method)` table; `OperatorAssignmentStmt` (`+=`/`*=` survive `frontend.validate`'s `OP_MAP` rejection already, so any that reach here compile to a real C++ compound assignment — `mutates=True` unconditional, `allocates` from a small `{list, str, bytes}` set of types whose compound op can grow); and constructor/literal nodes (`ListExpr`/`DictExpr`/`SetExpr`, plus calls `should_wrap_call_in_pointer` already recognizes in `expression_codegen.py` — always `allocates`, never `mutates`, tuple excluded since it isn't `ptr`-wrapped). Deliberately does *not* resolve calls to user-defined functions — their effect isn't known yet, that's what the fixed point computes. Walk each user-defined function once, calling this per statement, to seed direct facts.
-3. Argument-to-parameter binding resolver — a lookup, not a transform. Used both by step 2's walker to record call-graph edges for user-defined calls (separate from `analyze_statement` itself) and by the fixed point in step 4.
-4. Build the call graph and propagate both facts to a fixed point. Converges on its own since both facts are monotonic.
-5. Lambdas: reject at definition if the body writes into its own parameter (reuses steps 1–2's recognition logic). Never joins the call graph for the mutable trait. Its allocates fact is still computed on demand, recomputed not cached, consulting step 4's already-finished results for whatever named functions it calls.
-6. `loop_variable_is_mutated(loop) -> bool`: local, recomputed-not-cached walk of one loop body, same recognition logic, feeding codegen's `const auto&`/`auto&` choice and the other step's loop-claim mutability.
+Note what this error is *not* doing: it isn't offering you a way to get the real Python aliasing behavior back. Splice doesn't support that at all — there's no pointer/reference type you can reach for here. `copy()` is the only path forward, and it gives you the independent-copy behavior: after `order.fills = copy(pending)`, appending to `pending` no longer touches `order.fills`, on purpose, because that's the only relationship a plain-value field can actually have with something assigned into it. The error exists so that decision is something you make on purpose, at the one line where it matters, instead of something the compiler makes for you silently three hundred lines away.
 
-Query functions built on top:
+This is the same rule everywhere a name gets handed off — assigned into a field, assigned into a fresh local, or returned. A fresh value with no other name (`[1, 2, 3]`, a function's return value, `a.method()`) never needs `copy()`, because nothing else could possibly have a reference to it to alias in the first place — the rule only fires on names that already exist and might still be read elsewhere.
 
-- `call_touches_base(call, base) -> bool` — does any argument (including `self`) structurally match `base` and bind to a mutable parameter. The thing the exclusivity check and the loop-claim check both actually run.
-- `loop_variable_is_mutated(loop) -> bool` — a local, recomputed-not-cached walk of one loop's body, asking whether the loop variable itself is ever written to. Drives both the loop's claim (mutable vs. read-only) and codegen's `const auto&` vs `auto&` choice for the loop variable. Not cached: a loop is visited a small, fixed number of times (validator, codegen), unlike a function that might be called from many sites, so there's no repeated work to amortize.
+## What this buys you
 
-## Globals
+Because the compiler *proves* two mutable things can never alias — rather than hoping the programmer got it right, or paying for a runtime mechanism (refcounting, GC) to make it safe regardless — the generated code can do what hand-written fast C++ does: keep objects inline, pass by reference without fear during a call, mutate in place, and never touch the allocator except where you actually asked for a new container. The check costs you something real: some Python programs that lean on assignment-aliasing on purpose won't compile as-is, and need an explicit `copy()` (or a restructure) to say what they meant. In exchange, every program that *does* compile gets C++'s performance characteristics for free, and the one class of bug that plain-value translation would otherwise introduce silently — an aliasing assumption the source no longer honors — can't happen at all.
 
-- **Only ints and floats are allowed at module scope.** Nothing else — no containers, no mutable structs, no shared state of any kind as a bare global.
-- Everything else must live inside a class instance, threaded explicitly via `self`/parameters — never reached by bare name. This is what removes the need for any interprocedural "which globals does this function touch" analysis; every check stays purely local to one call site.
-
-## Explicitly not allowed
-
-- Bare `b = a` (no `copy()`) for any lvalue of non-trivial type.
-- A reference bound to a variable, returned bare, or forwarded to another parameter without passing the exclusivity check.
-- Two arguments (`self` included) to one call sharing a structural base, unless provably disjoint.
-- Any non-int/float mutable state at module scope.
-- Reassigning a parameter's own name inside the function body.
-
-## Genuinely won't be implemented (not open, not deferred — out of scope)
-
-- **Recursive/self-referential types** (e.g. a `Node` containing itself). No indirection mechanism exists in this design, so these have unbounded size and are rejected outright.
-- **Generics/templates.**
-
-## Lambdas
-
-Supported, with capture-by-value: a captured variable is copied at the point the lambda is created, becoming an independent value from then on — never a live reference to the outer binding. Once resolved that way, a lambda is just an ordinary function to the rest of the analysis: captures act like pre-bound parameters, its body gets walked the same way for mutation/allocation facts, it joins the call graph the same way if passed around and called.
-
-Capture-by-reference is banned for the same reason globals are: it's exactly the "reachable without appearing in a signature" hazard this whole design closes off elsewhere.
-
-**A lambda may never mutate its own parameters** — checked locally when the lambda is defined (does its body write into a parameter, same shape as the parameter-reassignment ban), not tracked through the fixed-point analysis. This means a lambda's mutable fact for every parameter is always "no" by rule, so it never needs to join the call graph for that trait, and builtins that take a callback (`sorted`'s `key=`, `map`, `filter`) get a flat "never mutates its container argument" seed fact rather than needing a rule parameterized by whatever callback they're given. Low-cost in practice: mutating each element of something already has a natural, fully-supported form (`for x in items: x.reset()`); a mutating lambda mainly shows up in the side-effecting-key-function pattern, which is questionable style regardless, since sort key functions aren't expected to have call-count- or order-dependent side effects. (Allocation tracking still walks lambda bodies regardless — that trait is unaffected by this rule.)
-
-**Real cost, not swept under the rug:** this diverges from actual Python closures, which are late-binding by reference. `[lambda: i for i in range(3)]` returns three closures all seeing `i`'s final value in real Python (`2, 2, 2`); copy-at-creation gives `0, 1, 2` instead. Not fixable without reintroducing a live, escaping reference to the outer variable — structurally incompatible with everything else here, not a gap to patch later. Lands specifically on Python's own well-known closure-in-a-loop footgun, not a pattern anyone relies on intentionally, which makes it a more acceptable divergence than most — but it is a real, observable difference between interpreted and compiled behavior, worth documenting rather than discovering later.
-
-## Deferred for v1 (safe to defer — costs precision, never soundness)
-
-- **Last-use analysis / move elision.** Ship with none at first — every `copy()` is a real copy, always correct regardless of how much gets elided later.
-
-## Python-side requirement
-
-- `copy()` needs a real interpreted implementation (`copy.deepcopy`) so the same source stays runnable directly in CPython for research/backtesting, not just when compiled.
-- The exclusivity check and last-use analysis need nothing on the Python side — they're proofs about the compiled output only.
+For the full rule set (function arguments, loops, globals, lambdas) and the analysis that enforces it, see [`docs/design/value_semantics_plan.md`](design/value_semantics_plan.md).
