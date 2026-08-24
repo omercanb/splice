@@ -1,23 +1,32 @@
 # Value semantics
 
-Every name in Python is a reference and if a program compiled from Python would like to preserve reference semantics, they would have to wrap every value in a pointer. This leads to lots of memory allocations, prevents having a flat memory layout, and makes it very expensive to interface between Python and C++.
+Every name in Python is a reference and if a program compiled from Python would like to preserve reference semantics, they would have to wrap every value in a pointer. This leads to lots of memory allocations, prevents having a flat memory layout, and makes it very expensive to interface between Python and C++. 
+
+## Goal
+Be able to represent all user defined data as flat value types in C++.
+Don't use any refcounting or memory allocation for data.
+Be able to interface directly between a value in Python and a value in C++.
 
 ## Solution
-Ban all forms of aliasing, and remove any concept of a reference from Python. Concretely, splice has static checks that makes sure nothing can alias eachother.
+Ban all forms of aliasing in Python. Concretely, Splice has static checks that makes sure reference semantics can never be observed and nothing can alias eachother. This enables all of the above conditions, most importantly, flat value types.
 
-## An example
+### An example of issues with aliasing
 ```python
-class Order:
-    def __init__(self) -> None:
-        self.fills: list[int] = []
+class Entry:
+    def __init__(self, items: list[int]):
+        self.items = items
 
-def process() -> None:
-    pending = [10, 20]
-    order = Order()
-    order.fills = pending
-    pending.append(30)
-    print(order.fills)
+def main():
+    nums = [1, 2, 3]
+    entry = Entry(nums)
+    nums.append(4)
 ```
+To support these exact semantics in C++, you would need `Entry.items` to be a pointer, then use refcounting or garbage collection for it. So we don't allow this type of code to be written. Instead, the compiler raises an error saying `self.items = items` needs to be replaces with `self.items = copy(items)`. So the solution is to explicitly require, at any point that will create a reference, to copy the object before it is read.
+It's very difficult to use C++ value types here and also support these exact semantics. 
+If `arr` uses a flat layout like `std::vector`, the first append can reallocate, then the parameter `num` becomes undefined behavior, because `arr[0]` no longer points to anything. So to have the benefit of using a flat layout while also ensuring that the semantics of Python stay the same, we must prevent aliasing and use `extend(arr, copy(arr[0]))`.
+
+## The Benefits
+
 
 ## The two obvious choices, and why both are wrong
 

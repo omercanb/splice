@@ -1,5 +1,7 @@
 """Builtin function definitions and utilities for code generation."""
 
+import sys
+
 from mypy.nodes import NameExpr, StrExpr
 
 
@@ -117,3 +119,46 @@ EXCEPTION_TYPES = {
 
 
 BOOL_OP_MACROS = {"and": "_and", "or": "_or"}
+
+# Real Python builtins that the runtime actually implements (see runtime/*.h).
+# Anything not listed here has no C++ equivalent yet.
+SUPPORTED_BUILTIN_FUNCTIONS = {
+    "builtins.print",
+    "builtins.len",
+    "builtins.range",
+    "builtins.enumerate",
+    "builtins.zip",
+    "builtins.map",
+    "builtins.filter",
+    "builtins.sorted",
+    "builtins.reversed",
+    "builtins.sum",
+    "builtins.any",
+    "builtins.all",
+    "builtins.min",
+    "builtins.max",
+    "builtins.divmod",
+    "builtins.round",
+    "builtins.ord",
+    "builtins.chr",
+    "builtins.repr",
+    "builtins.hash",
+    "builtins.open",
+    "builtins.int",
+    "builtins.float",
+    "builtins.bool",
+    "builtins.str",
+    "builtins.list",
+    "builtins.dict",
+    "builtins.set",
+    "builtins.bytes",
+    # Raising/catching one of these is handled separately, by
+    # check_exception_class - just don't double-flag the constructor call.
+    *EXCEPTION_TYPES,
+}
+
+# Used to differentiate imports from modules that Python comes with builtin vs imports from .pyi files the user defines
+KNOWN_STDLIB_MODULES = sys.stdlib_module_names
+
+# Individual Python stdlib functions to allow through as they get implemented.
+SUPPORTED_STDLIB_FUNCTIONS: set[str] = set()

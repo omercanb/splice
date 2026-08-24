@@ -64,10 +64,17 @@ from mypy.types import (
 )
 
 from splice.ast_utils import literal_int_value
-from splice.codegen.builtins import EXCEPTION_TYPES, OP_MAP
+from splice.codegen.builtins import (
+    EXCEPTION_TYPES,
+    KNOWN_STDLIB_MODULES,
+    OP_MAP,
+    SUPPORTED_BUILTIN_FUNCTIONS,
+    SUPPORTED_STDLIB_FUNCTIONS,
+)
 from splice.codegen.exceptions import names_a_class
 from splice.codegen.typegen import UnsupportedType, cpp_type, cpp_type_name
 from splice.convert_to_python import convert_to_python
+from splice.frontend.static_checks.check_bindings import check_bindings
 from splice.frontend.static_checks.compiler_errors_warnings import (  # noqa: F401 - re-exported for existing callers
     Diagnostic,
     Severity,
@@ -75,7 +82,6 @@ from splice.frontend.static_checks.compiler_errors_warnings import (  # noqa: F4
     diagnostic,
     render,
 )
-from splice.frontend.static_checks.check_bindings import check_bindings
 from splice.visitor import Traverser
 
 SUPPORTED_EXCEPTIONS = ", ".join(
@@ -209,6 +215,32 @@ class _StructuralChecker(Traverser):
         t = self.types.get(node)
         if t is not None and isinstance(t, ProperType):
             self.check_type(node, t)
+
+    def visit_call_expr(self, o: CallExpr) -> None:
+        self.check_supported_call(o)
+        super().visit_call_expr(o)
+
+    def check_supported_call(self, o: CallExpr) -> None:
+        """Reject a call to a real Python function the runtime doesn't implement"""
+        fullname = getattr(o.callee, "fullname", None)
+        if not fullname or fullname.startswith("splice.stdlib."):
+            return
+        module = fullname.rpartition(".")[0]
+        if fullname.startswith("builtins."):
+            supported = SUPPORTED_BUILTIN_FUNCTIONS
+        elif module in KNOWN_STDLIB_MODULES:
+            supported = SUPPORTED_STDLIB_FUNCTIONS
+        else:
+            return
+        if fullname in supported:
+            return
+        name = fullname.rpartition(".")[2]
+        self.report(
+            o,
+            "unsupported-builtin",
+            f"`{name}` is not supported",
+            "there is no C++ implementation for this function yet",
+        )
 
     def visit_class_def(self, o: ClassDef) -> None:
         if o.base_type_exprs:

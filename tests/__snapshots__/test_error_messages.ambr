@@ -450,6 +450,17 @@
   
   '''
 # ---
+# name: test_error_message[unsupported_builtin.py]
+  '''
+  unsupported_builtin.py:2:9: error: `abs` is not supported
+  
+    2 |     x = abs(-3)
+      |         ^^^^^^^
+  
+    help: there is no C++ implementation for this function yet
+  
+  '''
+# ---
 # name: test_error_message[unsupported_exception.py]
   '''
   unsupported_exception.py:4:12: error: `LookupError` has no C++ equivalent
@@ -459,6 +470,17 @@
   
     help: use one of: AssertionError, BaseException, Exception, FileNotFoundError, IndexError, KeyError, TypeError, ValueError
             a base class like LookupError has to be spelled as the concrete classes it covers
+  
+  '''
+# ---
+# name: test_error_message[unsupported_stdlib_module.py]
+  '''
+  unsupported_stdlib_module.py:5:9: error: `sqrt` is not supported
+  
+    5 |     x = math.sqrt(4.0)
+      |         ^^^^^^^^^^^^^^
+  
+    help: there is no C++ implementation for this function yet
   
   '''
 # ---
