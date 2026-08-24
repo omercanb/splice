@@ -1,7 +1,6 @@
 """ArgumentTransformer: a call to a user-defined function (or constructor) is
 rewritten to be fully positional, in the callee's declared parameter order,
-splicing in a default for anything the caller omitted. A call through an
-attribute (box.add(3)) is left untouched - see argument_transformer.py.
+splicing in a default for anything the caller omitted.
 """
 
 from pathlib import Path

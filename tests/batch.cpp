@@ -631,6 +631,8 @@ int run() {
     print(tuple(d[1LL], d[2LL], d[3LL]), str(" "), str("\n"));
     print(tuple(sorted(d, false)), str(" "), str("\n"));
     print(tuple(sorted(d, true)), str(" "), str("\n"));
+    print(tuple(sorted(d, [](auto k) { return (-k); }, false)), str(" "), str("\n"));
+    print(tuple(sorted(d, [](auto k) { return (-k); }, true)), str(" "), str("\n"));
     d[4LL] = 40LL;
     print(tuple(len(d), d[4LL]), str(" "), str("\n"));
     d[1LL] = 11LL;
@@ -1272,11 +1274,17 @@ int run() {
     print(tuple(l2.index(9LL, (-2LL))), str(" "), str("\n"));
     print(tuple(l2.count(3LL)), str(" "), str("\n"));
     print(tuple(l2.count(42LL)), str(" "), str("\n"));
-    l2.sort();
+    l2.sort(false);
     print(tuple(l2), str(" "), str("\n"));
     l2.sort(true);
     print(tuple(l2), str(" "), str("\n"));
     l2.sort(false);
+    print(tuple(l2), str(" "), str("\n"));
+    print(tuple(sorted(l2, [](auto x) { return (-x); }, false)), str(" "), str("\n"));
+    print(tuple(sorted(l2, [](auto x) { return (-x); }, true)), str(" "), str("\n"));
+    l2.sort([](auto x) { return (-x); }, false);
+    print(tuple(l2), str(" "), str("\n"));
+    l2.sort([](auto x) { return (-x); }, true);
     print(tuple(l2), str(" "), str("\n"));
     l2.reverse();
     print(tuple(l2), str(" "), str("\n"));
@@ -1496,6 +1504,8 @@ int run() {
     print(tuple(len(s)), str(" "), str("\n"));
     print(tuple(sorted(s, false)), str(" "), str("\n"));
     print(tuple(sorted(s, true)), str(" "), str("\n"));
+    print(tuple(sorted(s, [](auto x) { return (-x); }, false)), str(" "), str("\n"));
+    print(tuple(sorted(s, [](auto x) { return (-x); }, true)), str(" "), str("\n"));
     s.add(4LL);
     print(tuple(sorted(s, false)), str(" "), str("\n"));
     s.add(4LL);

@@ -262,6 +262,17 @@ class list {
                              [](const T &a, const T &b) { return b < a; });
     }
 
+    // sort by key(element)
+    template <typename KeyFunc>
+    void sort(KeyFunc key, bool reverse) {
+        if (!reverse)
+            std::stable_sort(data_.begin(), data_.end(),
+                             [&](const T &a, const T &b) { return key(a) < key(b); });
+        else
+            std::stable_sort(data_.begin(), data_.end(),
+                             [&](const T &a, const T &b) { return key(b) < key(a); });
+    }
+
     ALWAYS_INLINE void reverse() noexcept { std::reverse(data_.begin(), data_.end()); }
 
     ALWAYS_INLINE list<T> copy() const { return *this; }
@@ -356,6 +367,13 @@ template <typename T>
 list<T> sorted(const list<T> &l, bool reverse) {
     auto out = l.copy();
     out.sort(reverse);
+    return out;
+}
+
+template <typename T, typename KeyFunc>
+list<T> sorted(const list<T> &l, KeyFunc key, bool reverse) {
+    auto out = l.copy();
+    out.sort(key, reverse);
     return out;
 }
 

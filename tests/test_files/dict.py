@@ -7,6 +7,8 @@ def main() -> int:
     print(d[1], d[2], d[3])
     print(sorted(d))
     print(sorted(d, reverse=True))
+    print(sorted(d, key=lambda k: -k))
+    print(sorted(d, key=lambda k: -k, reverse=True))
 
     d[4] = 40
     print(len(d), d[4])

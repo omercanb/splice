@@ -14,7 +14,8 @@
       one_keyword = f(1, 2, 5)
       keywords_out_of_order = f(1, 2, 5)
       box = Box(10)
-      unrewritten_method_call = box.add(3)
+      method_omits_trailing_default = box.add(3, 2)
+      method_keywords_out_of_order = box.add(3, 4)
       return 0
   '''
 # ---

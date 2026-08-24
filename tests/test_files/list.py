@@ -75,6 +75,14 @@ def main() -> int:
     l2.sort(reverse=False)
     print(l2)
 
+    print(sorted(l2, key=lambda x: -x))
+    print(sorted(l2, key=lambda x: -x, reverse=True))
+
+    l2.sort(key=lambda x: -x)
+    print(l2)
+    l2.sort(key=lambda x: -x, reverse=True)
+    print(l2)
+
     l2.reverse()
     print(l2)
 

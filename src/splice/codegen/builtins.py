@@ -18,6 +18,8 @@ def bool_expr(value: bool) -> NameExpr:
 class BuiltinParam:
     name: str
     default: Optional[Expression] = None
+    # Skip this argument entirely rather than filling in a default, useful for sorted()
+    omit_if_missing: bool = False
 
 
 @dataclass(frozen=True)
@@ -41,10 +43,24 @@ BUILTIN_SIGNATURES: dict[str, BuiltinSignature] = {
             BuiltinParam("end", StrExpr("\n")),
         ],
     ),
-    # sorted(iterable, *, key=None, reverse=False). key= is not supported yet.
+    # sorted(iterable, *, key=None, reverse=False).
     "builtins.sorted": BuiltinSignature(
         params=[
             BuiltinParam("iterable"),
+            BuiltinParam("key", omit_if_missing=True),
+            BuiltinParam("reverse", bool_expr(False)),
+        ],
+    ),
+}
+
+# Same idea as BUILTIN_SIGNATURES, but for a builtin method call (l.sort(...))
+# rather than a free function - keyed by method name, since a builtin method
+# isn't qualified by fullname the way a free function is.
+BUILTIN_METHOD_SIGNATURES: dict[str, BuiltinSignature] = {
+    # list.sort(*, key=None, reverse=False).
+    "sort": BuiltinSignature(
+        params=[
+            BuiltinParam("key", omit_if_missing=True),
             BuiltinParam("reverse", bool_expr(False)),
         ],
     ),

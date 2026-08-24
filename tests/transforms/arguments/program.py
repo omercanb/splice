@@ -16,5 +16,6 @@ def main() -> int:
     one_keyword = f(1, c=5)
     keywords_out_of_order = f(c=5, a=1)
     box = Box(10)
-    unrewritten_method_call = box.add(3)
+    method_omits_trailing_default = box.add(3)
+    method_keywords_out_of_order = box.add(times=4, n=3)
     return 0

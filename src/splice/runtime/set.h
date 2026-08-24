@@ -204,5 +204,14 @@ template <typename T> list<T> sorted(const set<T> &s, bool reverse) {
     return out;
 }
 
+template <typename T, typename KeyFunc>
+list<T> sorted(const set<T> &s, KeyFunc key, bool reverse) {
+    list<T> out;
+    for (const auto &v : s.raw())
+        out.append(v);
+    out.sort(key, reverse);
+    return out;
+}
+
 // str() - {1, 2, 3}; empty prints as set(), since {} is an empty dict.
 } // namespace py

@@ -8,15 +8,24 @@ from mypy.nodes import (
     ARG_STAR2,
     CallExpr,
     Expression,
+    MemberExpr,
     NameExpr,
     Node,
     TupleExpr,
     TypeInfo,
 )
 
-from splice.analysis.call_graph import is_call_splice_intrinsic, resolve_funcdef
+from splice.analysis.call_graph import (
+    is_call_builtin,
+    is_call_splice_intrinsic,
+    resolve_funcdef,
+)
 from splice.ast_utils import TypeTable
-from splice.codegen.builtins import BUILTIN_SIGNATURES, BuiltinParam
+from splice.codegen.builtins import (
+    BUILTIN_METHOD_SIGNATURES,
+    BUILTIN_SIGNATURES,
+    BuiltinParam,
+)
 from splice.transform.tree_transformer import Transformer, copy_position
 
 
@@ -31,26 +40,33 @@ class ArgumentTransformer(Transformer):
         return o
 
     def reorder_arguments(self, o: CallExpr) -> None:
-        if not isinstance(o.callee, NameExpr):
-            return
         if is_call_splice_intrinsic(o):
             return
         if any(kind in (ARG_STAR, ARG_STAR2) for kind in o.arg_kinds):
             return  # *args/**kwargs at the call site aren't supported
 
-        signature = BUILTIN_SIGNATURES.get(o.callee.fullname)
-        if signature is not None:
-            self._rewrite_call(o, signature.params, variadic=signature.variadic)
+        if isinstance(o.callee, NameExpr):
+            signature = BUILTIN_SIGNATURES.get(o.callee.fullname)
+            if signature is not None:
+                self._rewrite_call(o, signature.params, variadic=signature.variadic)
+                return
+            if o.callee.fullname.startswith("builtins."):
+                return  # plain positional builtin, nothing to fill in
+            strip_self = isinstance(o.callee.node, TypeInfo)  # constructor call
+        elif isinstance(o.callee, MemberExpr):
+            if is_call_builtin(o, self.types):
+                method_signature = BUILTIN_METHOD_SIGNATURES.get(o.callee.name)
+                if method_signature is not None:
+                    self._rewrite_call(o, method_signature.params, variadic=False)
+                return  # other builtin methods (l.append(x)) have nothing to fill in
+            strip_self = True  # self is o.callee.expr, not one of o.args
+        else:
             return
-        if o.callee.fullname.startswith("builtins."):
-            return  # plain positional builtin, nothing to fill in
 
         funcdef = resolve_funcdef(o, self.types)
         if funcdef is None:
             return
-        params = funcdef.arguments
-        if isinstance(o.callee.node, TypeInfo):
-            params = params[1:]  # a constructor call never passes self
+        params = funcdef.arguments[1:] if strip_self else funcdef.arguments
         self._rewrite_call(
             o,
             [BuiltinParam(p.variable.name, p.initializer) for p in params],
@@ -77,6 +93,8 @@ class ArgumentTransformer(Transformer):
             positional_arg = next(positional, None)
             if positional_arg is not None:
                 new_args.append(positional_arg)
+            elif param.omit_if_missing:
+                continue
             else:
                 assert param.default is not None
                 new_args.append(param.default)

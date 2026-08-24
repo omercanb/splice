@@ -208,5 +208,12 @@ template <typename K, typename V> list<K> sorted(const dict<K, V> &d, bool rever
     return out;
 }
 
+template <typename K, typename V, typename KeyFunc>
+list<K> sorted(const dict<K, V> &d, KeyFunc key, bool reverse) {
+    auto out = d.keys();
+    out.sort(key, reverse);
+    return out;
+}
+
 // str() - {k: v, ...} with elements rendered via repr(), like Python
 } // namespace py

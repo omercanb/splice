@@ -4,6 +4,8 @@ def main() -> int:
     print(len(s))
     print(sorted(s))
     print(sorted(s, reverse=True))
+    print(sorted(s, key=lambda x: -x))
+    print(sorted(s, key=lambda x: -x, reverse=True))
 
     s.add(4)
     print(sorted(s))
