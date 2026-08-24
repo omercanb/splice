@@ -17,7 +17,8 @@
       a = [1, 2, 3]
   
   
-  def compound_assign_int(x: int) -> None:
+  def compound_assign_int() -> None:
+      x: int = 0
       x += 1
   
   
@@ -46,7 +47,7 @@
   list_literal:
     [1, 2, 3] -> mutates=False allocates=True
   compound_assign_int:
-    x -> mutates=True allocates=False
+    (no findings)
   compound_assign_list:
     a -> mutates=True allocates=True
   multiple_findings:

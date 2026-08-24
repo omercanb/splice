@@ -1,0 +1,40 @@
+# serializer version: 1
+# name: test_parameter_reassignment_errors
+  '''
+  program_parameter_reassignment_errors.py:2:5: error: `x` is a parameter and can't be reassigned
+  
+    2 |     x = 5
+      |     ^
+  
+    help: Reassigning a parameter doesn't fit with C++, where a parameter compiles to a reference. Assign the new value to a differently-named local instead
+  
+  program_parameter_reassignment_errors.py:6:5: error: `x` is a parameter and can't be reassigned
+  
+    6 |     x += 1
+      |     ^
+  
+    help: Reassigning a parameter doesn't fit with C++, where a parameter compiles to a reference. Assign the new value to a differently-named local instead
+  
+  program_parameter_reassignment_errors.py:10:9: error: `x` is a parameter and can't be reassigned
+  
+    10 |     for x in range(10):
+       |         ^
+  
+    help: Reassigning a parameter doesn't fit with C++, where a parameter compiles to a reference. Assign the new value to a differently-named local instead
+  
+  '''
+# ---
+# name: test_stale_loop_variable_errors
+  '''
+  program_stale_loop_variable_errors.py:4:11: error: `i` is read after the `for` loop that bound it has ended
+  
+    4 |     print(i)
+      |           ^
+  
+    help: Accessing the for loop iterator after the loop is not compatible with C++. Assign it inside the loop to another varibale to use it after the loop.
+            for i in range(10):
+                i_last = i
+            print(i_last)
+  
+  '''
+# ---

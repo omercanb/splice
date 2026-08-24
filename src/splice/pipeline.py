@@ -42,7 +42,7 @@ class AnalysisResult:
     mutations: MutationTable
     source: str
     path: str | None
-    # Non-fatal (warning-severity) diagnostics - empty on a clean compile.
+    # Non-fatal (warning-severity) diagnostics
     diagnostics: list[Diagnostic] = field(default_factory=list)
 
 
@@ -114,13 +114,16 @@ def analyse(
         print(render(diagnostics, source, path))
         raise UnsupportedProgram(diagnostics)
 
+    # AST level transforms
     _apply_transforms(tree, types)
 
+    # Analysis related to allocation and mutation
     function_effects = compute_function_effects(tree, types)
     call_graph = compute_call_graph(tree, types)
     mutations = compute_mutating_parameters(function_effects, call_graph)
     allocating_functions = compute_allocating_functions(function_effects, call_graph)
 
+    # Compilation related to mutable value semantics
     semantics_diagnostics: list[Diagnostic] = []
     if check_semantics:
         semantics_diagnostics = validate_semantics(

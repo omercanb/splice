@@ -76,30 +76,27 @@ def loop_header(
     return for_generic(codegen, index, iterable)
 
 
-def _hoist(
-    codegen: StatementCodegen, value: str, cpp_type_name: str, prefix: str
+def hoist_variable_declaration(
+    codegen: StatementCodegen, value: str, cpp_type: str, variable_name_prefix: str
 ) -> str:
-    """Evaluate `value` into a fresh temporary before the loop starts.
-
-    Python evaluates a range()/len() argument exactly once, before the
-    loop's target is ever assigned. Splicing the expression directly into
-    the C++ condition would instead re-read it on every iteration -
-    wrong the moment its value depends on the loop target itself
-    (`range(x)` inside `for x in ...`), or changes during the loop.
-    """
-    temp = temp_name(prefix)
-    codegen.emit(f"{cpp_type_name} {temp} = {value};")
+    """Evaluate value into a temporary before the loop and return the name of the temporary."""
+    # Used because python evaluates arguments to range/len once before iterating,
+    # while a C++ for loop reevaluates every iteration.
+    temp = temp_name(variable_name_prefix)
+    codegen.emit(f"{cpp_type} {temp} = {value};")
     return temp
 
 
 def for_range_len(
     codegen: StatementCodegen, index: MypyExpression, inner_iterable: MypyExpression
 ) -> LoopHeader:
-    """Translate: for i in range(len(list))"""
+    """Translate for i in range(len(list))"""
     assert isinstance(index, NameExpr)
     target = index.name
     inner_iter_expr = codegen.get_expr(inner_iterable)
-    stop = _hoist(codegen, f"len({inner_iter_expr})", "int64_t", "len")
+    stop = hoist_variable_declaration(
+        codegen, f"len({inner_iter_expr})", "int64_t", "len"
+    )
     return LoopHeader(f"for ({target} = 0; {target} < {stop}; ++{target})")
 
 
@@ -124,13 +121,13 @@ def for_range_no_step(
     target = index.name
 
     if len(args) == 1:
-        stop = _hoist(
+        stop = hoist_variable_declaration(
             codegen, codegen.get_expr(args[0]), cpp_type(codegen.types[args[0]]), "stop"
         )
         return LoopHeader(f"for ({target} = 0; {target} < {stop}; ++{target})")
 
     start = codegen.get_expr(args[0])
-    stop = _hoist(
+    stop = hoist_variable_declaration(
         codegen, codegen.get_expr(args[1]), cpp_type(codegen.types[args[1]]), "stop"
     )
     return LoopHeader(f"for ({target} = {start}; {target} < {stop}; ++{target})")
@@ -146,7 +143,7 @@ def for_range_constant_step(
     assert isinstance(index, NameExpr)
     target = index.name
     start = codegen.get_expr(args[0])
-    stop = _hoist(
+    stop = hoist_variable_declaration(
         codegen, codegen.get_expr(args[1]), cpp_type(codegen.types[args[1]]), "stop"
     )
     comparison = "<" if step > 0 else ">"
@@ -163,10 +160,10 @@ def for_range_unknown_step(
     assert isinstance(index, NameExpr)
     target = index.name
     start = codegen.get_expr(args[0])
-    stop = _hoist(
+    stop = hoist_variable_declaration(
         codegen, codegen.get_expr(args[1]), cpp_type(codegen.types[args[1]]), "stop"
     )
-    step = _hoist(
+    step = hoist_variable_declaration(
         codegen, codegen.get_expr(args[2]), cpp_type(codegen.types[args[2]]), "step"
     )
 
@@ -182,12 +179,14 @@ def for_range_unknown_step(
 def for_generic(
     codegen: StatementCodegen, index: MypyExpression, iterable: MypyExpression
 ) -> LoopHeader:
-    """Translate: for var in iterable (standard begin()/end() protocol)"""
+    """Translate: for var in iterable (standard C++ iterator protocol)"""
     target = codegen.get_expr(index, lvalue=True)
     # `for x in [1, 2, 3]:` iterates a temporary; the containers' iterators
     # hold only a reference, which would dangle once this statement ends.
     # Binding it to auto&& first extends its lifetime for the whole loop.
-    range_var = _hoist(codegen, codegen.get_expr(iterable), "auto &&", "range")
+    range_var = hoist_variable_declaration(
+        codegen, codegen.get_expr(iterable), "auto &&", "range"
+    )
     item_var = temp_name("item")
 
     return LoopHeader(

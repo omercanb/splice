@@ -383,7 +383,7 @@
     4 |     print(i)
       |           ^
   
-    help: C++'s for loop leaves its counter one past the last value used, unlike Python, so this would read a different value here. Assign it to another variable inside the loop body instead:
+    help: Accessing the for loop iterator after the loop is not compatible with C++. Assign it inside the loop to another varibale to use it after the loop.
             for i in range(5):
                 i_last = i
             print(i_last)

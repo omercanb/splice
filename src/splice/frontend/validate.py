@@ -1,14 +1,9 @@
-"""Reject Python the transpiler cannot translate, before code generation.
-
-Codegen may then assume its input is translatable, so what is left there are
-invariants rather than user facing checks. Every construct is collected in one
-walk so a program reports all of its problems at once.
+"""
+Static checks against Python consturcts the compiler can't translate to C++
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import StrEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -19,6 +14,7 @@ from mypy.nodes import (
     Block,
     CallExpr,
     ClassDef,
+    Decorator,
     DictExpr,
     DictionaryComprehension,
     Expression,
@@ -28,7 +24,6 @@ from mypy.nodes import (
     GeneratorExpr,
     GlobalDecl,
     IfStmt,
-    Decorator,
     IndexExpr,
     IntExpr,
     LambdaExpr,
@@ -56,7 +51,7 @@ from mypy.nodes import (
     Var,
     WhileStmt,
     YieldExpr,
-    YieldFromExpr, Context,
+    YieldFromExpr,
 )
 from mypy.types import (
     CallableType,
@@ -68,12 +63,19 @@ from mypy.types import (
     get_proper_type,
 )
 
-from splice.analysis.free_variables import get_free_variables
 from splice.ast_utils import literal_int_value
 from splice.codegen.builtins import EXCEPTION_TYPES, OP_MAP
 from splice.codegen.exceptions import names_a_class
 from splice.codegen.typegen import UnsupportedType, cpp_type, cpp_type_name
 from splice.convert_to_python import convert_to_python
+from splice.frontend.diagnostics import (  # noqa: F401 - re-exported for existing callers
+    Diagnostic,
+    Severity,
+    UnsupportedProgram,
+    diagnostic,
+    render,
+)
+from splice.frontend.validate_bindings import check_bindings
 from splice.visitor import Traverser
 
 SUPPORTED_EXCEPTIONS = ", ".join(
@@ -108,15 +110,6 @@ def _contains_call(expression: Expression) -> bool:
     finder = _CallFinder()
     finder.visit(expression)
     return finder.found
-
-
-def _lvalue_names(lvalue: Lvalue) -> list[str]:
-    """The names a target binds, for tracking what a `for` loop leaves stale."""
-    if isinstance(lvalue, NameExpr):
-        return [lvalue.name]
-    if isinstance(lvalue, TupleExpr):
-        return [name for item in lvalue.items for name in _lvalue_names(item)]
-    return []
 
 
 def _negative_int_literal(expr: Expression) -> int | None:
@@ -185,11 +178,6 @@ class _Validator(Traverser):
     def __init__(self, types: dict[Expression, Type]):
         self.types = types
         self.diagnostics: list[Diagnostic] = []
-        # Names a `for` loop has finished with, in the current function - read
-        # after that point in program order is not a translation this project
-        # matches, since C++'s for loop leaves its counter one past the value
-        # Python's would.
-        self.closed_loop_targets: dict[str, ForStmt] = {}
 
     def report(self, node, kind: str, message: str, hint: str) -> None:
         self.diagnostics.append(diagnostic(node, kind, message, hint))
@@ -277,11 +265,7 @@ class _Validator(Traverser):
         for argument in o.arguments:
             if argument.variable.type is not None:
                 self.check_type(argument, argument.variable.type)
-        # A nested def gets its own set of stale loop targets, restored on exit.
-        outer_closed = self.closed_loop_targets
-        self.closed_loop_targets = {}
         super().visit_func_def(o)
-        self.closed_loop_targets = outer_closed
 
     def visit_assignment_stmt(self, o: AssignmentStmt) -> None:
         source = convert_to_python(o.rvalue)
@@ -347,8 +331,6 @@ class _Validator(Traverser):
 
     def check_lvalue(self, lvalue: Lvalue, source: str | None = None) -> None:
         if isinstance(lvalue, NameExpr):
-            # A fresh bind, whether new or a rebind, is no longer stale.
-            self.closed_loop_targets.pop(lvalue.name, None)
             if lvalue.is_new_def:
                 self.check_inferred_type(lvalue)
             return
@@ -501,13 +483,6 @@ class _Validator(Traverser):
         self._visit_comprehension(o, o, [o.key, o.value])
 
     def _visit_comprehension(self, o, generator, elements: list[Expression]) -> None:
-        for free in get_free_variables(o):
-            self._report_if_stale(free)
-
-        bound_names = {
-            name for index in generator.indices for name in _lvalue_names(index)
-        }
-        saved = {name: self.closed_loop_targets.pop(name, None) for name in bound_names}
         for index in generator.indices:
             self.check_lvalue(index)
             self.visit(index)
@@ -518,23 +493,12 @@ class _Validator(Traverser):
                 self.visit(condition)
         for element in elements:
             self.visit(element)
-        for name, prior in saved.items():
-            if prior is not None:
-                self.closed_loop_targets[name] = prior
 
     def visit_lambda_expr(self, o: LambdaExpr) -> None:
-        for free in get_free_variables(o):
-            self._report_if_stale(free)
-
-        bound_names = {argument.variable.name for argument in o.arguments}
-        saved = {name: self.closed_loop_targets.pop(name, None) for name in bound_names}
         for argument in o.arguments:
             if argument.initializer is not None:
                 self.visit(argument.initializer)
         self.visit(o.body)
-        for name, prior in saved.items():
-            if prior is not None:
-                self.closed_loop_targets[name] = prior
 
     def visit_generator_expr(self, o: GeneratorExpr) -> None:
         as_list = convert_to_python(ListComprehension(o))
@@ -627,8 +591,6 @@ class _Validator(Traverser):
         self.visit(o.index)
         self.visit(o.expr)
         self.visit(o.body)
-        for name in _lvalue_names(o.index):
-            self.closed_loop_targets[name] = o
         if o.else_body is not None:
             self.visit(o.else_body)
 
@@ -655,27 +617,6 @@ class _Validator(Traverser):
                 "range()'s other arguments do:\n"
                 f"start = {convert_to_python(start)}\n"
                 f"for {convert_to_python(o.index)} in range(start, {rest}):",
-            )
-
-    def visit_name_expr(self, o: NameExpr) -> None:
-        self._report_if_stale(o)
-
-    def _report_if_stale(self, o: NameExpr) -> None:
-        closing = self.closed_loop_targets.get(o.name)
-        if closing is not None:
-            capture = f"{o.name}_last"
-            self.report(
-                o,
-                "stale-loop-variable",
-                f"`{o.name}` is read after the `for` loop that bound it has ended",
-                "C++'s for loop leaves its counter one past the last value "
-                "used, unlike Python, so this would read a different value "
-                "here. Assign it to another variable inside the loop body "
-                "instead:\n"
-                f"for {convert_to_python(closing.index)} in "
-                f"{convert_to_python(closing.expr)}:\n"
-                f"    {capture} = {o.name}\n"
-                f"print({capture})",
             )
 
     def visit_condition(self, expression: Expression) -> None:
@@ -732,30 +673,6 @@ class _Validator(Traverser):
         super().visit_comparison_expr(o)
 
 
-class Severity(StrEnum):
-    ERROR = "error"
-    WARNING = "warning"
-
-
-@dataclass(frozen=True)
-class Diagnostic:
-    """One unsupported construct and the source span it occupies."""
-
-    kind: str
-    message: str
-    hint: str
-    line: int
-    column: int
-    end_line: int
-    end_column: int
-    # WARNING reports but never blocks compilation, unlike the default.
-    severity: Severity = Severity.ERROR
-
-    @property
-    def position(self) -> tuple[int, int]:
-        return self.line, self.column
-
-
 def validate(tree: MypyFile, types: TypeTable) -> list[Diagnostic]:
     """Every construct in the file that cannot be translated, in source order."""
     type_table: dict[Expression, ProperType] = {}
@@ -767,71 +684,7 @@ def validate(tree: MypyFile, types: TypeTable) -> list[Diagnostic]:
     for symbol in tree.names.values():
         if isinstance(symbol.node, Var) and symbol.type is not None:
             validator.check_type(symbol.node, symbol.type)
+    all_diagnostics = validator.diagnostics + check_bindings(tree, type_table)
     # Nested and/or report once each, which reads as the same complaint twice.
-    unique = {(d.position, d.kind): d for d in validator.diagnostics}
+    unique = {(d.position, d.kind): d for d in all_diagnostics}
     return sorted(unique.values(), key=lambda d: d.position)
-
-
-def diagnostic(
-    node: Context,
-    kind: str,
-    message: str,
-    hint: str,
-    severity: Severity = Severity.ERROR,
-) -> Diagnostic:
-    """Build a diagnostic from any mypy node, which carries its own span."""
-    end_line = node.end_line if node.end_line is not None else node.line
-    end_column = node.end_column if node.end_column is not None else node.column + 1
-    return Diagnostic(
-        kind=kind,
-        message=message,
-        hint=hint,
-        line=node.line,
-        column=node.column,
-        end_line=end_line,
-        end_column=end_column,
-        severity=severity,
-    )
-
-
-class UnsupportedProgram(Exception):
-    """Every construct validation rejected, reported in one go."""
-
-    def __init__(self, diagnostics: list[Diagnostic]):
-        self.diagnostics = diagnostics
-        super().__init__(f"{len(diagnostics)} unsupported construct(s)")
-
-
-def render(
-    diagnostics: list[Diagnostic], source: str, path: str = "<source>"
-) -> str:
-    """Render diagnostics with the offending source line underlined."""
-    lines = source.splitlines()
-    return "\n".join(_render_one(d, lines, path) for d in diagnostics)
-
-
-def _render_one(diagnostic: Diagnostic, lines: list[str], path: str) -> str:
-    text = lines[diagnostic.line - 1] if diagnostic.line <= len(lines) else ""
-    # A span running onto later lines is underlined to the end of the first.
-    end = diagnostic.end_column if diagnostic.end_line == diagnostic.line else len(text)
-    underline = " " * diagnostic.column + "^" * max(1, end - diagnostic.column)
-
-    number = str(diagnostic.line)
-    gutter = " " * len(number)
-    # mypy columns are 0 based, editors and compilers count from 1.
-    header = (
-        f"{path}:{diagnostic.line}:{diagnostic.column + 1}: "
-        f"{diagnostic.severity}: {diagnostic.message}"
-    )
-    hint_lines = diagnostic.hint.splitlines()
-    hint = "\n".join(
-        [f"  help: {hint_lines[0]}"] + [f"          {l}" for l in hint_lines[1:]]
-    )
-    return (
-        f"{header}\n"
-        f"\n"
-        f"  {number} | {text}\n"
-        f"  {gutter} | {underline}\n"
-        f"\n"
-        f"{hint}\n"
-    )

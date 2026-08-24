@@ -14,7 +14,8 @@ def list_literal() -> None:
     a = [1, 2, 3]
 
 
-def compound_assign_int(x: int) -> None:
+def compound_assign_int() -> None:
+    x: int = 0
     x += 1
 
 
