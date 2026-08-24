@@ -26,6 +26,7 @@ from splice.frontend.validate_semantics import validate_semantics
 from splice.transform.comprehension_transformer import apply_comprehension_transforms
 from splice.transform.docstring_transformer import DocstringRemover
 from splice.transform.index_transformer import IndexTransformer
+from splice.transform.ord_transformer import OrdTransformer
 
 # Mypy config
 _STRICT_ASSIGNMENTS = define_options()[2]
@@ -140,6 +141,7 @@ def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
     DocstringRemover().visit(tree)
     apply_comprehension_transforms(tree, types)
     IndexTransformer(types).visit(tree)
+    OrdTransformer(types).visit(tree)
 
 
 def generate(result: AnalysisResult, extra_includes: list[str] | None = None) -> str:

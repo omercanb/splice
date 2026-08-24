@@ -45,7 +45,8 @@ def fact(n: int) -> int:
 
 def main() -> int:
     a: list[int] = list()
-    i = ord("a")
+    letter = "a"
+    i = ord(letter)
     print(i)
     hi()
     a.append(i)

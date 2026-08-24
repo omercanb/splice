@@ -154,8 +154,8 @@ int run() {
     print(py::round(2.5), py::round(3.5), py::round((-2.5)));
     print(py::round(2.567, 1LL), py::round(2.567, 2LL));
     print(py::round(5LL));
-    print(chr(65LL), ord(str("A")));
-    print(chr((ord(str("a")) + 1LL)));
+    print(chr(65LL), 65LL);
+    print(chr((97LL + 1LL)));
     print(sum(__list_comprehension_0(numbers)));
     return 0LL;
 }

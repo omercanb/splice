@@ -48,7 +48,8 @@
   
   def main() -> int:
       a: list[int] = list()
-      i = ord("a")
+      letter = "a"
+      i = ord(letter)
       print(i)
       hi()
       a.append(i)
@@ -76,7 +77,7 @@
   ("print('hi')", 'builtin')
   ('fact((n - 1))', 'user-defined')
   ('list()', 'builtin')
-  ("ord('a')", 'builtin')
+  ('ord(letter)', 'builtin')
   ('print(i)', 'builtin')
   ('hi()', 'user-defined')
   ('a.append(i)', 'builtin')
