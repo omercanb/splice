@@ -252,6 +252,19 @@
   
   '''
 # ---
+# name: test_error_message[lambda_mutates_parameter.py]
+  '''
+  lambda_mutates_parameter.py:3:26: error: this lambda mutates its own parameter `row`
+  
+    3 |     list(map(lambda row: row.append(0), matrix))
+      |                          ^^^^^^^^^^
+  
+    help: a lambda passed to a builtin like sorted/map/filter is assumed to never mutate what it's given - mutate each element in a plain for loop instead:
+            for row in items:
+                ...
+  
+  '''
+# ---
 # name: test_error_message[missing_copy.py]
   '''
   missing_copy.py:2:5: error: `a` needs an explicit copy here

@@ -53,7 +53,7 @@ class _DeclarationCollector(Traverser):
             # something that exists.
             pass
         else:
-            assert False, "rejected by validation"
+            assert False, "rejected by the static checks"
 
     def check_add_declaration(self, name: NameExpr):
         """Check if name is a declaration and add it to declarations"""

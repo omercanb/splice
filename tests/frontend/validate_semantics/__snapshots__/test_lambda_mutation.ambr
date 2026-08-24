@@ -1,0 +1,23 @@
+# serializer version: 1
+# name: test_lambda_mutation_errors
+  '''
+  program_lambda_mutation_errors.py:2:26: error: this lambda mutates its own parameter `row`
+  
+    2 |     list(map(lambda row: row.append(0), matrix))
+      |                          ^^^^^^^^^^
+  
+    help: a lambda passed to a builtin like sorted/map/filter is assumed to never mutate what it's given - mutate each element in a plain for loop instead:
+            for row in items:
+                ...
+  
+  program_lambda_mutation_errors.py:6:32: error: this lambda mutates its own parameter `row`
+  
+    6 |     items.sort(key=lambda row: row.pop())
+      |                                ^^^^^^^
+  
+    help: a lambda passed to a builtin like sorted/map/filter is assumed to never mutate what it's given - mutate each element in a plain for loop instead:
+            for row in items:
+                ...
+  
+  '''
+# ---

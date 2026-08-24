@@ -1,6 +1,6 @@
 """
-Validation logic for value semantics related checks
-Runs after ast transforms for easier validation
+Static checks for value semantics related rules
+Runs after ast transforms for easier checking
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ from mypy.nodes import (
     Expression,
     ForStmt,
     FuncDef,
+    LambdaExpr,
     MemberExpr,
     MypyFile,
     NameExpr,
@@ -31,7 +32,7 @@ from splice.analysis.call_graph import (
     match_call_arguments,
 )
 from splice.analysis.hotpath import collect_hotpath_funcs
-from splice.analysis.mutation import MutatesFact, MutationTable
+from splice.analysis.mutation import MutatesFact, MutationTable, find_mutations
 from splice.analysis.statement_effects import ExpressionEffect
 from splice.analysis.structural_aliasing import (
     AccessPath,
@@ -41,7 +42,11 @@ from splice.analysis.structural_aliasing import (
 )
 from splice.ast_utils import replace_in_source, source_text
 from splice.codegen.builtins import SCALAR_FULLNAMES
-from splice.frontend.static_checks.check_structural import Diagnostic, Severity, diagnostic
+from splice.frontend.static_checks.check_structural import (
+    Diagnostic,
+    Severity,
+    diagnostic,
+)
 from splice.visitor import Traverser
 
 # Marker used raise a diagnostic to check if positions in the transformed ast match the original positions
@@ -100,7 +105,9 @@ class _MutableValueSemanticsChecker(Traverser):
         chain: list[str] = []
         seen = set()
         while True:
-            direct = next((c for c in fact.cause if isinstance(c, ExpressionEffect)), None)
+            direct = next(
+                (c for c in fact.cause if isinstance(c, ExpressionEffect)), None
+            )
             if direct is not None:
                 chain.append(
                     f"line {direct.node.line}, {verb} here:\n"
@@ -118,7 +125,11 @@ class _MutableValueSemanticsChecker(Traverser):
         return self._cause_trace(
             fact,
             self.allocating_functions,
-            lambda edge: (source_text(edge.call, self.source), edge.callee, edge.call.line),
+            lambda edge: (
+                source_text(edge.call, self.source),
+                edge.callee,
+                edge.call.line,
+            ),
             "allocates",
         )
 
@@ -241,6 +252,32 @@ class _MutableValueSemanticsChecker(Traverser):
             f"wrap it in copy():\ncopy({text})",
         )
 
+    def visit_lambda_expr(self, o: LambdaExpr) -> None:
+        self.check_lambda_no_mutation(o)
+        super().visit_lambda_expr(o)
+
+    def check_lambda_no_mutation(self, o: LambdaExpr) -> None:
+        """A lambda passed to a builtin like sorted/map/filter needs to never
+        mutate its own parameter - directly or transitively (e.g.
+        `lambda row: mutate(row)` where `mutate` itself appends to its argument).
+        """
+        parameter_vars = {argument.variable for argument in o.arguments}
+        for node, base in find_mutations(
+            o.body, parameter_vars, self.types, self.mutations
+        ):
+            self._report_lambda_mutation(node, base)
+
+    def _report_lambda_mutation(self, node, base: Var) -> None:
+        self.report(
+            node,
+            "lambda-mutates-parameter",
+            f"this lambda mutates its own parameter `{base.name}`",
+            "a lambda passed to a builtin like sorted/map/filter is assumed "
+            "to never mutate what it's given - mutate each element in a "
+            "plain for loop instead:\n"
+            f"for {base.name} in items:\n    ...",
+        )
+
     def visit_for_stmt(self, o: ForStmt) -> None:
         self.visit(o.index)
         self.visit(o.expr)
@@ -273,7 +310,11 @@ class _MutableValueSemanticsChecker(Traverser):
             if path is not None:
                 fact = self.mutations.get(param_var)
                 mutable = fact is not None
-                trace = self._mutation_trace(fact) if mutable and self._is_transitive(fact) else None
+                trace = (
+                    self._mutation_trace(fact)
+                    if mutable and self._is_transitive(fact)
+                    else None
+                )
                 claims.append((arg_expr, path, mutable, trace))
                 if mutable:
                     self._check_loop_claims(arg_expr, path)
@@ -332,9 +373,12 @@ class _MutableValueSemanticsChecker(Traverser):
     def _check_claims(
         self, o: Context, claims: list[tuple[Expression, AccessPath, bool, str | None]]
     ) -> None:
-        for (expr1, path1, mut1, trace1), (expr2, path2, mut2, trace2) in itertools.combinations(
-            claims, 2
-        ):
+        for (expr1, path1, mut1, trace1), (
+            expr2,
+            path2,
+            mut2,
+            trace2,
+        ) in itertools.combinations(claims, 2):
             if not (mut1 or mut2):
                 continue
             if is_access_path_structural_alias(path1, path2) is not None:
@@ -364,6 +408,8 @@ def check_mutable_value_semantics(
     source: str,
     allocating_functions: dict[FuncDef, AllocatesFact],
 ) -> list[Diagnostic]:
-    checker = _MutableValueSemanticsChecker(mutations, types, source, allocating_functions)
+    checker = _MutableValueSemanticsChecker(
+        mutations, types, source, allocating_functions
+    )
     checker.visit(tree)
     return sorted(checker.diagnostics, key=lambda d: d.position)

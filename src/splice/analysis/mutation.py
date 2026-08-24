@@ -10,11 +10,21 @@ from mypy.nodes import (
     IndexExpr,
     MemberExpr,
     NameExpr,
+    Statement,
     Var,
 )
 
-from splice.analysis.call_graph import CallEdge, CallGraph
-from splice.analysis.statement_effects import ExpressionEffect
+from splice.analysis.builtin_effects import builtin_operation_effect
+from splice.analysis.call_graph import (
+    CallEdge,
+    CallGraph,
+    is_call_builtin,
+    is_call_splice_intrinsic,
+    match_call_arguments,
+)
+from splice.analysis.statement_effects import ExpressionEffect, compute_statment_effects
+from splice.ast_utils import TypeTable
+from splice.visitor import Traverser
 
 
 @dataclass(frozen=True)
@@ -47,6 +57,66 @@ def get_structural_base(expr: Expression) -> Var | None:
         if expr.callee.name in _ALIASING_METHODS:
             return get_structural_base(expr.callee.expr)
     return None
+
+
+def call_mutates_argument(
+    call: CallExpr, arg_expr: Expression, types: TypeTable, mutations: MutationTable
+) -> bool:
+    """Does `call`, when given `arg_expr` as one of its arguments (self included,
+    for a method call), mutate it."""
+    if is_call_splice_intrinsic(call) or is_call_builtin(call, types):
+        if not isinstance(call.callee, MemberExpr):
+            return False
+        effect = builtin_operation_effect(types[call.callee.expr], call.callee.name)
+        if effect is None:
+            return False
+        args = [call.callee.expr, *call.args]
+        return any(
+            arg is arg_expr and i in effect.mutated_args for i, arg in enumerate(args)
+        )
+    return any(
+        arg is arg_expr and param_var in mutations
+        for arg, param_var in match_call_arguments(call, types)
+    )
+
+
+class _CallCollector(Traverser):
+    def __init__(self) -> None:
+        self.calls: list[CallExpr] = []
+
+    def visit_call_expr(self, o: CallExpr) -> None:
+        self.calls.append(o)
+        super().visit_call_expr(o)
+
+
+def find_mutations(
+    stmt: Statement, target_vars: set[Var], types: TypeTable, mutations: MutationTable
+) -> list[tuple[Expression, Var]]:
+    """Every place within `stmt` that mutates one of `target_vars`."""
+    found: list[tuple[Expression, Var]] = []
+
+    for effect in compute_statment_effects(stmt, types):
+        if not effect.effect.mutates:
+            continue
+        base = get_structural_base(effect.node)
+        if base in target_vars:
+            found.append((effect.node, base))
+
+    collector = _CallCollector()
+    collector.visit(stmt)
+    for call in collector.calls:
+        # Already covered above, via compute_statment_effects - checking again
+        # here would double-report the same builtin method call.
+        if is_call_splice_intrinsic(call) or is_call_builtin(call, types):
+            continue
+        for arg_expr, _ in match_call_arguments(call, types):
+            base = get_structural_base(arg_expr)
+            if base in target_vars and call_mutates_argument(
+                call, arg_expr, types, mutations
+            ):
+                found.append((arg_expr, base))
+
+    return found
 
 
 def compute_mutating_parameters(

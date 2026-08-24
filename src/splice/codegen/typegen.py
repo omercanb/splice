@@ -18,8 +18,8 @@ from splice.codegen.builtins import FIXED_WIDTH_INT_TYPES
 class UnsupportedType(Exception):
     """A mypy type with no C++ equivalent.
 
-    Raised rather than asserted so validation can catch it and report the node
-    it came from, keeping the list of convertible types in one place.
+    Raised rather than asserted so the static checks can catch it and report
+    the node it came from, keeping the list of convertible types in one place.
     """
 
     def __init__(self, t: Type, problematic_member_type: Optional[Type] = None):
