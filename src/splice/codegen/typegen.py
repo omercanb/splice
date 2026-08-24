@@ -28,6 +28,18 @@ class UnsupportedType(Exception):
         super().__init__(f"no C++ equivalent for the type {t}")
 
 
+def optional_inner_type(t: Type) -> Optional[Type]:
+    """T, if `t` is exactly Optional[T] (T | None) - the only union shape splice supports. None otherwise, including for a plain, non-union type."""
+    proper = get_proper_type(t)
+    if not (
+        isinstance(proper, UnionType)
+        and len(proper.items) == 2
+        and any(isinstance(item, NoneType) for item in proper.items)
+    ):
+        return None
+    return next(item for item in proper.items if not isinstance(item, NoneType))
+
+
 def cpp_type(t: Type) -> str:
     return cpp_type_name(t)
 
@@ -97,27 +109,13 @@ def cpp_type_name(t: Type) -> str:
                 return f"tuple<{elem_types}>"
 
             # Optional[T] = T | None
-            case UnionType(items=items) if len(items) == 2 and any(
-                isinstance(item, NoneType) for item in items
-            ):
-                non_none = next(
-                    item for item in items if not isinstance(item, NoneType)
-                )
-                inner = cpp_type(non_none)
+            case UnionType() if optional_inner_type(t) is not None:
+                inner = cpp_type(optional_inner_type(t))
                 return f"std::optional<{inner}>"
 
             # A literal is just its underlying type: `x = 3` infers Literal[3].
             case LiteralType(fallback=fallback):
                 return cpp_type_name(fallback)
-
-            # Generic union
-            case UnionType(items=items):
-                types = [cpp_type_name(item) for item in items]
-                # Members can differ in mypy yet agree in C++, as Literal[0] and
-                # Literal[3] both do. Only a real disagreement needs a variant.
-                if len(set(types)) == 1:
-                    return types[0]
-                return f"std::variant<{', '.join(types)}>"
 
             # None/void
             case NoneType():

@@ -4,6 +4,7 @@ from mypy.nodes import MypyFile, Expression, TempNode, RefExpr, Var, FuncDef, As
 from mypy.types import Type, get_proper_type
 
 from splice.ast_utils import TypeTable
+from splice.codegen.typegen import optional_inner_type
 from splice.visitor import Traverser
 
 
@@ -27,7 +28,16 @@ def get_resolved_types(tree: MypyFile, types: dict[Expression, Type]) -> TypeTab
             #     type_table[expr] = expr.node
             if isinstance(expr.node, Var) or isinstance(expr.node, FuncDef):
                 assert expr.node.type is not None
-                type_table[expr] = get_proper_type(expr.node.type)
+                declared = get_proper_type(expr.node.type)
+                occurrence = get_proper_type(t)
+                # Narrowed to exclude None here (eg. inside `if a is not None:`) - keep it instead of widening back to the declared type.
+                if (
+                    optional_inner_type(declared) is not None
+                    and optional_inner_type(occurrence) is None
+                ):
+                    type_table[expr] = occurrence
+                else:
+                    type_table[expr] = declared
             else:
                 type_table[expr] = get_proper_type(types[expr])
         else:

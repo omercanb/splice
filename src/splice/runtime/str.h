@@ -10,21 +10,24 @@
 #include "exceptions.h"
 #include "truthy.h"
 #include "types.h"
-#include <type_traits>
 #include <algorithm>
 #include <array>
 #include <cctype>
 #include <charconv>
 #include <cmath>
 #include <functional>
+#include <optional>
 #include <ostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace py {
 
-template <typename T> class list;
-template <typename... Ts> class tuple;
+template <typename T>
+class list;
+template <typename... Ts>
+class tuple;
 class slice;
 
 class str {
@@ -207,7 +210,7 @@ class str {
     bool islower() const { return casedAllAre(false); }
 
     // list/tuple-returning: defined in strops.h.
-    list<str> split() const;                  // on whitespace
+    list<str> split() const; // on whitespace
     list<str> split(const str &sep) const;
     list<str> rsplit(const str &sep) const;
     list<str> splitlines() const;
@@ -218,7 +221,8 @@ class str {
     // format: PEP 3101 Format Mini-Language, enough for str.format()
     // and the "{conv:{}}" calls f-strings desugar into. Defined below, after
     // to_str()/repr(), which it needs to render arbitrary argument types.
-    template <typename... Args> str format(const Args &...args) const;
+    template <typename... Args>
+    str format(const Args &...args) const;
 
     ALWAYS_INLINE str operator+(const str &o) const { return str(data_ + o.data_); }
     ALWAYS_INLINE str &operator+=(const str &o) {
@@ -266,13 +270,15 @@ class str {
     ALWAYS_INLINE static char up(char c) { return (char)std::toupper((unsigned char)c); }
     ALWAYS_INLINE static char low(char c) { return (char)std::tolower((unsigned char)c); }
 
-    template <typename F> str mapped(F f) const {
+    template <typename F>
+    str mapped(F f) const {
         std::string out = data_;
         for (char &c : out)
             c = (char)f((unsigned char)c);
         return str(std::move(out));
     }
-    template <typename F> ALWAYS_INLINE bool allOf(F f) const {
+    template <typename F>
+    ALWAYS_INLINE bool allOf(F f) const {
         return !data_.empty() && std::all_of(data_.begin(), data_.end(), f);
     }
     bool casedAllAre(bool wantUpper) const {
@@ -366,12 +372,14 @@ inline str PyException::__str__() const { return str(what()); }
 // free spelling of __str__(). Detection and the call both go through a
 // mutable reference because transpiled methods aren't const, matching
 // Python; casting the const away is safe since __str__ never mutates.
-template <class T, class = void> struct has_str : std::false_type {};
+template <class T, class = void>
+struct has_str : std::false_type {};
 template <class T>
 struct has_str<T, std::void_t<decltype(std::declval<T &>().__str__())>>
     : std::true_type {};
 
-template <class T, class = void> struct has_repr : std::false_type {};
+template <class T, class = void>
+struct has_repr : std::false_type {};
 template <class T>
 struct has_repr<T, std::void_t<decltype(std::declval<T &>().__repr__())>>
     : std::true_type {};
@@ -386,12 +394,23 @@ str to_str(const T &x) {
 // that has to differ from its __str__ needs its own __repr__.
 inline str repr(const char *s) { return str("'" + std::string(s) + "'"); }
 
-template <typename T> str repr(const T &x) {
+template <typename T>
+str repr(const T &x) {
     if constexpr (has_repr<T>::value) {
         return const_cast<T &>(x).__repr__();
     } else {
         return to_str(x);
     }
+}
+
+template <typename T>
+inline str to_str(const std::optional<T> &x) {
+    return x.has_value() ? to_str(*x) : str("None");
+}
+
+template <typename T>
+inline str repr(const std::optional<T> &x) {
+    return x.has_value() ? repr(*x) : str("None");
 }
 
 // A parsed "[[fill]align][sign][#][0][width][,][.precision][type]" spec, per
@@ -506,11 +525,24 @@ inline std::string apply_format(const FormatSpec &spec, _int value) {
     std::string digits, prefix;
     int base = 10;
     switch (spec.type) {
-    case 'x': base = 16; prefix = spec.alt ? "0x" : ""; break;
-    case 'X': base = 16; prefix = spec.alt ? "0X" : ""; break;
-    case 'o': base = 8; prefix = spec.alt ? "0o" : ""; break;
-    case 'b': base = 2; prefix = spec.alt ? "0b" : ""; break;
-    default: break;
+    case 'x':
+        base = 16;
+        prefix = spec.alt ? "0x" : "";
+        break;
+    case 'X':
+        base = 16;
+        prefix = spec.alt ? "0X" : "";
+        break;
+    case 'o':
+        base = 8;
+        prefix = spec.alt ? "0o" : "";
+        break;
+    case 'b':
+        base = 2;
+        prefix = spec.alt ? "0b" : "";
+        break;
+    default:
+        break;
     }
     if (base == 10) {
         digits = std::to_string(mag);
@@ -541,8 +573,8 @@ inline std::string apply_format(const FormatSpec &spec, _float value) {
     _int precision = spec.precision < 0 ? 6 : spec.precision;
     if (spec.type == '%')
         mag *= 100;
-    auto fmt = (spec.type == 'e' || spec.type == 'E') ? std::chars_format::scientific
-              : (spec.type == 'g' || spec.type == 'G') ? std::chars_format::general
+    auto fmt = (spec.type == 'e' || spec.type == 'E')   ? std::chars_format::scientific
+               : (spec.type == 'g' || spec.type == 'G') ? std::chars_format::general
                                                         : std::chars_format::fixed;
     std::array<char, 64> buf;
     auto result =
@@ -577,7 +609,8 @@ std::string apply_format(const FormatSpec &spec, const T &value) {
     return apply_format(spec, to_str(value).raw());
 }
 
-template <typename T> std::string render_arg(const T &value, const std::string &raw_spec) {
+template <typename T>
+std::string render_arg(const T &value, const std::string &raw_spec) {
     return apply_format(parse_format_spec(raw_spec), value);
 }
 
@@ -592,7 +625,8 @@ struct FormatArg {
 
 class FormatArgs {
   public:
-    template <typename... Ts> explicit FormatArgs(const Ts &...values) {
+    template <typename... Ts>
+    explicit FormatArgs(const Ts &...values) {
         (args_.push_back(FormatArg{
              [&values](const std::string &spec) { return render_arg(values, spec); },
              [&values] { return to_str(values).raw(); },
@@ -696,7 +730,8 @@ inline std::string format_impl(const std::string &tmpl, const FormatArgs &args) 
 
 } // namespace detail
 
-template <typename... Args> str str::format(const Args &...args) const {
+template <typename... Args>
+str str::format(const Args &...args) const {
     detail::FormatArgs fa(args...);
     return str(detail::format_impl(data_, fa));
 }

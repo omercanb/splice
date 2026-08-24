@@ -40,7 +40,7 @@ from splice.codegen.translation_utils import (
     translate_tuple_access,
 )
 from splice.ast_utils import get_int_literal, literal_int_value
-from splice.codegen.typegen import cpp_type_name
+from splice.codegen.typegen import cpp_type_name, optional_inner_type
 from splice.visitor import Visitor
 
 
@@ -108,7 +108,19 @@ class ExpressionCodegen(Visitor[str]):
             return "std::nullopt"
         if isinstance(o.node, Var) and o.node.is_self:
             return "this"
+        if self._is_narrowed_optional(o):
+            return f"(*{o.name})"
         return o.name
+
+    def _is_narrowed_optional(self, o: NameExpr) -> bool:
+        """True when mypy narrowed this occurrence to exclude None, even though the variable's storage stays std::optional<T> - eg. `a` inside `if a is not None:`."""
+        node = o.node
+        if not isinstance(node, Var) or node.type is None:
+            return False
+        if optional_inner_type(node.type) is None:
+            return False
+        occurrence = self.types.get(o)
+        return occurrence is not None and optional_inner_type(occurrence) is None
 
     def visit_member_expr(self, o: MemberExpr) -> str:
         obj = self.visit(o.expr)

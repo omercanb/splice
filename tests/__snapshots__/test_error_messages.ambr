@@ -279,6 +279,14 @@
 # ---
 # name: test_error_message[mixed_bool_op.py]
   '''
+  mixed_bool_op.py:6:5: error: no C++ equivalent for the type `int | str`
+  
+    6 |     label = count() or "none"
+      |     ^^^^^
+  
+    help: use int, float, str, bool, or a list, dict, set or tuple of those:
+            values: list[int] = []
+  
   mixed_bool_op.py:6:13: error: `or` on unrelated types has no single C++ type
   
     6 |     label = count() or "none"

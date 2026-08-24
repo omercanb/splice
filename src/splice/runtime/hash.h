@@ -3,6 +3,7 @@
 #include "types.h"
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -24,6 +25,11 @@ ALWAYS_INLINE size_t hash(T x) {
 
 ALWAYS_INLINE size_t hash_combine(size_t seed, size_t h) {
     return seed ^ (h + 0x9e3779b97f4a7c15ULL + (seed << 6) + (seed >> 2));
+}
+
+template <typename T>
+ALWAYS_INLINE size_t hash(const std::optional<T> &x) {
+    return x.has_value() ? hash(*x) : static_cast<size_t>(0x9e3779b97f4a7c15ULL);
 }
 
 namespace detail {
