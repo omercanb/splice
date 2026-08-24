@@ -232,7 +232,7 @@ class ExpressionCodegen(Visitor[str]):
         base_type = get_proper_type(self.types[o.base])
         if isinstance(base_type, TupleType):
             i = literal_int_value(self.types[o.index])
-            assert i is not None  # validate.py already guarantees this
+            assert i is not None  # check_structural.py already guarantees this
             return translate_tuple_access(i, base)
         index = self.visit(o.index)
         return call_method(base, "__getitem__", index)

@@ -15,14 +15,16 @@ from splice.analysis.statement_effects import compute_function_effects
 from splice.ast_utils import TypeTable
 from splice.codegen.statement_codegen import StatementCodegen
 from splice.frontend.mypy_fixes import get_resolved_types
-from splice.frontend.validate import (
+from splice.frontend.static_checks.check_structural import (
     Diagnostic,
     Severity,
     UnsupportedProgram,
+    check_structural,
     render,
-    validate,
 )
-from splice.frontend.validate_semantics import validate_semantics
+from splice.frontend.static_checks.check_mutable_value_semantics import (
+    check_mutable_value_semantics,
+)
 from splice.transform.comprehension_transformer import apply_comprehension_transforms
 from splice.transform.docstring_transformer import DocstringRemover
 from splice.transform.index_transformer import IndexTransformer
@@ -109,7 +111,7 @@ def analyse(
     types = get_resolved_types(result.files["main"], result.types)
     # We need to close() to free a SQLite connection, otherwise we get too many connections when running tests
     result.manager.metastore.close()
-    diagnostics = validate(tree, types)
+    diagnostics = check_structural(tree, types)
     if diagnostics:
         print(render(diagnostics, source, path))
         raise UnsupportedProgram(diagnostics)
@@ -126,7 +128,7 @@ def analyse(
     # Compilation related to mutable value semantics
     semantics_diagnostics: list[Diagnostic] = []
     if check_semantics:
-        semantics_diagnostics = validate_semantics(
+        semantics_diagnostics = check_mutable_value_semantics(
             tree, mutations, types, source, allocating_functions
         )
         if semantics_diagnostics:
@@ -148,7 +150,7 @@ def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
 
 
 def generate(result: AnalysisResult, extra_includes: list[str] | None = None) -> str:
-    """Translate the already-validated, already-transformed tree.
+    """Translate the already-checked, already-transformed tree.
 
     extra_includes are headers with hand-written C++ for names the program
     imports but never defines itself (see StatementCodegen).

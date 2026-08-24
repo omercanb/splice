@@ -1,4 +1,4 @@
-"""The stateful checks in validate_bindings.py: parameter reassignment and
+"""The stateful checks in check_bindings.py: parameter reassignment and
 reading a for loop's variable after the loop that bound it has closed.
 """
 
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from splice.frontend.diagnostics import UnsupportedProgram, render
+from splice.frontend.static_checks.compiler_errors_warnings import UnsupportedProgram, render
 from splice.pipeline import analyse, pipeline
 
 parameter_reassignment_path = (

@@ -135,5 +135,5 @@ class uint64(metaclass=_FixedWidthIntMeta):
 
 
 def _error_after_tree_transform(value: int) -> int:
-    """Test-only marker for validate semantics. Used to check that ast positions are correct after tree transforms."""
+    """Test-only marker for the mutable-value-semantics check. Used to check that ast positions are correct after tree transforms."""
     return value

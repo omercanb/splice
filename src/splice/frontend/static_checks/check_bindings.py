@@ -26,7 +26,7 @@ from mypy.types import Instance, Type, get_proper_type
 from splice.analysis.free_variables import get_free_variables
 from splice.codegen.builtins import SCALAR_FULLNAMES
 from splice.convert_to_python import convert_to_python
-from splice.frontend.diagnostics import Diagnostic, diagnostic
+from splice.frontend.static_checks.compiler_errors_warnings import Diagnostic, diagnostic
 from splice.visitor import Traverser
 
 
@@ -63,7 +63,7 @@ class _BindingChecker(Traverser):
 
     def visit_func_def(self, o: FuncDef) -> None:
         # A nested def gets its own set of both, restored on exit - same reasoning
-        # as validate.py's original: one function's bindings shouldn't leak into
+        # as check_structural.py's original: one function's bindings shouldn't leak into
         # an unrelated sibling or enclosing function.
         outer_loop_targets = self.closed_loop_targets
         outer_parameters = self.parameter_names

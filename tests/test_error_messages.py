@@ -10,15 +10,19 @@ from pathlib import Path
 
 import pytest
 
+from splice.frontend.static_checks.compiler_errors_warnings import (
+    UnsupportedProgram,
+    render,
+)
 from splice.pipeline import analyse
-from splice.frontend.validate import UnsupportedProgram, render
 
 error_programs_path = "tests/error_programs"
 paths = sorted(glob.glob(f"{error_programs_path}/*.py"))
 
-validator_paths = [
-    "src/splice/frontend/validate.py",
-    "src/splice/frontend/validate_semantics.py",
+check_paths = [
+    "src/splice/frontend/static_checks/check_structural.py",
+    "src/splice/frontend/static_checks/check_mutable_value_semantics.py",
+    "src/splice/frontend/static_checks/check_bindings.py",
 ]
 
 
@@ -40,11 +44,11 @@ def test_error_message(path: str, snapshot):
 
 
 def reportable_kinds() -> set[str]:
-    """Every kind the validators can report, read off their self.report calls."""
+    """Every kind the checks can report, read off their self.report calls."""
     return {
         node.args[1].value
-        for validator_path in validator_paths
-        for node in ast.walk(ast.parse(Path(validator_path).read_text()))
+        for check_path in check_paths
+        for node in ast.walk(ast.parse(Path(check_path).read_text()))
         if isinstance(node, ast.Call)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "report"

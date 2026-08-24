@@ -104,7 +104,7 @@ class StatementCodegen(Traverser):
         self.emit(f"using namespace py;")
 
     def generate_global_declarations(self):
-        """Globals are scalars only (validate_semantics.py enforces this), so each compiles straight to a constexpr."""
+        """Globals are scalars only (check_mutable_value_semantics.py enforces this), so each compiles straight to a constexpr."""
         self.constexpr_mode = True
         for stmt in self.tree.defs:
             if not isinstance(stmt, AssignmentStmt) or stmt.is_alias_def:
@@ -222,7 +222,7 @@ class StatementCodegen(Traverser):
     def visit_operator_assignment_stmt(self, o: OperatorAssignmentStmt):
         # a[i] is already a __getitem__/back() CallExpr here, a reference the
         # compound operator can act on directly. Ops with no C++ compound
-        # form (/, //, %, **) are rejected earlier, by validate.py.
+        # form (/, //, %, **) are rejected earlier, by check_structural.py.
         lhs = self.get_expr(o.lvalue, lvalue=True)
         rhs = self.get_expr(o.rvalue)
         self.emit(f"{lhs} {o.op}= {rhs};")

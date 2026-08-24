@@ -31,7 +31,7 @@ from splice.analysis.call_graph import (
     match_call_arguments,
 )
 from splice.analysis.hotpath import collect_hotpath_funcs
-from splice.analysis.mutation import MutatesFact, MutationTable, TransitiveMutation
+from splice.analysis.mutation import MutatesFact, MutationTable
 from splice.analysis.statement_effects import ExpressionEffect
 from splice.analysis.structural_aliasing import (
     AccessPath,
@@ -41,7 +41,7 @@ from splice.analysis.structural_aliasing import (
 )
 from splice.ast_utils import replace_in_source, source_text
 from splice.codegen.builtins import SCALAR_FULLNAMES
-from splice.frontend.validate import Diagnostic, Severity, diagnostic
+from splice.frontend.static_checks.check_structural import Diagnostic, Severity, diagnostic
 from splice.visitor import Traverser
 
 # Marker used raise a diagnostic to check if positions in the transformed ast match the original positions
@@ -61,7 +61,7 @@ def _is_copy_call(expr: Expression) -> bool:
     )
 
 
-class _SemanticsValidator(Traverser):
+class _MutableValueSemanticsChecker(Traverser):
     def __init__(
         self,
         mutations: MutationTable,
@@ -357,13 +357,13 @@ class _SemanticsValidator(Traverser):
                 return
 
 
-def validate_semantics(
+def check_mutable_value_semantics(
     tree: MypyFile,
     mutations: MutationTable,
     types: dict[Expression, Type],
     source: str,
     allocating_functions: dict[FuncDef, AllocatesFact],
 ) -> list[Diagnostic]:
-    validator = _SemanticsValidator(mutations, types, source, allocating_functions)
-    validator.visit(tree)
-    return sorted(validator.diagnostics, key=lambda d: d.position)
+    checker = _MutableValueSemanticsChecker(mutations, types, source, allocating_functions)
+    checker.visit(tree)
+    return sorted(checker.diagnostics, key=lambda d: d.position)

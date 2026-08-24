@@ -1,4 +1,4 @@
-"""The mandatory-copy check in validate_semantics.py: check_hand_off_copy,
+"""The mandatory-copy check in check_mutable_value_semantics.py: check_hand_off_copy,
 covering the parameter-vs-local distinction on return and the scalar
 exemption.
 """
@@ -7,7 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from splice.frontend.validate import UnsupportedProgram, render
+from splice.frontend.static_checks.compiler_errors_warnings import (
+    UnsupportedProgram,
+    render,
+)
 from splice.pipeline import analyse, pipeline
 
 errors_path = Path(__file__).parent / "program_hand_off_errors.py"

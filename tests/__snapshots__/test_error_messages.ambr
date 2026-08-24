@@ -322,6 +322,17 @@
   
   '''
 # ---
+# name: test_error_message[parameter_reassignment.py]
+  '''
+  parameter_reassignment.py:2:5: error: `x` is a parameter and can't be reassigned
+  
+    2 |     x = 5
+      |     ^
+  
+    help: Reassigning a parameter doesn't fit with C++, where a parameter compiles to a reference. Assign the new value to a differently-named local instead
+  
+  '''
+# ---
 # name: test_error_message[raise_from.py]
   '''
   raise_from.py:5:9: error: chaining exceptions with `from` is not supported

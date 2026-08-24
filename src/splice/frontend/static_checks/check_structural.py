@@ -68,14 +68,14 @@ from splice.codegen.builtins import EXCEPTION_TYPES, OP_MAP
 from splice.codegen.exceptions import names_a_class
 from splice.codegen.typegen import UnsupportedType, cpp_type, cpp_type_name
 from splice.convert_to_python import convert_to_python
-from splice.frontend.diagnostics import (  # noqa: F401 - re-exported for existing callers
+from splice.frontend.static_checks.compiler_errors_warnings import (  # noqa: F401 - re-exported for existing callers
     Diagnostic,
     Severity,
     UnsupportedProgram,
     diagnostic,
     render,
 )
-from splice.frontend.validate_bindings import check_bindings
+from splice.frontend.static_checks.check_bindings import check_bindings
 from splice.visitor import Traverser
 
 SUPPORTED_EXCEPTIONS = ", ".join(
@@ -174,7 +174,7 @@ def _tuple_index_hint(o: IndexExpr) -> str:
     )
 
 
-class _Validator(Traverser):
+class _StructuralChecker(Traverser):
     def __init__(self, types: dict[Expression, Type]):
         self.types = types
         self.diagnostics: list[Diagnostic] = []
@@ -673,18 +673,18 @@ class _Validator(Traverser):
         super().visit_comparison_expr(o)
 
 
-def validate(tree: MypyFile, types: TypeTable) -> list[Diagnostic]:
+def check_structural(tree: MypyFile, types: TypeTable) -> list[Diagnostic]:
     """Every construct in the file that cannot be translated, in source order."""
     type_table: dict[Expression, ProperType] = {}
     for k, v in types.items():
         if isinstance(v, ProperType):
             type_table[k] = v
-    validator = _Validator(type_table)
-    validator.visit(tree)
+    checker = _StructuralChecker(type_table)
+    checker.visit(tree)
     for symbol in tree.names.values():
         if isinstance(symbol.node, Var) and symbol.type is not None:
-            validator.check_type(symbol.node, symbol.type)
-    all_diagnostics = validator.diagnostics + check_bindings(tree, type_table)
+            checker.check_type(symbol.node, symbol.type)
+    all_diagnostics = checker.diagnostics + check_bindings(tree, type_table)
     # Nested and/or report once each, which reads as the same complaint twice.
     unique = {(d.position, d.kind): d for d in all_diagnostics}
     return sorted(unique.values(), key=lambda d: d.position)
