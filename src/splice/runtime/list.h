@@ -352,16 +352,8 @@ ALWAYS_INLINE _int len(const list<T> &l) {
     return l.__len__();
 }
 
-// sorted(iterable, *, reverse=False) - returns a new list.
-// _sorted_kwargs is emitted when the call passes reverse=, like print.
 template <typename T>
-list<T> sorted(const list<T> &l) {
-    auto out = l.copy();
-    out.sort();
-    return out;
-}
-template <typename T>
-list<T> _sorted_kwargs(bool reverse, const list<T> &l) {
+list<T> sorted(const list<T> &l, bool reverse) {
     auto out = l.copy();
     out.sort(reverse);
     return out;

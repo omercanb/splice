@@ -202,6 +202,7 @@ class StatementCodegen(Traverser):
             self.expr_codegen,
             mutations=self.mutations,
             flatten=o in self.hotpath_funcs,
+            include_defaults=False,
         )
         self.emit_function_body(f"{signature} {{", o)
 

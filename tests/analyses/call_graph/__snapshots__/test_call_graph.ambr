@@ -78,7 +78,7 @@
   main -> add: c.add(i) [c -> self, i -> x]
   main -> greet: c.greet() [c -> self]
   main -> add: add(num1, num2) [num1 -> a, num2 -> b]
-  main -> mul: mul(num1) [num1 -> a]
+  main -> mul: mul(num1, 2) [num1 -> a, 2 -> b]
   main -> mul: mul(num2, num3) [num2 -> a, num3 -> b]
   main -> fact: fact(num1) [num1 -> n]
   '''

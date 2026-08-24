@@ -78,7 +78,7 @@
   ('c.add(i)', [c -> self, i -> x])
   ('c.greet()', [c -> self])
   ('add(num1, num2)', [num1 -> a, num2 -> b])
-  ('mul(num1)', [num1 -> a])
+  ('mul(num1, 2)', [num1 -> a, 2 -> b])
   ('mul(num2, num3)', [num2 -> a, num3 -> b])
   ('fact(num1)', [num1 -> n])
   '''

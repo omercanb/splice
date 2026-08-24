@@ -28,11 +28,8 @@ from splice.codegen.translation_utils import (
     is_truthy,
     member_access,
     needs_explicit_constructor_type,
-    should_translate_kwargs,
-    translate_arguments_with_kwargs,
     translate_binary_expr,
     translate_bool_op,
-    translate_builtin_function_name_to_kwargs,
     translate_comparison,
     translate_constructor,
     translate_constructor_special_cases,
@@ -161,15 +158,8 @@ class ExpressionCodegen(Visitor[str]):
             return f"{array_type}({args})"
 
         callee = self.visit(o.callee)
+        arguments = [self.visit(arg) for arg in o.args]
 
-        # Handle special case for builtins with kwargs (like print)
-        if should_translate_kwargs(o):
-            arguments = translate_arguments_with_kwargs(o, self)
-            callee = translate_builtin_function_name_to_kwargs(o)
-        else:
-            arguments = [self.visit(arg) for arg in o.args]
-
-        argument_list = ", ".join(arguments)
         special_case = translate_constructor_special_cases(o.callee)
         if special_case:
             callee = special_case

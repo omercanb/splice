@@ -25,6 +25,7 @@ from splice.frontend.static_checks.check_structural import (
 from splice.frontend.static_checks.check_mutable_value_semantics import (
     check_mutable_value_semantics,
 )
+from splice.transform.argument_transformer import ArgumentTransformer
 from splice.transform.comprehension_transformer import apply_comprehension_transforms
 from splice.transform.docstring_transformer import DocstringRemover
 from splice.transform.index_transformer import IndexTransformer
@@ -147,6 +148,8 @@ def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
     apply_comprehension_transforms(tree, types)
     IndexTransformer(types).visit(tree)
     OrdTransformer(types).visit(tree)
+    # Runs last so it sees every call, including ones the transforms above introduced.
+    ArgumentTransformer(types).visit(tree)
 
 
 def generate(result: AnalysisResult, extra_includes: list[str] | None = None) -> str:

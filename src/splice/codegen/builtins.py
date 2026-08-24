@@ -1,8 +1,10 @@
 """Builtin function definitions and utilities for code generation."""
 
 import sys
+from dataclasses import dataclass, field
+from typing import Optional
 
-from mypy.nodes import NameExpr, StrExpr
+from mypy.nodes import Expression, NameExpr, StrExpr
 
 
 def bool_expr(value: bool) -> NameExpr:
@@ -12,38 +14,41 @@ def bool_expr(value: bool) -> NameExpr:
     return node
 
 
-# Define builtin functions and their properties
-BUILTINS = {
-    "builtins.print": {
-        "kwargs": ["sep", "end"],
-        "defaults": {
-            "sep": StrExpr(" "),
-            "end": StrExpr("\n"),
-        },
-    },
+@dataclass(frozen=True)
+class BuiltinParam:
+    name: str
+    default: Optional[Expression] = None
+
+
+@dataclass(frozen=True)
+class BuiltinSignature:
+    """A builtin's call shape
+    variadic=True means every plain positional argument packs into a tuple (used for print)
+    """
+
+    params: list[BuiltinParam] = field(default_factory=list)
+    variadic: bool = False
+
+
+# Builtins whose call shape needs normalizing (a default to fill in, or *args
+# to pack). Only these two have one today - everything else in
+# SUPPORTED_BUILTIN_FUNCTIONS is plain positional with no optional argument.
+BUILTIN_SIGNATURES: dict[str, BuiltinSignature] = {
+    "builtins.print": BuiltinSignature(
+        variadic=True,
+        params=[
+            BuiltinParam("sep", StrExpr(" ")),
+            BuiltinParam("end", StrExpr("\n")),
+        ],
+    ),
     # sorted(iterable, *, key=None, reverse=False). key= is not supported yet.
-    "builtins.sorted": {
-        "kwargs": ["reverse"],
-        "defaults": {
-            "reverse": bool_expr(False),
-        },
-    },
+    "builtins.sorted": BuiltinSignature(
+        params=[
+            BuiltinParam("iterable"),
+            BuiltinParam("reverse", bool_expr(False)),
+        ],
+    ),
 }
-
-
-def get_kwarg_order(fullname: str) -> list[str]:
-    """Get the order of kwargs for a builtin function."""
-    return BUILTINS[fullname]["kwargs"]
-
-
-def get_kwarg_defaults(fullname: str) -> dict[str, StrExpr]:
-    """Get default values for a builtin function's kwargs."""
-    return BUILTINS[fullname]["defaults"]
-
-
-def is_builtin_with_kwargs(fullname: str) -> bool:
-    """Check if a function is a registered builtin with kwargs."""
-    return fullname in BUILTINS
 
 
 OP_MAP = {

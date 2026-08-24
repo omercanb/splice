@@ -2,10 +2,10 @@
 
 #include "hash.h"
 #include "str.h"
+#include <sstream>
+#include <string>
 #include <tuple>
 #include <type_traits>
-#include <string>
-#include <sstream>
 
 namespace py {
 
@@ -20,7 +20,8 @@ struct comparable<A, B,
                                        std::declval<const B &>())>>
     : std::true_type {};
 
-template <typename A, typename B> bool eq(const A &a, const B &b) {
+template <typename A, typename B>
+bool eq(const A &a, const B &b) {
     if constexpr (comparable<A, B>::value)
         return a == b;
     else
@@ -29,13 +30,18 @@ template <typename A, typename B> bool eq(const A &a, const B &b) {
 } // namespace detail
 
 // Generic tuple wrapper around std::tuple
-template <typename... Ts> class tuple {
+template <typename... Ts>
+class tuple {
   public:
     std::tuple<Ts...> data;
     // Default constructor - creates with default-initialized values
     ALWAYS_INLINE tuple() : data() {}
 
-    // Regular constructor - takes arguments
+    // Template magic by Claude
+    // Used to differentiate a tuple of many elements thats being default constructed with 0 arguments
+    // From a tuple of zero elements thats being constructed
+    template <typename U = void,
+              typename = std::enable_if_t<(sizeof...(Ts) > 0), U>>
     ALWAYS_INLINE tuple(Ts... args) : data(args...) {}
 
     str __str__() const {
@@ -59,18 +65,21 @@ template <typename... Ts> class tuple {
     }
 
     // Get element by compile-time index
-    template <size_t I> ALWAYS_INLINE auto get() {
+    template <size_t I>
+    ALWAYS_INLINE auto get() {
         return std::get<I>(data);
     }
 
-    template <size_t I> ALWAYS_INLINE const auto get() const {
+    template <size_t I>
+    ALWAYS_INLINE const auto get() const {
         return std::get<I>(data);
     }
 
     // Python-like __len__()
     ALWAYS_INLINE int __len__() const { return sizeof...(Ts); }
 
-    template <typename U> bool __contains__(const U &value) const {
+    template <typename U>
+    bool __contains__(const U &value) const {
         bool found = false;
         std::apply(
             [&](const auto &...elems) {
@@ -82,30 +91,34 @@ template <typename... Ts> class tuple {
 
     // Assignment operator - forwards to underlying std::tuple
     template <typename... Us>
-    ALWAYS_INLINE tuple& operator=(const tuple<Us...>& other) {
+    ALWAYS_INLINE tuple &operator=(const tuple<Us...> &other) {
         data = other.data;
         return *this;
     }
 };
 
 // Specialization for 2-element tuple (for enumerate, zip, etc.)
-template <typename T1, typename T2> class tuple<T1, T2> {
+template <typename T1, typename T2>
+class tuple<T1, T2> {
   public:
     std::tuple<T1, T2> data;
     ALWAYS_INLINE tuple() : data() {}
     ALWAYS_INLINE tuple(T1 a, T2 b) : data(a, b) {}
 
-    template <size_t I> ALWAYS_INLINE auto get() {
+    template <size_t I>
+    ALWAYS_INLINE auto get() {
         return std::get<I>(data);
     }
 
-    template <size_t I> ALWAYS_INLINE const auto get() const {
+    template <size_t I>
+    ALWAYS_INLINE const auto get() const {
         return std::get<I>(data);
     }
 
     ALWAYS_INLINE int __len__() const { return 2; }
 
-    template <typename U> bool __contains__(const U &value) const {
+    template <typename U>
+    bool __contains__(const U &value) const {
         bool found = false;
         std::apply(
             [&](const auto &...elems) {
@@ -124,7 +137,7 @@ template <typename T1, typename T2> class tuple<T1, T2> {
 
     // Assignment operator - forwards to underlying std::tuple
     template <typename U1, typename U2>
-    ALWAYS_INLINE tuple& operator=(const tuple<U1, U2>& other) {
+    ALWAYS_INLINE tuple &operator=(const tuple<U1, U2> &other) {
         data = other.data;
         return *this;
     }
@@ -172,7 +185,8 @@ ALWAYS_INLINE bool operator>=(const tuple<Ts...> &a, const tuple<Us...> &b) {
     return a.data >= b.data;
 }
 
-template <typename... Ts> inline size_t hash(const tuple<Ts...> &t) {
+template <typename... Ts>
+inline size_t hash(const tuple<Ts...> &t) {
     size_t seed = sizeof...(Ts);
     std::apply([&](const Ts &...elems) { ((seed = hash_combine(seed, hash(elems))), ...); },
                t.data);
@@ -181,8 +195,9 @@ template <typename... Ts> inline size_t hash(const tuple<Ts...> &t) {
 
 // Destructuring - creates a tuple of references
 // Usage: destructure(a, b) = some_tuple;
-template <typename... Ts> ALWAYS_INLINE tuple<Ts&...> destructure(Ts&... args) {
-    return tuple<Ts&...>(args...);
+template <typename... Ts>
+ALWAYS_INLINE tuple<Ts &...> destructure(Ts &...args) {
+    return tuple<Ts &...>(args...);
 }
 
 } // namespace py

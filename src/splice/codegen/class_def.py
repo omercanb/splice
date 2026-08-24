@@ -58,6 +58,7 @@ def write_class_bodies(codegen: StatementCodegen, class_def: ClassDef) -> None:
             mutations=codegen.mutations,
             qualifier=f"{class_def.name}::",
             flatten=method in codegen.hotpath_funcs,
+            include_defaults=False,
         )
         codegen.emit_function_body(f"{header} {{", method)
 

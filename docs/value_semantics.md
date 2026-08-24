@@ -10,7 +10,7 @@ Be able to interface directly between a value in Python and a value in C++.
 ## Solution
 Ban all forms of aliasing in Python. Concretely, Splice has static checks that makes sure reference semantics can never be observed and nothing can alias eachother. This enables all of the above conditions, most importantly, flat value types.
 
-### An example of issues with aliasing
+### An example of issues with references
 ```python
 class Entry:
     def __init__(self, items: list[int]):
@@ -21,7 +21,9 @@ def main():
     entry = Entry(nums)
     nums.append(4)
 ```
-To support these exact semantics in C++, you would need `Entry.items` to be a pointer, then use refcounting or garbage collection for it. So we don't allow this type of code to be written. Instead, the compiler raises an error saying `self.items = items` needs to be replaces with `self.items = copy(items)`. So the solution is to explicitly require, at any point that will create a reference, to copy the object before it is read.
+To support these exact semantics in C++, you would need `Entry.items` to be a pointer, then you'd have to use refcounting or garbage collection for it. So we don't allow this type of code to be written. Instead, the compiler raises an error saying `self.items = items` needs to be replaced with `self.items = copy(items)`. In general the solution is to explicitly require a copy, at any point that will normally create a reference. 
+The result of this is that all used data types, 
+
 It's very difficult to use C++ value types here and also support these exact semantics. 
 If `arr` uses a flat layout like `std::vector`, the first append can reallocate, then the parameter `num` becomes undefined behavior, because `arr[0]` no longer points to anything. So to have the benefit of using a flat layout while also ensuring that the semantics of Python stay the same, we must prevent aliasing and use `extend(arr, copy(arr[0]))`.
 

@@ -196,17 +196,10 @@ set<T> operator^(const set<T> &a, const set<T> &b) {
     return a.symmetric_difference(b);
 }
 
-// sorted() is how a program gets a stable view of an unordered set.
-template <typename T> list<T> sorted(const set<T> &s) {
+template <typename T> list<T> sorted(const set<T> &s, bool reverse) {
     list<T> out;
     for (const auto &v : s.raw())
         out.append(v);
-    out.sort();
-    return out;
-}
-template <typename T>
-list<T> _sorted_kwargs(bool reverse, const set<T> &s) {
-    auto out = sorted(s);
     out.sort(reverse);
     return out;
 }

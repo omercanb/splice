@@ -1,0 +1,20 @@
+# serializer version: 1
+# name: test_argument_transform_snapshot
+  '''
+  def f(a: int, b: int = 2, c: int = 3) -> int:
+      return ((a + b) + c)
+  class Box:
+      def __init__(self: main.Box, value: int) -> None:
+          self.value = value
+      def add(self: main.Box, n: int, times: int = 2) -> int:
+          return (self.value + (n * times))
+  def main() -> int:
+      fully_positional = f(1, 2, 3)
+      omits_trailing_defaults = f(1, 2, 3)
+      one_keyword = f(1, 2, 5)
+      keywords_out_of_order = f(1, 2, 5)
+      box = Box(10)
+      unrewritten_method_call = box.add(3)
+      return 0
+  '''
+# ---

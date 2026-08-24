@@ -202,14 +202,7 @@ ALWAYS_INLINE _int len(const dict<K, V> &d) {
     return d.__len__();
 }
 
-// sorted(d) sorts the keys, since iterating a dict yields keys.
-template <typename K, typename V> list<K> sorted(const dict<K, V> &d) {
-    auto out = d.keys();
-    out.sort();
-    return out;
-}
-template <typename K, typename V>
-list<K> _sorted_kwargs(bool reverse, const dict<K, V> &d) {
+template <typename K, typename V> list<K> sorted(const dict<K, V> &d, bool reverse) {
     auto out = d.keys();
     out.sort(reverse);
     return out;

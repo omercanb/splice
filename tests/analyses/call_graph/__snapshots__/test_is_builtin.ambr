@@ -68,17 +68,17 @@
   
       return 0
   
-  ("print('wave')", 'builtin')
+  ("print(('wave',), ' ', '\\n')", 'builtin')
   ('D()', 'user-defined')
-  ("print('bye')", 'builtin')
+  ("print(('bye',), ' ', '\\n')", 'builtin')
   ('self.items.append(x)', 'builtin')
   ('self.bye()', 'user-defined')
   ('self.d.wave()', 'user-defined')
-  ("print('hi')", 'builtin')
+  ("print(('hi',), ' ', '\\n')", 'builtin')
   ('fact((n - 1))', 'user-defined')
   ('list()', 'builtin')
   ('ord(letter)', 'builtin')
-  ('print(i)', 'builtin')
+  ("print((i,), ' ', '\\n')", 'builtin')
   ('hi()', 'user-defined')
   ('a.append(i)', 'builtin')
   ('C(i)', 'user-defined')
@@ -86,7 +86,7 @@
   ('c.add(i)', 'user-defined')
   ('c.greet()', 'user-defined')
   ('add(num1, num2)', 'user-defined')
-  ('mul(num1)', 'user-defined')
+  ('mul(num1, 2)', 'user-defined')
   ('mul(num2, num3)', 'user-defined')
   ('fact(num1)', 'user-defined')
   '''
