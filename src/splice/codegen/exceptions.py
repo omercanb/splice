@@ -92,8 +92,7 @@ def write_handlers(codegen: StatementCodegen, try_stmt: TryStmt) -> None:
     if not try_stmt.handlers:
         # A try/finally has nothing to catch, and a catch-less try is not valid
         # C++. The guard alone does the job.
-        for statement in try_stmt.body.body:
-            codegen.visit(statement)
+        codegen.visit_statements(try_stmt.body.body)
         return
 
     codegen.emit("try {")

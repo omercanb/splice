@@ -15,7 +15,7 @@ from typing import NamedTuple, Optional
 from tabulate import tabulate
 
 from splice import namer
-from splice.cpp_build import compile_cpp, compile_proc
+from splice.cpp_build import compile, compile_cpp
 from splice.pipeline import pipeline
 from tests.benchmarks.benchmarking import BenchmarkInfo, benchmarks
 
@@ -165,9 +165,12 @@ def translate_and_compile_benchmark(benchmark: BenchmarkInfo) -> str:
     if not raw_output:
         print(f"compiling {benchmark.name} {benchmark.module}...")
     cpp = translate_module_for_benchmarking(benchmark.module, benchmark.name)
-    exe = compile_proc(
+    cpp_path = get_translated_filepath(benchmark)
+    exe = compile(
         cpp,
-        get_translated_filepath(benchmark),
+        cpp_path,
+        cpp_path[: cpp_path.rfind(".")],
+        get_python_filepath(benchmark),
     )
     return exe
 

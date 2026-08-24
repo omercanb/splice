@@ -15,15 +15,15 @@ from splice.analysis.statement_effects import compute_function_effects
 from splice.ast_utils import TypeTable
 from splice.codegen.statement_codegen import StatementCodegen
 from splice.frontend.mypy_fixes import get_resolved_types
+from splice.frontend.static_checks.check_mutable_value_semantics import (
+    check_mutable_value_semantics,
+)
 from splice.frontend.static_checks.check_structural import (
     Diagnostic,
     Severity,
     UnsupportedProgram,
     check_structural,
     render,
-)
-from splice.frontend.static_checks.check_mutable_value_semantics import (
-    check_mutable_value_semantics,
 )
 from splice.transform.argument_transformer import ArgumentTransformer
 from splice.transform.comprehension_transformer import apply_comprehension_transforms
@@ -152,22 +152,36 @@ def _apply_transforms(tree: MypyFile, types: dict[Expression, Type]):
     ArgumentTransformer(types).visit(tree)
 
 
-def generate(result: AnalysisResult, extra_includes: list[str] | None = None) -> str:
+def generate(
+    result: AnalysisResult,
+    extra_includes: list[str] | None = None,
+    line_markers: bool = True,
+) -> str:
     """Translate the already-checked, already-transformed tree.
 
     extra_includes are headers with hand-written C++ for names the program
     imports but never defines itself (see StatementCodegen).
+
+    line_markers controls whether each emitted line is tagged with a
+    `// N` comment naming the Python source line it came from
     """
     return StatementCodegen(
-        result.tree, result.types, result.mutations, extra_includes=extra_includes
+        result.tree,
+        result.types,
+        result.mutations,
+        extra_includes=extra_includes,
+        line_markers=line_markers,
     ).generate()
 
 
 def pipeline(
-    path: str, source: str | None = None, extra_includes: list[str] | None = None
+    path: str,
+    source: str | None = None,
+    extra_includes: list[str] | None = None,
+    line_markers: bool = True,
 ) -> str:
     """The main function that compiled a program to C++. If source is provided, it will be used instead of reading from the file. The path is used only in errors otherwise."""
     if source is None:
         source = open(path).read()
     result = analyse(path, source)
-    return generate(result, extra_includes=extra_includes)
+    return generate(result, extra_includes=extra_includes, line_markers=line_markers)

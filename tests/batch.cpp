@@ -4,1016 +4,1016 @@ using namespace py;
 namespace prog_array {
 constexpr int64_t numInstruments = 3LL;
 
-int run();
+int run();    // 8
 
-int run() {
-    Array<uint32_t, 3> a;
-    Array<uint32_t, 4> b;
-    int64_t total;
-    uint32_t v;
-    a = Array<uint32_t, 3>();
-    a[1LL] = 5LL;
-    print(tuple(str("Test 1 - index/assign:"), a[0LL], a[1LL], a[2LL]), str(" "), str("\n"));
-    b = Array<uint32_t, 4>();
-    print(tuple(str("Test 2 - Literal size:"), b[0LL], b[3LL]), str(" "), str("\n"));
-    print(tuple(str("Test 3 - last element:"), a.back()), str(" "), str("\n"));
-    print(tuple(str("Test 4 - len:"), len(a), len(b)), str(" "), str("\n"));
-    b.fill(uint32_t(1LL));
-    print(tuple(str("Test 5 - fill:"), b[0LL], b[1LL], b[2LL], b[3LL]), str(" "), str("\n"));
-    total = 0LL;
-    auto && __range_0 = b;
-    for (auto &&__item_0 : __range_0) {
-        v = __item_0;
-        total = (total + v);
-    }
-    print(tuple(str("Test 6 - iteration sum:"), total), str(" "), str("\n"));
-    print(tuple(str("Test 7 - str:"), a), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 8
+    Array<uint32_t, 3> a;    // 10
+    Array<uint32_t, 4> b;    // 15
+    int64_t total;    // 29
+    uint32_t v;    // 30
+    a = Array<uint32_t, 3>();    // 10
+    a[1LL] = 5LL;    // 11
+    print(tuple(str("Test 1 - index/assign:"), a[0LL], a[1LL], a[2LL]), str(" "), str("\n"));    // 12
+    b = Array<uint32_t, 4>();    // 15
+    print(tuple(str("Test 2 - Literal size:"), b[0LL], b[3LL]), str(" "), str("\n"));    // 16
+    print(tuple(str("Test 3 - last element:"), a.back()), str(" "), str("\n"));    // 19
+    print(tuple(str("Test 4 - len:"), len(a), len(b)), str(" "), str("\n"));    // 22
+    b.fill(uint32_t(1LL));    // 25
+    print(tuple(str("Test 5 - fill:"), b[0LL], b[1LL], b[2LL], b[3LL]), str(" "), str("\n"));    // 26
+    total = 0LL;    // 29
+    auto && __range_0 = b;    // 30
+    for (auto &&__item_0 : __range_0) {    // 30
+        v = __item_0;    // 30
+        total = (total + v);    // 31
+    }    // 30
+    print(tuple(str("Test 6 - iteration sum:"), total), str(" "), str("\n"));    // 32
+    print(tuple(str("Test 7 - str:"), a), str(" "), str("\n"));    // 35
+    return 0LL;    // 37
+}    // 8
 }
 
 namespace prog_boolops {
 
-int64_t side(const int64_t &RESTRICT v);
-int run();
+int64_t side(const int64_t &RESTRICT v);    // 1
+int run();    // 6
 
-int64_t side(const int64_t &RESTRICT v) {
-    print(tuple(str("SIDE")), str(" "), str("\n"));
-    return v;
-}
+int64_t side(const int64_t &RESTRICT v) {    // 1
+    print(tuple(str("SIDE")), str(" "), str("\n"));    // 2
+    return v;    // 3
+}    // 1
 
-int run() {
-    int64_t a;
-    int64_t b;
-    int64_t zero;
-    str empty;
-    str text;
-    list<int64_t> no_items;
-    double f;
-    double g;
-    int64_t n;
-    a = 1LL;
-    b = 2LL;
-    zero = 0LL;
-    print(tuple(_and(a, b)), str(" "), str("\n"));
-    print(tuple(_or(a, b)), str(" "), str("\n"));
-    print(tuple(_and(zero, b)), str(" "), str("\n"));
-    print(tuple(_or(zero, b)), str(" "), str("\n"));
-    print(tuple(_and(zero, zero)), str(" "), str("\n"));
-    print(tuple(_or(zero, zero)), str(" "), str("\n"));
-    empty = str("");
-    text = str("hi");
-    print(tuple(_or(empty, text)), str(" "), str("\n"));
-    print(tuple(_and(text, empty)), str(" "), str("\n"));
-    print(tuple(_or(text, empty)), str(" "), str("\n"));
-    print(tuple(_and(empty, text)), str(" "), str("\n"));
-    no_items = list<int64_t>();
-    print(tuple(_or(no_items, list<int64_t>({1LL, 2LL}))), str(" "), str("\n"));
-    print(tuple(_and(list<int64_t>({3LL}), no_items)), str(" "), str("\n"));
-    print(tuple(_or(list<int64_t>({3LL}), list<int64_t>({4LL}))), str(" "), str("\n"));
-    print(tuple(_and(no_items, list<int64_t>({4LL}))), str(" "), str("\n"));
-    f = 0.0;
-    g = 2.5;
-    print(tuple(_or(f, g)), str(" "), str("\n"));
-    print(tuple(_and(g, f)), str(" "), str("\n"));
-    print(tuple(_and(zero, side(9LL))), str(" "), str("\n"));
-    print(tuple(_or(a, side(9LL))), str(" "), str("\n"));
-    print(tuple(_and(a, side(9LL))), str(" "), str("\n"));
-    print(tuple(_or(zero, side(9LL))), str(" "), str("\n"));
-    print(tuple(_and(a, _and(b, 3LL))), str(" "), str("\n"));
-    print(tuple(_or(zero, _or(zero, 3LL))), str(" "), str("\n"));
-    print(tuple(_or(_and(a, b), 3LL)), str(" "), str("\n"));
-    print(tuple(_or(zero, _and(b, 3LL))), str(" "), str("\n"));
-    print(tuple((_and(a, b) + 1LL)), str(" "), str("\n"));
-    if ((a && to_bool(text))) {
-        print(tuple(str("cond and")), str(" "), str("\n"));
-    }
-    if ((to_bool(empty) || a)) {
-        print(tuple(str("cond or")), str(" "), str("\n"));
-    }
-    if ((!(to_bool(empty) || zero))) {
-        print(tuple(str("cond not")), str(" "), str("\n"));
-    }
-    if ((a && (to_bool(text) && b))) {
-        print(tuple(str("cond chained")), str(" "), str("\n"));
-    }
-    if ((to_bool(no_items) || to_bool(text))) {
-        print(tuple(str("cond mixed")), str(" "), str("\n"));
-    }
-    if ((zero && side(9LL))) {
-        print(tuple(str("unreachable")), str(" "), str("\n"));
-    }
-    n = 0LL;
-    while ((((n < 2LL)) && to_bool(text))) {
-        n = (n + 1LL);
-    }
-    print(tuple(n), str(" "), str("\n"));
-    print(tuple((!to_bool(a))), str(" "), str("\n"));
-    print(tuple((!to_bool(zero))), str(" "), str("\n"));
-    print(tuple((!to_bool(empty))), str(" "), str("\n"));
-    print(tuple((!to_bool(_and(a, b)))), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 6
+    int64_t a;    // 7
+    int64_t b;    // 8
+    int64_t zero;    // 9
+    str empty;    // 19
+    str text;    // 20
+    list<int64_t> no_items;    // 26
+    double f;    // 32
+    double g;    // 33
+    int64_t n;    // 64
+    a = 1LL;    // 7
+    b = 2LL;    // 8
+    zero = 0LL;    // 9
+    print(tuple(_and(a, b)), str(" "), str("\n"));    // 12
+    print(tuple(_or(a, b)), str(" "), str("\n"));    // 13
+    print(tuple(_and(zero, b)), str(" "), str("\n"));    // 14
+    print(tuple(_or(zero, b)), str(" "), str("\n"));    // 15
+    print(tuple(_and(zero, zero)), str(" "), str("\n"));    // 16
+    print(tuple(_or(zero, zero)), str(" "), str("\n"));    // 17
+    empty = str("");    // 19
+    text = str("hi");    // 20
+    print(tuple(_or(empty, text)), str(" "), str("\n"));    // 21
+    print(tuple(_and(text, empty)), str(" "), str("\n"));    // 22
+    print(tuple(_or(text, empty)), str(" "), str("\n"));    // 23
+    print(tuple(_and(empty, text)), str(" "), str("\n"));    // 24
+    no_items = list<int64_t>();    // 26
+    print(tuple(_or(no_items, list<int64_t>({1LL, 2LL}))), str(" "), str("\n"));    // 27
+    print(tuple(_and(list<int64_t>({3LL}), no_items)), str(" "), str("\n"));    // 28
+    print(tuple(_or(list<int64_t>({3LL}), list<int64_t>({4LL}))), str(" "), str("\n"));    // 29
+    print(tuple(_and(no_items, list<int64_t>({4LL}))), str(" "), str("\n"));    // 30
+    f = 0.0;    // 32
+    g = 2.5;    // 33
+    print(tuple(_or(f, g)), str(" "), str("\n"));    // 34
+    print(tuple(_and(g, f)), str(" "), str("\n"));    // 35
+    print(tuple(_and(zero, side(9LL))), str(" "), str("\n"));    // 38
+    print(tuple(_or(a, side(9LL))), str(" "), str("\n"));    // 39
+    print(tuple(_and(a, side(9LL))), str(" "), str("\n"));    // 40
+    print(tuple(_or(zero, side(9LL))), str(" "), str("\n"));    // 41
+    print(tuple(_and(a, _and(b, 3LL))), str(" "), str("\n"));    // 44
+    print(tuple(_or(zero, _or(zero, 3LL))), str(" "), str("\n"));    // 45
+    print(tuple(_or(_and(a, b), 3LL)), str(" "), str("\n"));    // 46
+    print(tuple(_or(zero, _and(b, 3LL))), str(" "), str("\n"));    // 47
+    print(tuple((_and(a, b) + 1LL)), str(" "), str("\n"));    // 48
+    if ((a && to_bool(text))) {    // 51
+        print(tuple(str("cond and")), str(" "), str("\n"));    // 52
+    }    // 51
+    if ((to_bool(empty) || a)) {    // 53
+        print(tuple(str("cond or")), str(" "), str("\n"));    // 54
+    }    // 53
+    if ((!(to_bool(empty) || zero))) {    // 55
+        print(tuple(str("cond not")), str(" "), str("\n"));    // 56
+    }    // 55
+    if ((a && (to_bool(text) && b))) {    // 57
+        print(tuple(str("cond chained")), str(" "), str("\n"));    // 58
+    }    // 57
+    if ((to_bool(no_items) || to_bool(text))) {    // 59
+        print(tuple(str("cond mixed")), str(" "), str("\n"));    // 60
+    }    // 59
+    if ((zero && side(9LL))) {    // 61
+        print(tuple(str("unreachable")), str(" "), str("\n"));    // 62
+    }    // 61
+    n = 0LL;    // 64
+    while ((((n < 2LL)) && to_bool(text))) {    // 65
+        n = (n + 1LL);    // 66
+    }    // 65
+    print(tuple(n), str(" "), str("\n"));    // 67
+    print(tuple((!to_bool(a))), str(" "), str("\n"));    // 70
+    print(tuple((!to_bool(zero))), str(" "), str("\n"));    // 71
+    print(tuple((!to_bool(empty))), str(" "), str("\n"));    // 72
+    print(tuple((!to_bool(_and(a, b)))), str(" "), str("\n"));    // 73
+    return 0LL;    // 75
+}    // 6
 }
 
 namespace prog_builtin_functions {
 
-list<int64_t> __list_comprehension_0(const list<int64_t> &RESTRICT numbers);
-int run();
+list<int64_t> __list_comprehension_0(const list<int64_t> &RESTRICT numbers);    // 31
+int run();    // 1
 
-list<int64_t> __list_comprehension_0(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_0;
-    int64_t v;
-    __tmp_0 = list<int64_t>();
-    auto && __range_1 = numbers;
-    for (auto &&__item_1 : __range_1) {
-        v = __item_1;
-        __tmp_0.append((v * 2LL));
-    }
-    return __tmp_0;
-}
+list<int64_t> __list_comprehension_0(const list<int64_t> &RESTRICT numbers) {    // 31
+    list<int64_t> __tmp_0;    // 31
+    int64_t v;    // 31
+    __tmp_0 = list<int64_t>();    // 31
+    auto && __range_1 = numbers;    // 31
+    for (auto &&__item_1 : __range_1) {    // 31
+        v = __item_1;    // 31
+        __tmp_0.append((v * 2LL));    // 31
+    }    // 31
+    return __tmp_0;    // 31
+}    // 31
 
-int run() {
-    list<int64_t> numbers;
-    list<int64_t> empty;
-    list<int64_t> zeros;
-    list<int64_t> with_zero;
-    numbers = list<int64_t>({4LL, 1LL, 7LL, 3LL});
-    empty = list<int64_t>();
-    print(tuple(sum(numbers), sum(empty)), str(" "), str("\n"));
-    print(tuple(min(numbers), max(numbers)), str(" "), str("\n"));
-    print(tuple(min(3LL, 8LL), max(3LL, 8LL), min(2.5, 1.5)), str(" "), str("\n"));
-    zeros = list<int64_t>({0LL, 0LL});
-    with_zero = list<int64_t>({1LL, 0LL, 2LL});
-    print(tuple(any(numbers), any(zeros), any(empty)), str(" "), str("\n"));
-    print(tuple(all(numbers), all(with_zero), all(empty)), str(" "), str("\n"));
-    print(tuple(sum(range(5LL)), max(range(5LL))), str(" "), str("\n"));
-    print(tuple(sum(set<int64_t>({1LL, 2LL, 3LL}))), str(" "), str("\n"));
-    print(tuple(min(str("hello")), max(str("hello"))), str(" "), str("\n"));
-    print(tuple(divmod(7LL, 2LL), divmod((-7LL), 2LL)), str(" "), str("\n"));
-    print(tuple(py::round(2.5), py::round(3.5), py::round((-2.5))), str(" "), str("\n"));
-    print(tuple(py::round(2.567, 1LL), py::round(2.567, 2LL)), str(" "), str("\n"));
-    print(tuple(py::round(5LL)), str(" "), str("\n"));
-    print(tuple(chr(65LL), 65LL), str(" "), str("\n"));
-    print(tuple(chr((97LL + 1LL))), str(" "), str("\n"));
-    print(tuple(sum(__list_comprehension_0(numbers))), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    list<int64_t> numbers;    // 2
+    list<int64_t> empty;    // 3
+    list<int64_t> zeros;    // 10
+    list<int64_t> with_zero;    // 11
+    numbers = list<int64_t>({4LL, 1LL, 7LL, 3LL});    // 2
+    empty = list<int64_t>();    // 3
+    print(tuple(sum(numbers), sum(empty)), str(" "), str("\n"));    // 5
+    print(tuple(min(numbers), max(numbers)), str(" "), str("\n"));    // 6
+    print(tuple(min(3LL, 8LL), max(3LL, 8LL), min(2.5, 1.5)), str(" "), str("\n"));    // 7
+    zeros = list<int64_t>({0LL, 0LL});    // 10
+    with_zero = list<int64_t>({1LL, 0LL, 2LL});    // 11
+    print(tuple(any(numbers), any(zeros), any(empty)), str(" "), str("\n"));    // 12
+    print(tuple(all(numbers), all(with_zero), all(empty)), str(" "), str("\n"));    // 13
+    print(tuple(sum(range(5LL)), max(range(5LL))), str(" "), str("\n"));    // 16
+    print(tuple(sum(set<int64_t>({1LL, 2LL, 3LL}))), str(" "), str("\n"));    // 17
+    print(tuple(min(str("hello")), max(str("hello"))), str(" "), str("\n"));    // 18
+    print(tuple(divmod(7LL, 2LL), divmod((-7LL), 2LL)), str(" "), str("\n"));    // 20
+    print(tuple(py::round(2.5), py::round(3.5), py::round((-2.5))), str(" "), str("\n"));    // 23
+    print(tuple(py::round(2.567, 1LL), py::round(2.567, 2LL)), str(" "), str("\n"));    // 24
+    print(tuple(py::round(5LL)), str(" "), str("\n"));    // 25
+    print(tuple(chr(65LL), 65LL), str(" "), str("\n"));    // 27
+    print(tuple(chr((97LL + 1LL))), str(" "), str("\n"));    // 28
+    print(tuple(sum(__list_comprehension_0(numbers))), str(" "), str("\n"));    // 31
+    return 0LL;    // 33
+}    // 1
 }
 
 namespace prog_bytes {
 
-int run();
+int run();    // 1
 
-int run() {
-    bytes b;
-    bytes padded;
-    bytes a;
-    bytes c;
-    int64_t total;
-    int64_t byte;
-    bytes joined;
-    b = bytes(std::string("Hello World", 11));
-    print(tuple(b), str(" "), str("\n"));
-    print(tuple(len(b)), str(" "), str("\n"));
-    print(tuple(b[0LL], b.back()), str(" "), str("\n"));
-    print(tuple(b.upper()), str(" "), str("\n"));
-    print(tuple(b.lower()), str(" "), str("\n"));
-    print(tuple(b.swapcase()), str(" "), str("\n"));
-    print(tuple(b.capitalize()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("hello world", 11)).title()), str(" "), str("\n"));
-    print(tuple(b.find(bytes(std::string("o", 1)))), str(" "), str("\n"));
-    print(tuple(b.find(bytes(std::string("o", 1)), 5LL)), str(" "), str("\n"));
-    print(tuple(b.rfind(bytes(std::string("o", 1)))), str(" "), str("\n"));
-    print(tuple(b.find(bytes(std::string("zz", 2)))), str(" "), str("\n"));
-    print(tuple(b.index(bytes(std::string("World", 5)))), str(" "), str("\n"));
-    print(tuple(b.count(bytes(std::string("l", 1)))), str(" "), str("\n"));
-    print(tuple(b.count(bytes(std::string("zz", 2)))), str(" "), str("\n"));
-    print(tuple(b.startswith(bytes(std::string("Hello", 5)))), str(" "), str("\n"));
-    print(tuple(b.startswith(bytes(std::string("World", 5)))), str(" "), str("\n"));
-    print(tuple(b.endswith(bytes(std::string("World", 5)))), str(" "), str("\n"));
-    print(tuple(b.replace(bytes(std::string("l", 1)), bytes(std::string("L", 1)))), str(" "), str("\n"));
-    print(tuple(b.replace(bytes(std::string("l", 1)), bytes(std::string("L", 1)), 2LL)), str(" "), str("\n"));
-    print(tuple(b.removeprefix(bytes(std::string("Hello ", 6)))), str(" "), str("\n"));
-    print(tuple(b.removesuffix(bytes(std::string(" World", 6)))), str(" "), str("\n"));
-    padded = bytes(std::string("  spaced  ", 10));
-    print(tuple(padded.strip()), str(" "), str("\n"));
-    print(tuple(padded.lstrip()), str(" "), str("\n"));
-    print(tuple(padded.rstrip()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("xxhixx", 6)).strip(bytes(std::string("x", 1)))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("hi", 2)).ljust(5LL, bytes(std::string(".", 1)))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("hi", 2)).rjust(5LL, bytes(std::string(".", 1)))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("hi", 2)).center(6LL, bytes(std::string(".", 1)))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("42", 2)).zfill(5LL)), str(" "), str("\n"));
-    print(tuple(bytes(std::string("-42", 3)).zfill(5LL)), str(" "), str("\n"));
-    print(tuple(bytes(std::string("abc", 3)).isalpha(), bytes(std::string("a1", 2)).isalpha()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("123", 3)).isdigit(), bytes(std::string("12a", 3)).isdigit()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("a1", 2)).isalnum(), bytes(std::string("a-1", 3)).isalnum()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("  ", 2)).isspace(), bytes(std::string("a ", 2)).isspace()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("ABC", 3)).isupper(), bytes(std::string("Abc", 3)).isupper()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("abc", 3)).islower(), bytes(std::string("Abc", 3)).islower()), str(" "), str("\n"));
-    print(tuple(b.split()), str(" "), str("\n"));
-    print(tuple(bytes(std::string("a,b,c", 5)).split(bytes(std::string(",", 1)))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("a,,b", 4)).split(bytes(std::string(",", 1)))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("-", 1)).join(bytes(std::string("a,b,c", 5)).split(bytes(std::string(",", 1))))), str(" "), str("\n"));
-    print(tuple(bytes(std::string("one\ntwo", 7)).splitlines()), str(" "), str("\n"));
-    a = bytes(std::string("foo", 3));
-    c = bytes(std::string("bar", 3));
-    print(tuple((a + c)), str(" "), str("\n"));
-    print(tuple((a * 3LL)), str(" "), str("\n"));
-    print(tuple(((a == bytes(std::string("foo", 3)))), ((a == c))), str(" "), str("\n"));
-    print(tuple(((a < c)), ((a > c))), str(" "), str("\n"));
-    print(tuple((b.__contains__(bytes(std::string("World", 5))))), str(" "), str("\n"));
-    print(tuple((b.__contains__(87LL))), str(" "), str("\n"));
-    print(tuple((b.__contains__(90LL))), str(" "), str("\n"));
-    print(tuple(bytes(3LL)), str(" "), str("\n"));
-    print(tuple(bytes(list<int64_t>({65LL, 66LL, 67LL}))), str(" "), str("\n"));
-    total = 0LL;
-    auto && __range_2 = bytes(std::string("abc", 3));
-    for (auto &&__item_2 : __range_2) {
-        byte = __item_2;
-        total += byte;
-    }
-    print(tuple(total), str(" "), str("\n"));
-    joined = bytes(std::string("", 0));
-    auto && __range_3 = bytes(std::string("abc", 3));
-    for (auto &&__item_3 : __range_3) {
-        byte = __item_3;
-        joined = ((joined + bytes(list<int64_t>({byte}))) + bytes(std::string(".", 1)));
-    }
-    print(tuple(joined), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    bytes b;    // 2
+    bytes padded;    // 29
+    bytes a;    // 54
+    bytes c;    // 55
+    int64_t total;    // 68
+    int64_t byte;    // 69
+    bytes joined;    // 73
+    b = bytes(std::string("Hello World", 11));    // 2
+    print(tuple(b), str(" "), str("\n"));    // 3
+    print(tuple(len(b)), str(" "), str("\n"));    // 4
+    print(tuple(b[0LL], b.back()), str(" "), str("\n"));    // 5
+    print(tuple(b.upper()), str(" "), str("\n"));    // 7
+    print(tuple(b.lower()), str(" "), str("\n"));    // 8
+    print(tuple(b.swapcase()), str(" "), str("\n"));    // 9
+    print(tuple(b.capitalize()), str(" "), str("\n"));    // 10
+    print(tuple(bytes(std::string("hello world", 11)).title()), str(" "), str("\n"));    // 11
+    print(tuple(b.find(bytes(std::string("o", 1)))), str(" "), str("\n"));    // 13
+    print(tuple(b.find(bytes(std::string("o", 1)), 5LL)), str(" "), str("\n"));    // 14
+    print(tuple(b.rfind(bytes(std::string("o", 1)))), str(" "), str("\n"));    // 15
+    print(tuple(b.find(bytes(std::string("zz", 2)))), str(" "), str("\n"));    // 16
+    print(tuple(b.index(bytes(std::string("World", 5)))), str(" "), str("\n"));    // 17
+    print(tuple(b.count(bytes(std::string("l", 1)))), str(" "), str("\n"));    // 18
+    print(tuple(b.count(bytes(std::string("zz", 2)))), str(" "), str("\n"));    // 19
+    print(tuple(b.startswith(bytes(std::string("Hello", 5)))), str(" "), str("\n"));    // 20
+    print(tuple(b.startswith(bytes(std::string("World", 5)))), str(" "), str("\n"));    // 21
+    print(tuple(b.endswith(bytes(std::string("World", 5)))), str(" "), str("\n"));    // 22
+    print(tuple(b.replace(bytes(std::string("l", 1)), bytes(std::string("L", 1)))), str(" "), str("\n"));    // 24
+    print(tuple(b.replace(bytes(std::string("l", 1)), bytes(std::string("L", 1)), 2LL)), str(" "), str("\n"));    // 25
+    print(tuple(b.removeprefix(bytes(std::string("Hello ", 6)))), str(" "), str("\n"));    // 26
+    print(tuple(b.removesuffix(bytes(std::string(" World", 6)))), str(" "), str("\n"));    // 27
+    padded = bytes(std::string("  spaced  ", 10));    // 29
+    print(tuple(padded.strip()), str(" "), str("\n"));    // 30
+    print(tuple(padded.lstrip()), str(" "), str("\n"));    // 31
+    print(tuple(padded.rstrip()), str(" "), str("\n"));    // 32
+    print(tuple(bytes(std::string("xxhixx", 6)).strip(bytes(std::string("x", 1)))), str(" "), str("\n"));    // 33
+    print(tuple(bytes(std::string("hi", 2)).ljust(5LL, bytes(std::string(".", 1)))), str(" "), str("\n"));    // 35
+    print(tuple(bytes(std::string("hi", 2)).rjust(5LL, bytes(std::string(".", 1)))), str(" "), str("\n"));    // 36
+    print(tuple(bytes(std::string("hi", 2)).center(6LL, bytes(std::string(".", 1)))), str(" "), str("\n"));    // 37
+    print(tuple(bytes(std::string("42", 2)).zfill(5LL)), str(" "), str("\n"));    // 38
+    print(tuple(bytes(std::string("-42", 3)).zfill(5LL)), str(" "), str("\n"));    // 39
+    print(tuple(bytes(std::string("abc", 3)).isalpha(), bytes(std::string("a1", 2)).isalpha()), str(" "), str("\n"));    // 41
+    print(tuple(bytes(std::string("123", 3)).isdigit(), bytes(std::string("12a", 3)).isdigit()), str(" "), str("\n"));    // 42
+    print(tuple(bytes(std::string("a1", 2)).isalnum(), bytes(std::string("a-1", 3)).isalnum()), str(" "), str("\n"));    // 43
+    print(tuple(bytes(std::string("  ", 2)).isspace(), bytes(std::string("a ", 2)).isspace()), str(" "), str("\n"));    // 44
+    print(tuple(bytes(std::string("ABC", 3)).isupper(), bytes(std::string("Abc", 3)).isupper()), str(" "), str("\n"));    // 45
+    print(tuple(bytes(std::string("abc", 3)).islower(), bytes(std::string("Abc", 3)).islower()), str(" "), str("\n"));    // 46
+    print(tuple(b.split()), str(" "), str("\n"));    // 48
+    print(tuple(bytes(std::string("a,b,c", 5)).split(bytes(std::string(",", 1)))), str(" "), str("\n"));    // 49
+    print(tuple(bytes(std::string("a,,b", 4)).split(bytes(std::string(",", 1)))), str(" "), str("\n"));    // 50
+    print(tuple(bytes(std::string("-", 1)).join(bytes(std::string("a,b,c", 5)).split(bytes(std::string(",", 1))))), str(" "), str("\n"));    // 51
+    print(tuple(bytes(std::string("one\ntwo", 7)).splitlines()), str(" "), str("\n"));    // 52
+    a = bytes(std::string("foo", 3));    // 54
+    c = bytes(std::string("bar", 3));    // 55
+    print(tuple((a + c)), str(" "), str("\n"));    // 56
+    print(tuple((a * 3LL)), str(" "), str("\n"));    // 57
+    print(tuple(((a == bytes(std::string("foo", 3)))), ((a == c))), str(" "), str("\n"));    // 58
+    print(tuple(((a < c)), ((a > c))), str(" "), str("\n"));    // 59
+    print(tuple((b.__contains__(bytes(std::string("World", 5))))), str(" "), str("\n"));    // 61
+    print(tuple((b.__contains__(87LL))), str(" "), str("\n"));    // 62
+    print(tuple((b.__contains__(90LL))), str(" "), str("\n"));    // 63
+    print(tuple(bytes(3LL)), str(" "), str("\n"));    // 65
+    print(tuple(bytes(list<int64_t>({65LL, 66LL, 67LL}))), str(" "), str("\n"));    // 66
+    total = 0LL;    // 68
+    auto && __range_2 = bytes(std::string("abc", 3));    // 69
+    for (auto &&__item_2 : __range_2) {    // 69
+        byte = __item_2;    // 69
+        total += byte;    // 70
+    }    // 69
+    print(tuple(total), str(" "), str("\n"));    // 71
+    joined = bytes(std::string("", 0));    // 73
+    auto && __range_3 = bytes(std::string("abc", 3));    // 74
+    for (auto &&__item_3 : __range_3) {    // 74
+        byte = __item_3;    // 74
+        joined = ((joined + bytes(list<int64_t>({byte}))) + bytes(std::string(".", 1)));    // 75
+    }    // 74
+    print(tuple(joined), str(" "), str("\n"));    // 76
+    return 0LL;    // 78
+}    // 1
 }
 
 namespace prog_casts {
 
-int run();
+int run();    // 1
 
-int run() {
-    double a;
-    int64_t b;
-    double c;
-    str float_str;
-    double f1;
-    str int_str;
-    int64_t i1;
-    int64_t i2;
-    a = 2.0;
-    b = to_int(a);
-    c = to_float(b);
-    float_str = str("  0.10 ");
-    f1 = to_float(float_str);
-    int_str = str("100");
-    i1 = to_int(int_str);
-    i2 = to_int(int_str, 2LL);
-    print(tuple(a, b, c, f1, i1, i2), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    double a;    // 2
+    int64_t b;    // 3
+    double c;    // 4
+    str float_str;    // 5
+    double f1;    // 6
+    str int_str;    // 7
+    int64_t i1;    // 8
+    int64_t i2;    // 9
+    a = 2.0;    // 2
+    b = to_int(a);    // 3
+    c = to_float(b);    // 4
+    float_str = str("  0.10 ");    // 5
+    f1 = to_float(float_str);    // 6
+    int_str = str("100");    // 7
+    i1 = to_int(int_str);    // 8
+    i2 = to_int(int_str, 2LL);    // 9
+    print(tuple(a, b, c, f1, i1, i2), str(" "), str("\n"));    // 10
+    return 0LL;    // 11
+}    // 1
 }
 
 namespace prog_classes {
 
-class Counter;
-class Point;
-class Empty;
+class Counter;    // 1
+class Point;    // 14
+class Empty;    // 39
 
-int run();
+int run();    // 43
 
-class Counter {
-  public:
-    int64_t count;
+class Counter {    // 1
+  public:    // 1
+    int64_t count;    // 1
 
-    Counter(const int64_t &RESTRICT start) { __init__(start); }
+    Counter(const int64_t &RESTRICT start) { __init__(start); }    // 1
 
-    Counter() = default;
+    Counter() = default;    // 1
 
-    void __init__(const int64_t &RESTRICT start);
-    void bump(const int64_t &RESTRICT by);
-    int64_t doubled();
-};
+    void __init__(const int64_t &RESTRICT start);    // 4
+    void bump(const int64_t &RESTRICT by);    // 7
+    int64_t doubled();    // 10
+};    // 10
 
-class Point {
-  public:
-    int64_t x;
-    int64_t y;
+class Point {    // 14
+  public:    // 14
+    int64_t x;    // 14
+    int64_t y;    // 14
 
-    Point(const int64_t &RESTRICT x, const int64_t &RESTRICT y) { __init__(x, y); }
+    Point(const int64_t &RESTRICT x, const int64_t &RESTRICT y) { __init__(x, y); }    // 14
 
-    Point() = default;
+    Point() = default;    // 14
 
-    void __init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y);
-    int64_t norm();
-    Point moved(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy);
-    str __str__();
-    int64_t __len__();
-    bool __bool__();
-};
+    void __init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y);    // 18
+    int64_t norm();    // 22
+    Point moved(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy);    // 25
+    str __str__();    // 29
+    int64_t __len__();    // 32
+    bool __bool__();    // 35
+};    // 35
 
-class Empty {
-  public:
-};
+class Empty {    // 39
+  public:    // 39
+};    // 39
 
-void Counter::__init__(const int64_t &RESTRICT start) {
-    this->count = start;
-}
+void Counter::__init__(const int64_t &RESTRICT start) {    // 4
+    this->count = start;    // 5
+}    // 4
 
-void Counter::bump(const int64_t &RESTRICT by) {
-    this->count = (this->count + by);
-}
+void Counter::bump(const int64_t &RESTRICT by) {    // 7
+    this->count = (this->count + by);    // 8
+}    // 7
 
-int64_t Counter::doubled() {
-    return (this->count * 2LL);
-}
+int64_t Counter::doubled() {    // 10
+    return (this->count * 2LL);    // 11
+}    // 10
 
-void Point::__init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y) {
-    this->x = x;
-    this->y = y;
-}
+void Point::__init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y) {    // 18
+    this->x = x;    // 19
+    this->y = y;    // 20
+}    // 18
 
-int64_t Point::norm() {
-    return ((this->x * this->x) + (this->y * this->y));
-}
+int64_t Point::norm() {    // 22
+    return ((this->x * this->x) + (this->y * this->y));    // 23
+}    // 22
 
-Point Point::moved(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy) {
-    return Point((this->x + dx), (this->y + dy));
-}
+Point Point::moved(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy) {    // 25
+    return Point((this->x + dx), (this->y + dy));    // 26
+}    // 25
 
-str Point::__str__() {
-    return ((((str("Point(") + to_str(this->x)) + str(", ")) + to_str(this->y)) + str(")"));
-}
+str Point::__str__() {    // 29
+    return ((((str("Point(") + to_str(this->x)) + str(", ")) + to_str(this->y)) + str(")"));    // 30
+}    // 29
 
-int64_t Point::__len__() {
-    return 2LL;
-}
+int64_t Point::__len__() {    // 32
+    return 2LL;    // 33
+}    // 32
 
-bool Point::__bool__() {
-    return _or(((this->x != 0LL)), ((this->y != 0LL)));
-}
+bool Point::__bool__() {    // 35
+    return _or(((this->x != 0LL)), ((this->y != 0LL)));    // 36
+}    // 35
 
-int run() {
-    Counter counter;
-    Point p;
-    Point q;
-    list<Point> points;
-    Point point;
-    Empty e;
-    counter = Counter(5LL);
-    counter.bump(3LL);
-    print(tuple(counter.count, counter.doubled()), str(" "), str("\n"));
-    p = Point(3LL, 4LL);
-    print(tuple(p.x, p.y, p.norm()), str(" "), str("\n"));
-    print(tuple(p), str(" "), str("\n"));
-    print(tuple(len(p)), str(" "), str("\n"));
-    print(tuple(to_bool(p), to_bool(Point(0LL, 0LL))), str(" "), str("\n"));
-    q = p.moved(1LL, 1LL);
-    print(tuple(q, q.norm()), str(" "), str("\n"));
-    p.x = 10LL;
-    print(tuple(p.x, p.norm()), str(" "), str("\n"));
-    points = list<Point>({Point(1LL, 1LL), Point(2LL, 2LL)});
-    auto && __range_4 = points;
-    for (auto &&__item_4 : __range_4) {
-        point = __item_4;
-        print(tuple(point, point.norm()), str(" "), str("\n"));
-    }
-    print(tuple(len(points)), str(" "), str("\n"));
-    e = Empty();
-    return 0LL;
-}
+int run() {    // 43
+    Counter counter;    // 44
+    Point p;    // 48
+    Point q;    // 57
+    list<Point> points;    // 65
+    Point point;    // 66
+    Empty e;    // 70
+    counter = Counter(5LL);    // 44
+    counter.bump(3LL);    // 45
+    print(tuple(counter.count, counter.doubled()), str(" "), str("\n"));    // 46
+    p = Point(3LL, 4LL);    // 48
+    print(tuple(p.x, p.y, p.norm()), str(" "), str("\n"));    // 49
+    print(tuple(p), str(" "), str("\n"));    // 52
+    print(tuple(len(p)), str(" "), str("\n"));    // 53
+    print(tuple(to_bool(p), to_bool(Point(0LL, 0LL))), str(" "), str("\n"));    // 54
+    q = p.moved(1LL, 1LL);    // 57
+    print(tuple(q, q.norm()), str(" "), str("\n"));    // 58
+    p.x = 10LL;    // 61
+    print(tuple(p.x, p.norm()), str(" "), str("\n"));    // 62
+    points = list<Point>({Point(1LL, 1LL), Point(2LL, 2LL)});    // 65
+    auto && __range_4 = points;    // 66
+    for (auto &&__item_4 : __range_4) {    // 66
+        point = __item_4;    // 66
+        print(tuple(point, point.norm()), str(" "), str("\n"));    // 67
+    }    // 66
+    print(tuple(len(points)), str(" "), str("\n"));    // 68
+    e = Empty();    // 70
+    return 0LL;    // 72
+}    // 43
 }
 
 namespace prog_comparison {
 
-int run();
+int run();    // 1
 
-int run() {
-    int64_t a;
-    int64_t b;
-    int64_t c;
-    int64_t d;
-    a = 1LL;
-    b = 2LL;
-    c = 3LL;
-    print(tuple(((a < b) && (b < c))), str(" "), str("\n"));
-    print(tuple(((a > b))), str(" "), str("\n"));
-    print(tuple(((a > b) && (b > c))), str(" "), str("\n"));
-    d = 3LL;
-    print(tuple(((c <= d))), str(" "), str("\n"));
-    print(tuple(((a == d))), str(" "), str("\n"));
-    print(tuple(((c == d))), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    int64_t a;    // 2
+    int64_t b;    // 3
+    int64_t c;    // 4
+    int64_t d;    // 8
+    a = 1LL;    // 2
+    b = 2LL;    // 3
+    c = 3LL;    // 4
+    print(tuple(((a < b) && (b < c))), str(" "), str("\n"));    // 5
+    print(tuple(((a > b))), str(" "), str("\n"));    // 6
+    print(tuple(((a > b) && (b > c))), str(" "), str("\n"));    // 7
+    d = 3LL;    // 8
+    print(tuple(((c <= d))), str(" "), str("\n"));    // 9
+    print(tuple(((a == d))), str(" "), str("\n"));    // 10
+    print(tuple(((c == d))), str(" "), str("\n"));    // 11
+    return 0LL;    // 12
+}    // 1
 }
 
 namespace prog_comprehensions {
 
-list<int64_t> __list_comprehension_1(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor, const int64_t &RESTRICT offset);
-list<int64_t> scaled(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor);
-list<int64_t> __list_comprehension_2(const list<int64_t> &RESTRICT numbers);
-list<int64_t> __list_comprehension_3(const list<int64_t> &RESTRICT numbers);
-list<int64_t> __list_comprehension_4();
-list<int64_t> __list_comprehension_5();
-list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers);
-set<int64_t> __set_comprehension_0(const list<int64_t> &RESTRICT numbers);
-dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numbers);
-list<int64_t> __list_comprehension_7(const list<int64_t> &RESTRICT numbers);
-list<int64_t> __list_comprehension_11(const int64_t &RESTRICT v);
-list<int64_t> __list_comprehension_8(const list<int64_t> &RESTRICT numbers);
-list<int64_t> __list_comprehension_9(const list<int64_t> &RESTRICT numbers);
-list<int64_t> __list_comprehension_10(const list<int64_t> &RESTRICT doubled);
-int run();
+list<int64_t> __list_comprehension_1(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor, const int64_t &RESTRICT offset);    // 4
+list<int64_t> scaled(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor);    // 1
+list<int64_t> __list_comprehension_2(const list<int64_t> &RESTRICT numbers);    // 11
+list<int64_t> __list_comprehension_3(const list<int64_t> &RESTRICT numbers);    // 12
+list<int64_t> __list_comprehension_4();    // 15
+list<int64_t> __list_comprehension_5();    // 16
+list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers);    // 17
+set<int64_t> __set_comprehension_0(const list<int64_t> &RESTRICT numbers);    // 23
+dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numbers);    // 25
+list<int64_t> __list_comprehension_7(const list<int64_t> &RESTRICT numbers);    // 30
+list<int64_t> __list_comprehension_11(const int64_t &RESTRICT v);    // 33
+list<int64_t> __list_comprehension_8(const list<int64_t> &RESTRICT numbers);    // 33
+list<int64_t> __list_comprehension_9(const list<int64_t> &RESTRICT numbers);    // 36
+list<int64_t> __list_comprehension_10(const list<int64_t> &RESTRICT doubled);    // 37
+int run();    // 7
 
-list<int64_t> __list_comprehension_1(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor, const int64_t &RESTRICT offset) {
-    list<int64_t> __tmp_1;
-    int64_t v;
-    __tmp_1 = list<int64_t>();
-    auto && __range_5 = values;
-    for (auto &&__item_5 : __range_5) {
-        v = __item_5;
-        __tmp_1.append(((v * factor) + offset));
-    }
-    return __tmp_1;
-}
+list<int64_t> __list_comprehension_1(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor, const int64_t &RESTRICT offset) {    // 4
+    list<int64_t> __tmp_1;    // 4
+    int64_t v;    // 4
+    __tmp_1 = list<int64_t>();    // 4
+    auto && __range_5 = values;    // 4
+    for (auto &&__item_5 : __range_5) {    // 4
+        v = __item_5;    // 4
+        __tmp_1.append(((v * factor) + offset));    // 4
+    }    // 4
+    return __tmp_1;    // 4
+}    // 4
 
-list<int64_t> scaled(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor) {
-    int64_t offset;
-    offset = 1LL;
-    return __list_comprehension_1(values, factor, offset);
-}
+list<int64_t> scaled(const list<int64_t> &RESTRICT values, const int64_t &RESTRICT factor) {    // 1
+    int64_t offset;    // 3
+    offset = 1LL;    // 3
+    return __list_comprehension_1(values, factor, offset);    // 4
+}    // 1
 
-list<int64_t> __list_comprehension_2(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_2;
-    int64_t v;
-    __tmp_2 = list<int64_t>();
-    auto && __range_6 = numbers;
-    for (auto &&__item_6 : __range_6) {
-        v = __item_6;
-        __tmp_2.append(v);
-    }
-    return __tmp_2;
-}
+list<int64_t> __list_comprehension_2(const list<int64_t> &RESTRICT numbers) {    // 11
+    list<int64_t> __tmp_2;    // 11
+    int64_t v;    // 11
+    __tmp_2 = list<int64_t>();    // 11
+    auto && __range_6 = numbers;    // 11
+    for (auto &&__item_6 : __range_6) {    // 11
+        v = __item_6;    // 11
+        __tmp_2.append(v);    // 11
+    }    // 11
+    return __tmp_2;    // 11
+}    // 11
 
-list<int64_t> __list_comprehension_3(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_3;
-    int64_t v;
-    __tmp_3 = list<int64_t>();
-    auto && __range_7 = numbers;
-    for (auto &&__item_7 : __range_7) {
-        v = __item_7;
-        if (((v > 2LL))) {
-            __tmp_3.append(v);
-        }
-    }
-    return __tmp_3;
-}
+list<int64_t> __list_comprehension_3(const list<int64_t> &RESTRICT numbers) {    // 12
+    list<int64_t> __tmp_3;    // 12
+    int64_t v;    // 12
+    __tmp_3 = list<int64_t>();    // 12
+    auto && __range_7 = numbers;    // 12
+    for (auto &&__item_7 : __range_7) {    // 12
+        v = __item_7;    // 12
+        if (((v > 2LL))) {    // 12
+            __tmp_3.append(v);    // 12
+        }    // 12
+    }    // 12
+    return __tmp_3;    // 12
+}    // 12
 
-list<int64_t> __list_comprehension_4() {
-    list<int64_t> __tmp_4;
-    int64_t i;
-    __tmp_4 = list<int64_t>();
-    int64_t __stop_0 = 4LL;
-    for (i = 0; i < __stop_0; ++i) {
-        __tmp_4.append(i);
-    }
-    return __tmp_4;
-}
+list<int64_t> __list_comprehension_4() {    // 15
+    list<int64_t> __tmp_4;    // 15
+    int64_t i;    // 15
+    __tmp_4 = list<int64_t>();    // 15
+    int64_t __stop_0 = 4LL;    // 15
+    for (i = 0; i < __stop_0; ++i) {    // 15
+        __tmp_4.append(i);    // 15
+    }    // 15
+    return __tmp_4;    // 15
+}    // 15
 
-list<int64_t> __list_comprehension_5() {
-    list<int64_t> __tmp_5;
-    int64_t i;
-    __tmp_5 = list<int64_t>();
-    int64_t __stop_1 = 8LL;
-    for (i = 1LL; i < __stop_1; i += 2) {
-        __tmp_5.append(i);
-    }
-    return __tmp_5;
-}
+list<int64_t> __list_comprehension_5() {    // 16
+    list<int64_t> __tmp_5;    // 16
+    int64_t i;    // 16
+    __tmp_5 = list<int64_t>();    // 16
+    int64_t __stop_1 = 8LL;    // 16
+    for (i = 1LL; i < __stop_1; i += 2) {    // 16
+        __tmp_5.append(i);    // 16
+    }    // 16
+    return __tmp_5;    // 16
+}    // 16
 
-list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_6;
-    int64_t i;
-    __tmp_6 = list<int64_t>();
-    int64_t __len_0 = len(numbers);
-    for (i = 0; i < __len_0; ++i) {
-        __tmp_6.append(numbers[i]);
-    }
-    return __tmp_6;
-}
+list<int64_t> __list_comprehension_6(const list<int64_t> &RESTRICT numbers) {    // 17
+    list<int64_t> __tmp_6;    // 17
+    int64_t i;    // 17
+    __tmp_6 = list<int64_t>();    // 17
+    int64_t __len_0 = len(numbers);    // 17
+    for (i = 0; i < __len_0; ++i) {    // 17
+        __tmp_6.append(numbers[i]);    // 17
+    }    // 17
+    return __tmp_6;    // 17
+}    // 17
 
-set<int64_t> __set_comprehension_0(const list<int64_t> &RESTRICT numbers) {
-    set<int64_t> __tmp_7;
-    int64_t v;
-    __tmp_7 = set<int64_t>();
-    auto && __range_8 = numbers;
-    for (auto &&__item_8 : __range_8) {
-        v = __item_8;
-        __tmp_7.add((v * v));
-    }
-    return __tmp_7;
-}
+set<int64_t> __set_comprehension_0(const list<int64_t> &RESTRICT numbers) {    // 23
+    set<int64_t> __tmp_7;    // 23
+    int64_t v;    // 23
+    __tmp_7 = set<int64_t>();    // 23
+    auto && __range_8 = numbers;    // 23
+    for (auto &&__item_8 : __range_8) {    // 23
+        v = __item_8;    // 23
+        __tmp_7.add((v * v));    // 23
+    }    // 23
+    return __tmp_7;    // 23
+}    // 23
 
-dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numbers) {
-    dict<int64_t, int64_t> __tmp_8;
-    int64_t v;
-    __tmp_8 = dict<int64_t, int64_t>();
-    auto && __range_9 = numbers;
-    for (auto &&__item_9 : __range_9) {
-        v = __item_9;
-        if (((v > 1LL))) {
-            __tmp_8[v] = (v * v);
-        }
-    }
-    return __tmp_8;
-}
+dict<int64_t, int64_t> __dict_comprehension_0(const list<int64_t> &RESTRICT numbers) {    // 25
+    dict<int64_t, int64_t> __tmp_8;    // 25
+    int64_t v;    // 25
+    __tmp_8 = dict<int64_t, int64_t>();    // 25
+    auto && __range_9 = numbers;    // 25
+    for (auto &&__item_9 : __range_9) {    // 25
+        v = __item_9;    // 25
+        if (((v > 1LL))) {    // 25
+            __tmp_8[v] = (v * v);    // 25
+        }    // 25
+    }    // 25
+    return __tmp_8;    // 25
+}    // 25
 
-list<int64_t> __list_comprehension_7(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_9;
-    int64_t x;
-    int64_t y;
-    __tmp_9 = list<int64_t>();
-    auto && __range_10 = numbers;
-    for (auto &&__item_10 : __range_10) {
-        x = __item_10;
-        auto && __range_11 = numbers;
-        for (auto &&__item_11 : __range_11) {
-            y = __item_11;
-            if (((x < y))) {
-                __tmp_9.append((x * y));
-            }
-        }
-    }
-    return __tmp_9;
-}
+list<int64_t> __list_comprehension_7(const list<int64_t> &RESTRICT numbers) {    // 30
+    list<int64_t> __tmp_9;    // 30
+    int64_t x;    // 30
+    int64_t y;    // 30
+    __tmp_9 = list<int64_t>();    // 30
+    auto && __range_10 = numbers;    // 30
+    for (auto &&__item_10 : __range_10) {    // 30
+        x = __item_10;    // 30
+        auto && __range_11 = numbers;    // 30
+        for (auto &&__item_11 : __range_11) {    // 30
+            y = __item_11;    // 30
+            if (((x < y))) {    // 30
+                __tmp_9.append((x * y));    // 30
+            }    // 30
+        }    // 30
+    }    // 30
+    return __tmp_9;    // 30
+}    // 30
 
-list<int64_t> __list_comprehension_11(const int64_t &RESTRICT v) {
-    list<int64_t> __tmp_13;
-    int64_t w;
-    __tmp_13 = list<int64_t>();
-    int64_t __stop_2 = v;
-    for (w = 0; w < __stop_2; ++w) {
-        __tmp_13.append(w);
-    }
-    return __tmp_13;
-}
+list<int64_t> __list_comprehension_11(const int64_t &RESTRICT v) {    // 33
+    list<int64_t> __tmp_13;    // 33
+    int64_t w;    // 33
+    __tmp_13 = list<int64_t>();    // 33
+    int64_t __stop_2 = v;    // 33
+    for (w = 0; w < __stop_2; ++w) {    // 33
+        __tmp_13.append(w);    // 33
+    }    // 33
+    return __tmp_13;    // 33
+}    // 33
 
-list<int64_t> __list_comprehension_8(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_10;
-    int64_t v;
-    __tmp_10 = list<int64_t>();
-    auto && __range_12 = numbers;
-    for (auto &&__item_12 : __range_12) {
-        v = __item_12;
-        __tmp_10.append(len(__list_comprehension_11(v)));
-    }
-    return __tmp_10;
-}
+list<int64_t> __list_comprehension_8(const list<int64_t> &RESTRICT numbers) {    // 33
+    list<int64_t> __tmp_10;    // 33
+    int64_t v;    // 33
+    __tmp_10 = list<int64_t>();    // 33
+    auto && __range_12 = numbers;    // 33
+    for (auto &&__item_12 : __range_12) {    // 33
+        v = __item_12;    // 33
+        __tmp_10.append(len(__list_comprehension_11(v)));    // 33
+    }    // 33
+    return __tmp_10;    // 33
+}    // 33
 
-list<int64_t> __list_comprehension_9(const list<int64_t> &RESTRICT numbers) {
-    list<int64_t> __tmp_11;
-    int64_t v;
-    __tmp_11 = list<int64_t>();
-    auto && __range_13 = numbers;
-    for (auto &&__item_13 : __range_13) {
-        v = __item_13;
-        __tmp_11.append((v * 2LL));
-    }
-    return __tmp_11;
-}
+list<int64_t> __list_comprehension_9(const list<int64_t> &RESTRICT numbers) {    // 36
+    list<int64_t> __tmp_11;    // 36
+    int64_t v;    // 36
+    __tmp_11 = list<int64_t>();    // 36
+    auto && __range_13 = numbers;    // 36
+    for (auto &&__item_13 : __range_13) {    // 36
+        v = __item_13;    // 36
+        __tmp_11.append((v * 2LL));    // 36
+    }    // 36
+    return __tmp_11;    // 36
+}    // 36
 
-list<int64_t> __list_comprehension_10(const list<int64_t> &RESTRICT doubled) {
-    list<int64_t> __tmp_12;
-    int64_t v;
-    __tmp_12 = list<int64_t>();
-    auto && __range_14 = doubled;
-    for (auto &&__item_14 : __range_14) {
-        v = __item_14;
-        __tmp_12.append((v + 1LL));
-    }
-    return __tmp_12;
-}
+list<int64_t> __list_comprehension_10(const list<int64_t> &RESTRICT doubled) {    // 37
+    list<int64_t> __tmp_12;    // 37
+    int64_t v;    // 37
+    __tmp_12 = list<int64_t>();    // 37
+    auto && __range_14 = doubled;    // 37
+    for (auto &&__item_14 : __range_14) {    // 37
+        v = __item_14;    // 37
+        __tmp_12.append((v + 1LL));    // 37
+    }    // 37
+    return __tmp_12;    // 37
+}    // 37
 
-int run() {
-    list<int64_t> numbers;
-    set<int64_t> squares;
-    dict<int64_t, int64_t> lookup;
-    list<int64_t> doubled;
-    numbers = list<int64_t>({1LL, 2LL, 3LL, 4LL});
-    print(tuple(__list_comprehension_2(numbers)), str(" "), str("\n"));
-    print(tuple(__list_comprehension_3(numbers)), str(" "), str("\n"));
-    print(tuple(__list_comprehension_4()), str(" "), str("\n"));
-    print(tuple(__list_comprehension_5()), str(" "), str("\n"));
-    print(tuple(__list_comprehension_6(numbers)), str(" "), str("\n"));
-    print(tuple(scaled(numbers, 10LL)), str(" "), str("\n"));
-    squares = __set_comprehension_0(numbers);
-    print(tuple(sorted(squares, false)), str(" "), str("\n"));
-    lookup = __dict_comprehension_0(numbers);
-    print(tuple(len(lookup), lookup[2LL], lookup[4LL]), str(" "), str("\n"));
-    print(tuple(sorted(lookup, false)), str(" "), str("\n"));
-    print(tuple(__list_comprehension_7(numbers)), str(" "), str("\n"));
-    print(tuple(__list_comprehension_8(numbers)), str(" "), str("\n"));
-    doubled = __list_comprehension_9(numbers);
-    print(tuple(__list_comprehension_10(doubled)), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 7
+    list<int64_t> numbers;    // 8
+    set<int64_t> squares;    // 23
+    dict<int64_t, int64_t> lookup;    // 25
+    list<int64_t> doubled;    // 36
+    numbers = list<int64_t>({1LL, 2LL, 3LL, 4LL});    // 8
+    print(tuple(__list_comprehension_2(numbers)), str(" "), str("\n"));    // 11
+    print(tuple(__list_comprehension_3(numbers)), str(" "), str("\n"));    // 12
+    print(tuple(__list_comprehension_4()), str(" "), str("\n"));    // 15
+    print(tuple(__list_comprehension_5()), str(" "), str("\n"));    // 16
+    print(tuple(__list_comprehension_6(numbers)), str(" "), str("\n"));    // 17
+    print(tuple(scaled(numbers, 10LL)), str(" "), str("\n"));    // 20
+    squares = __set_comprehension_0(numbers);    // 23
+    print(tuple(sorted(squares, false)), str(" "), str("\n"));    // 24
+    lookup = __dict_comprehension_0(numbers);    // 25
+    print(tuple(len(lookup), lookup[2LL], lookup[4LL]), str(" "), str("\n"));    // 26
+    print(tuple(sorted(lookup, false)), str(" "), str("\n"));    // 27
+    print(tuple(__list_comprehension_7(numbers)), str(" "), str("\n"));    // 30
+    print(tuple(__list_comprehension_8(numbers)), str(" "), str("\n"));    // 33
+    doubled = __list_comprehension_9(numbers);    // 36
+    print(tuple(__list_comprehension_10(doubled)), str(" "), str("\n"));    // 37
+    return 0LL;    // 39
+}    // 7
 }
 
 namespace prog_dict {
 
-int run();
+int run();    // 1
 
-int run() {
-    dict<int64_t, int64_t> d;
-    dict<int64_t, int64_t> e;
-    dict<int64_t, int64_t> c;
-    dict<str, int64_t> s;
-    d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});
-    print(tuple(len(d)), str(" "), str("\n"));
-    print(tuple(d[1LL], d[2LL], d[3LL]), str(" "), str("\n"));
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    print(tuple(sorted(d, true)), str(" "), str("\n"));
-    print(tuple(sorted(d, [](auto k) { return (-k); }, false)), str(" "), str("\n"));
-    print(tuple(sorted(d, [](auto k) { return (-k); }, true)), str(" "), str("\n"));
-    d[4LL] = 40LL;
-    print(tuple(len(d), d[4LL]), str(" "), str("\n"));
-    d[1LL] = 11LL;
-    print(tuple(len(d), d[1LL]), str(" "), str("\n"));
-    print(tuple(d.get(1LL)), str(" "), str("\n"));
-    print(tuple(d.get(99LL, (-1LL))), str(" "), str("\n"));
-    print(tuple(d.pop(4LL)), str(" "), str("\n"));
-    print(tuple(d.pop(99LL, (-1LL))), str(" "), str("\n"));
-    print(tuple(len(d)), str(" "), str("\n"));
-    print(tuple(d.setdefault(2LL, 999LL)), str(" "), str("\n"));
-    print(tuple(d.setdefault(9LL, 90LL)), str(" "), str("\n"));
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    print(tuple(sorted(d.keys(), false)), str(" "), str("\n"));
-    print(tuple(sorted(d.values(), false)), str(" "), str("\n"));
-    e = dict<int64_t, int64_t>({{5LL, 50LL}});
-    d.update(e);
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    c = d.copy();
-    print(tuple(len(c)), str(" "), str("\n"));
-    c.clear();
-    print(tuple(len(c), len(d)), str(" "), str("\n"));
-    s = dict<str, int64_t>({{str("b"), 2LL}, {str("a"), 1LL}});
-    print(tuple(sorted(s, false)), str(" "), str("\n"));
-    print(tuple(s[str("a")], s[str("b")]), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    dict<int64_t, int64_t> d;    // 2
+    dict<int64_t, int64_t> e;    // 32
+    dict<int64_t, int64_t> c;    // 36
+    dict<str, int64_t> s;    // 41
+    d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});    // 2
+    print(tuple(len(d)), str(" "), str("\n"));    // 6
+    print(tuple(d[1LL], d[2LL], d[3LL]), str(" "), str("\n"));    // 7
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 8
+    print(tuple(sorted(d, true)), str(" "), str("\n"));    // 9
+    print(tuple(sorted(d, [](auto k) { return (-k); }, false)), str(" "), str("\n"));    // 10
+    print(tuple(sorted(d, [](auto k) { return (-k); }, true)), str(" "), str("\n"));    // 11
+    d[4LL] = 40LL;    // 13
+    print(tuple(len(d), d[4LL]), str(" "), str("\n"));    // 14
+    d[1LL] = 11LL;    // 15
+    print(tuple(len(d), d[1LL]), str(" "), str("\n"));    // 16
+    print(tuple(d.get(1LL)), str(" "), str("\n"));    // 18
+    print(tuple(d.get(99LL, (-1LL))), str(" "), str("\n"));    // 19
+    print(tuple(d.pop(4LL)), str(" "), str("\n"));    // 21
+    print(tuple(d.pop(99LL, (-1LL))), str(" "), str("\n"));    // 22
+    print(tuple(len(d)), str(" "), str("\n"));    // 23
+    print(tuple(d.setdefault(2LL, 999LL)), str(" "), str("\n"));    // 25
+    print(tuple(d.setdefault(9LL, 90LL)), str(" "), str("\n"));    // 26
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 27
+    print(tuple(sorted(d.keys(), false)), str(" "), str("\n"));    // 29
+    print(tuple(sorted(d.values(), false)), str(" "), str("\n"));    // 30
+    e = dict<int64_t, int64_t>({{5LL, 50LL}});    // 32
+    d.update(e);    // 33
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 34
+    c = d.copy();    // 36
+    print(tuple(len(c)), str(" "), str("\n"));    // 37
+    c.clear();    // 38
+    print(tuple(len(c), len(d)), str(" "), str("\n"));    // 39
+    s = dict<str, int64_t>({{str("b"), 2LL}, {str("a"), 1LL}});    // 41
+    print(tuple(sorted(s, false)), str(" "), str("\n"));    // 42
+    print(tuple(s[str("a")], s[str("b")]), str(" "), str("\n"));    // 43
+    return 0LL;    // 45
+}    // 1
 }
 
 namespace prog_exceptions {
 
-int64_t guarded_parse(const str &RESTRICT text);
-int64_t parse_or(const str &RESTRICT text, const int64_t &RESTRICT fallback);
-int64_t nested();
-int64_t handler_raises();
-int64_t check_positive(const int64_t &RESTRICT n);
-int64_t reraise(const int64_t &RESTRICT n);
-int64_t raise_bare_class(const str &RESTRICT key);
-int64_t siblings(const str &RESTRICT first, const str &RESTRICT second);
-int64_t relay();
-int run();
+int64_t guarded_parse(const str &RESTRICT text);    // 1
+int64_t parse_or(const str &RESTRICT text, const int64_t &RESTRICT fallback);    // 9
+int64_t nested();    // 21
+int64_t handler_raises();    // 34
+int64_t check_positive(const int64_t &RESTRICT n);    // 51
+int64_t reraise(const int64_t &RESTRICT n);    // 57
+int64_t raise_bare_class(const str &RESTRICT key);    // 68
+int64_t siblings(const str &RESTRICT first, const str &RESTRICT second);    // 72
+int64_t relay();    // 89
+int run();    // 98
 
-int64_t guarded_parse(const str &RESTRICT text) {
-    {
-        Finally __finally([&] {
-            print(tuple(str("cleanup"), text), str(" "), str("\n"));
-        });
-        return to_int(text);
-    }
-}
+int64_t guarded_parse(const str &RESTRICT text) {    // 1
+    {    // 3
+        Finally __finally([&] {    // 3
+            print(tuple(str("cleanup"), text), str(" "), str("\n"));    // 6
+        });    // 3
+        return to_int(text);    // 4
+    }    // 3
+}    // 1
 
-int64_t parse_or(const str &RESTRICT text, const int64_t &RESTRICT fallback) {
-    int64_t value;
-    {
-        bool __thrown = false;
-        try {
-            value = to_int(text);
-        } catch (ValueError &) {
-            __thrown = true;
-            print(tuple(str("bad literal"), text), str(" "), str("\n"));
-            return fallback;
-        }
-        if (!__thrown) {
-            print(tuple(str("good literal"), text), str(" "), str("\n"));
-            return value;
-        }
-    }
-}
+int64_t parse_or(const str &RESTRICT text, const int64_t &RESTRICT fallback) {    // 9
+    int64_t value;    // 12
+    {    // 11
+        bool __thrown = false;    // 11
+        try {    // 11
+            value = to_int(text);    // 12
+        } catch (ValueError &) {    // 11
+            __thrown = true;    // 11
+            print(tuple(str("bad literal"), text), str(" "), str("\n"));    // 14
+            return fallback;    // 15
+        }    // 11
+        if (!__thrown) {    // 11
+            print(tuple(str("good literal"), text), str(" "), str("\n"));    // 17
+            return value;    // 18
+        }    // 11
+    }    // 11
+}    // 9
 
-int64_t nested() {
-    {
-        Finally __finally([&] {
-            print(tuple(str("outer finally")), str(" "), str("\n"));
-        });
-        try {
-            {
-                Finally __finally([&] {
-                    print(tuple(str("inner finally")), str(" "), str("\n"));
-                });
-                return to_int(str("nope"));
-            }
-        } catch (ValueError &) {
-            print(tuple(str("outer caught")), str(" "), str("\n"));
-            return (-1LL);
-        }
-    }
-}
+int64_t nested() {    // 21
+    {    // 22
+        Finally __finally([&] {    // 22
+            print(tuple(str("outer finally")), str(" "), str("\n"));    // 31
+        });    // 22
+        try {    // 22
+            {    // 23
+                Finally __finally([&] {    // 23
+                    print(tuple(str("inner finally")), str(" "), str("\n"));    // 26
+                });    // 23
+                return to_int(str("nope"));    // 24
+            }    // 23
+        } catch (ValueError &) {    // 22
+            print(tuple(str("outer caught")), str(" "), str("\n"));    // 28
+            return (-1LL);    // 29
+        }    // 22
+    }    // 22
+}    // 21
 
-int64_t handler_raises() {
-    try {
-        {
-            Finally __finally([&] {
-                print(tuple(str("guard ran")), str(" "), str("\n"));
-            });
-            bool __thrown = false;
-            try {
-                print(tuple(to_int(str("bad"))), str(" "), str("\n"));
-            } catch (ValueError &) {
-                __thrown = true;
-                print(tuple(str("handler raising")), str(" "), str("\n"));
-                return to_int(str("worse"));
-            }
-            if (!__thrown) {
-                print(tuple(str("not reached")), str(" "), str("\n"));
-            }
-        }
-    } catch (ValueError &) {
-        print(tuple(str("caught the handler's exception")), str(" "), str("\n"));
-    }
-    return 0LL;
-}
+int64_t handler_raises() {    // 34
+    try {    // 36
+        {    // 37
+            Finally __finally([&] {    // 37
+                print(tuple(str("guard ran")), str(" "), str("\n"));    // 45
+            });    // 37
+            bool __thrown = false;    // 37
+            try {    // 37
+                print(tuple(to_int(str("bad"))), str(" "), str("\n"));    // 38
+            } catch (ValueError &) {    // 37
+                __thrown = true;    // 37
+                print(tuple(str("handler raising")), str(" "), str("\n"));    // 40
+                return to_int(str("worse"));    // 41
+            }    // 37
+            if (!__thrown) {    // 37
+                print(tuple(str("not reached")), str(" "), str("\n"));    // 43
+            }    // 37
+        }    // 37
+    } catch (ValueError &) {    // 36
+        print(tuple(str("caught the handler's exception")), str(" "), str("\n"));    // 47
+    }    // 36
+    return 0LL;    // 48
+}    // 34
 
-int64_t check_positive(const int64_t &RESTRICT n) {
-    if (((n < 0LL))) {
-        throw ValueError(str("negative"));
-    }
-    return n;
-}
+int64_t check_positive(const int64_t &RESTRICT n) {    // 51
+    if (((n < 0LL))) {    // 52
+        throw ValueError(str("negative"));    // 53
+    }    // 52
+    return n;    // 54
+}    // 51
 
-int64_t reraise(const int64_t &RESTRICT n) {
-    {
-        Finally __finally([&] {
-            print(tuple(str("reraise finally")), str(" "), str("\n"));
-        });
-        try {
-            return check_positive(n);
-        } catch (ValueError &) {
-            print(tuple(str("logging and passing it on")), str(" "), str("\n"));
-            throw;
-        }
-    }
-}
+int64_t reraise(const int64_t &RESTRICT n) {    // 57
+    {    // 59
+        Finally __finally([&] {    // 59
+            print(tuple(str("reraise finally")), str(" "), str("\n"));    // 65
+        });    // 59
+        try {    // 59
+            return check_positive(n);    // 60
+        } catch (ValueError &) {    // 59
+            print(tuple(str("logging and passing it on")), str(" "), str("\n"));    // 62
+            throw;    // 63
+        }    // 59
+    }    // 59
+}    // 57
 
-int64_t raise_bare_class(const str &RESTRICT key) {
-    throw KeyError("");
-}
+int64_t raise_bare_class(const str &RESTRICT key) {    // 68
+    throw KeyError("");    // 69
+}    // 68
 
-int64_t siblings(const str &RESTRICT first, const str &RESTRICT second) {
-    {
-        bool __thrown = false;
-        try {
-            print(tuple(to_int(first)), str(" "), str("\n"));
-        } catch (ValueError &) {
-            __thrown = true;
-            print(tuple(str("first was bad")), str(" "), str("\n"));
-        }
-        if (!__thrown) {
-            print(tuple(str("first was fine")), str(" "), str("\n"));
-        }
-    }
-    {
-        bool __thrown = false;
-        try {
-            print(tuple(to_int(second)), str(" "), str("\n"));
-        } catch (ValueError &) {
-            __thrown = true;
-            print(tuple(str("second was bad")), str(" "), str("\n"));
-        }
-        if (!__thrown) {
-            print(tuple(str("second was fine")), str(" "), str("\n"));
-        }
-    }
-    return 0LL;
-}
+int64_t siblings(const str &RESTRICT first, const str &RESTRICT second) {    // 72
+    {    // 74
+        bool __thrown = false;    // 74
+        try {    // 74
+            print(tuple(to_int(first)), str(" "), str("\n"));    // 75
+        } catch (ValueError &) {    // 74
+            __thrown = true;    // 74
+            print(tuple(str("first was bad")), str(" "), str("\n"));    // 77
+        }    // 74
+        if (!__thrown) {    // 74
+            print(tuple(str("first was fine")), str(" "), str("\n"));    // 79
+        }    // 74
+    }    // 74
+    {    // 80
+        bool __thrown = false;    // 80
+        try {    // 80
+            print(tuple(to_int(second)), str(" "), str("\n"));    // 81
+        } catch (ValueError &) {    // 80
+            __thrown = true;    // 80
+            print(tuple(str("second was bad")), str(" "), str("\n"));    // 83
+        }    // 80
+        if (!__thrown) {    // 80
+            print(tuple(str("second was fine")), str(" "), str("\n"));    // 85
+        }    // 80
+    }    // 80
+    return 0LL;    // 86
+}    // 72
 
-int64_t relay() {
-    try {
-        throw ValueError(str("original"));
-    } catch (PyException &e) {
-        print(tuple(str("relaying")), str(" "), str("\n"));
-        e.raise();
-    }
-}
+int64_t relay() {    // 89
+    try {    // 91
+        throw ValueError(str("original"));    // 92
+    } catch (PyException &e) {    // 91
+        print(tuple(str("relaying")), str(" "), str("\n"));    // 94
+        e.raise();    // 95
+    }    // 91
+}    // 89
 
-int run() {
-    list<int64_t> numbers;
-    list<int64_t> items;
-    int64_t i;
-    print(tuple(guarded_parse(str("41"))), str(" "), str("\n"));
-    try {
-        print(tuple(guarded_parse(str("zzz"))), str(" "), str("\n"));
-    } catch (ValueError &) {
-        print(tuple(str("caught from callee")), str(" "), str("\n"));
-    }
-    print(tuple(parse_or(str("7"), 0LL)), str(" "), str("\n"));
-    print(tuple(parse_or(str("seven"), 0LL)), str(" "), str("\n"));
-    print(tuple(nested()), str(" "), str("\n"));
-    print(tuple(handler_raises()), str(" "), str("\n"));
-    print(tuple(check_positive(3LL)), str(" "), str("\n"));
-    try {
-        print(tuple(check_positive((-1LL))), str(" "), str("\n"));
-    } catch (ValueError &) {
-        print(tuple(str("caught the raise")), str(" "), str("\n"));
-    }
-    try {
-        print(tuple(reraise((-2LL))), str(" "), str("\n"));
-    } catch (ValueError &) {
-        print(tuple(str("caught the re-raise")), str(" "), str("\n"));
-    }
-    try {
-        print(tuple(raise_bare_class(str("k"))), str(" "), str("\n"));
-    } catch (KeyError &) {
-        print(tuple(str("caught the bare class")), str(" "), str("\n"));
-    }
-    print(tuple(siblings(str("8"), str("eight"))), str(" "), str("\n"));
-    try {
-        print(tuple(relay()), str(" "), str("\n"));
-    } catch (ValueError &) {
-        print(tuple(str("still a ValueError after the relay")), str(" "), str("\n"));
-    }
-    try {
-        throw TypeError(str("wrong type"));
-    } catch (PyException &) {
-        print(tuple(str("base handler took the subclass")), str(" "), str("\n"));
-    }
-    numbers = list<int64_t>({1LL, 2LL, 3LL});
-    try {
-        print(tuple(numbers[10LL]), str(" "), str("\n"));
-    } catch (IndexError &) {
-        print(tuple(str("index error wins over the base class")), str(" "), str("\n"));
-    } catch (PyException &) {
-        print(tuple(str("not reached")), str(" "), str("\n"));
-    }
-    items = list<int64_t>({1LL, 2LL, 3LL});
-    try {
-        print(tuple(items[10LL]), str(" "), str("\n"));
-    } catch (PyException &) {
-        print(tuple(str("bare except caught it")), str(" "), str("\n"));
-    }
-    try {
-        print(tuple(to_float(str("x"))), str(" "), str("\n"));
-    } catch (ValueError &e) {
-        print(tuple(str("float refused it")), str(" "), str("\n"));
-    }
-    int64_t __stop_3 = 3LL;
-    for (i = 0; i < __stop_3; ++i) {
-        {
-            Finally __finally([&] {
-                print(tuple(str("loop finally"), i), str(" "), str("\n"));
-            });
-            if (((i == 1LL))) {
-                break;
-            }
-            print(tuple(str("loop"), i), str(" "), str("\n"));
-        }
-    }
-    return 0LL;
-}
+int run() {    // 98
+    list<int64_t> numbers;    // 139
+    list<int64_t> items;    // 147
+    int64_t i;    // 159
+    print(tuple(guarded_parse(str("41"))), str(" "), str("\n"));    // 99
+    try {    // 100
+        print(tuple(guarded_parse(str("zzz"))), str(" "), str("\n"));    // 101
+    } catch (ValueError &) {    // 100
+        print(tuple(str("caught from callee")), str(" "), str("\n"));    // 103
+    }    // 100
+    print(tuple(parse_or(str("7"), 0LL)), str(" "), str("\n"));    // 105
+    print(tuple(parse_or(str("seven"), 0LL)), str(" "), str("\n"));    // 106
+    print(tuple(nested()), str(" "), str("\n"));    // 107
+    print(tuple(handler_raises()), str(" "), str("\n"));    // 108
+    print(tuple(check_positive(3LL)), str(" "), str("\n"));    // 110
+    try {    // 111
+        print(tuple(check_positive((-1LL))), str(" "), str("\n"));    // 112
+    } catch (ValueError &) {    // 111
+        print(tuple(str("caught the raise")), str(" "), str("\n"));    // 114
+    }    // 111
+    try {    // 116
+        print(tuple(reraise((-2LL))), str(" "), str("\n"));    // 117
+    } catch (ValueError &) {    // 116
+        print(tuple(str("caught the re-raise")), str(" "), str("\n"));    // 119
+    }    // 116
+    try {    // 121
+        print(tuple(raise_bare_class(str("k"))), str(" "), str("\n"));    // 122
+    } catch (KeyError &) {    // 121
+        print(tuple(str("caught the bare class")), str(" "), str("\n"));    // 124
+    }    // 121
+    print(tuple(siblings(str("8"), str("eight"))), str(" "), str("\n"));    // 126
+    try {    // 128
+        print(tuple(relay()), str(" "), str("\n"));    // 129
+    } catch (ValueError &) {    // 128
+        print(tuple(str("still a ValueError after the relay")), str(" "), str("\n"));    // 131
+    }    // 128
+    try {    // 134
+        throw TypeError(str("wrong type"));    // 135
+    } catch (PyException &) {    // 134
+        print(tuple(str("base handler took the subclass")), str(" "), str("\n"));    // 137
+    }    // 134
+    numbers = list<int64_t>({1LL, 2LL, 3LL});    // 139
+    try {    // 140
+        print(tuple(numbers[10LL]), str(" "), str("\n"));    // 141
+    } catch (IndexError &) {    // 140
+        print(tuple(str("index error wins over the base class")), str(" "), str("\n"));    // 143
+    } catch (PyException &) {    // 140
+        print(tuple(str("not reached")), str(" "), str("\n"));    // 145
+    }    // 140
+    items = list<int64_t>({1LL, 2LL, 3LL});    // 147
+    try {    // 148
+        print(tuple(items[10LL]), str(" "), str("\n"));    // 149
+    } catch (PyException &) {    // 148
+        print(tuple(str("bare except caught it")), str(" "), str("\n"));    // 151
+    }    // 148
+    try {    // 153
+        print(tuple(to_float(str("x"))), str(" "), str("\n"));    // 154
+    } catch (ValueError &e) {    // 153
+        print(tuple(str("float refused it")), str(" "), str("\n"));    // 156
+    }    // 153
+    int64_t __stop_3 = 3LL;    // 159
+    for (i = 0; i < __stop_3; ++i) {    // 159
+        {    // 160
+            Finally __finally([&] {    // 160
+                print(tuple(str("loop finally"), i), str(" "), str("\n"));    // 165
+            });    // 160
+            if (((i == 1LL))) {    // 161
+                break;    // 162
+            }    // 161
+            print(tuple(str("loop"), i), str(" "), str("\n"));    // 163
+        }    // 160
+    }    // 159
+    return 0LL;    // 167
+}    // 98
 }
 
 namespace prog_files {
 
-int run();
+int run();    // 1
 
-int run() {
-    str SAMPLE;
-    file handle;
-    str text;
-    file stepped;
-    list<str> rest;
-    file lines;
-    str line;
-    file out;
-    str written;
-    SAMPLE = str("tests/test_files/sample.txt");
-    handle = open(SAMPLE);
-    text = handle.read();
-    print(tuple(len(text)), str(" "), str("\n"));
-    print(tuple(text.splitlines()), str(" "), str("\n"));
-    print(tuple(len(handle.read())), str(" "), str("\n"));
-    handle.close();
-    stepped = open(SAMPLE);
-    print(tuple(stepped.readline().strip()), str(" "), str("\n"));
-    print(tuple(stepped.readline().strip()), str(" "), str("\n"));
-    rest = stepped.readlines();
-    print(tuple(len(rest), rest[0LL].strip()), str(" "), str("\n"));
-    print(tuple(len(stepped.readlines())), str(" "), str("\n"));
-    lines = open(SAMPLE);
-    auto && __range_15 = lines;
-    for (auto &&__item_15 : __range_15) {
-        line = __item_15;
-        print(tuple(len(line), line.strip()), str(" "), str("\n"));
-    }
-    out = open(str("tests/test_files/sample_out.txt"), str("w"));
-    print(tuple(out.write(str("alpha\n"))), str(" "), str("\n"));
-    print(tuple(out.write(str("beta\n"))), str(" "), str("\n"));
-    out.close();
-    written = open(str("tests/test_files/sample_out.txt")).read();
-    print(tuple(written.splitlines(), len(written)), str(" "), str("\n"));
-    try {
-        open(str("tests/test_files/no_such_file.txt"));
-    } catch (FileNotFoundError &) {
-        print(tuple(str("missing file raised")), str(" "), str("\n"));
-    }
-    return 0LL;
-}
+int run() {    // 1
+    str SAMPLE;    // 2
+    file handle;    // 3
+    str text;    // 4
+    file stepped;    // 12
+    list<str> rest;    // 15
+    file lines;    // 20
+    str line;    // 21
+    file out;    // 25
+    str written;    // 29
+    SAMPLE = str("tests/test_files/sample.txt");    // 2
+    handle = open(SAMPLE);    // 3
+    text = handle.read();    // 4
+    print(tuple(len(text)), str(" "), str("\n"));    // 5
+    print(tuple(text.splitlines()), str(" "), str("\n"));    // 6
+    print(tuple(len(handle.read())), str(" "), str("\n"));    // 8
+    handle.close();    // 9
+    stepped = open(SAMPLE);    // 12
+    print(tuple(stepped.readline().strip()), str(" "), str("\n"));    // 13
+    print(tuple(stepped.readline().strip()), str(" "), str("\n"));    // 14
+    rest = stepped.readlines();    // 15
+    print(tuple(len(rest), rest[0LL].strip()), str(" "), str("\n"));    // 16
+    print(tuple(len(stepped.readlines())), str(" "), str("\n"));    // 17
+    lines = open(SAMPLE);    // 20
+    auto && __range_15 = lines;    // 21
+    for (auto &&__item_15 : __range_15) {    // 21
+        line = __item_15;    // 21
+        print(tuple(len(line), line.strip()), str(" "), str("\n"));    // 22
+    }    // 21
+    out = open(str("tests/test_files/sample_out.txt"), str("w"));    // 25
+    print(tuple(out.write(str("alpha\n"))), str(" "), str("\n"));    // 26
+    print(tuple(out.write(str("beta\n"))), str(" "), str("\n"));    // 27
+    out.close();    // 28
+    written = open(str("tests/test_files/sample_out.txt")).read();    // 29
+    print(tuple(written.splitlines(), len(written)), str(" "), str("\n"));    // 30
+    try {    // 32
+        open(str("tests/test_files/no_such_file.txt"));    // 33
+    } catch (FileNotFoundError &) {    // 32
+        print(tuple(str("missing file raised")), str(" "), str("\n"));    // 35
+    }    // 32
+    return 0LL;    // 37
+}    // 1
 }
 
 namespace prog_fixed_width_int_promotion {
 
-uint16_t scale(const uint16_t &RESTRICT value, const uint16_t &RESTRICT factor);
-int32_t clamp(const int32_t &RESTRICT value, const int32_t &RESTRICT low, const int32_t &RESTRICT high);
-int run();
+uint16_t scale(const uint16_t &RESTRICT value, const uint16_t &RESTRICT factor);    // 4
+int32_t clamp(const int32_t &RESTRICT value, const int32_t &RESTRICT low, const int32_t &RESTRICT high);    // 8
+int run();    // 16
 
-uint16_t scale(const uint16_t &RESTRICT value, const uint16_t &RESTRICT factor) {
-    return (value * factor);
-}
+uint16_t scale(const uint16_t &RESTRICT value, const uint16_t &RESTRICT factor) {    // 4
+    return (value * factor);    // 5
+}    // 4
 
-int32_t clamp(const int32_t &RESTRICT value, const int32_t &RESTRICT low, const int32_t &RESTRICT high) {
-    if (((value < low))) {
-        return low;
-    }
-    if (((value > high))) {
-        return high;
-    }
-    return value;
-}
+int32_t clamp(const int32_t &RESTRICT value, const int32_t &RESTRICT low, const int32_t &RESTRICT high) {    // 8
+    if (((value < low))) {    // 9
+        return low;    // 10
+    }    // 9
+    if (((value > high))) {    // 11
+        return high;    // 12
+    }    // 11
+    return value;    // 13
+}    // 8
 
-int run() {
-    uint16_t n;
-    uint8_t m;
-    uint16_t doubled;
-    uint16_t total;
-    n = 10LL;
-    m = 200LL;
-    print(tuple(n, m), str(" "), str("\n"));
-    doubled = scale(n, 2LL);
-    print(tuple(doubled), str(" "), str("\n"));
-    total = (scale(n, 2LL) + n);
-    print(tuple(total), str(" "), str("\n"));
-    print(tuple(clamp(500LL, 0LL, 100LL)), str(" "), str("\n"));
-    print(tuple(clamp((-5LL), 0LL, 100LL)), str(" "), str("\n"));
-    print(tuple(clamp(50LL, 0LL, 100LL)), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 16
+    uint16_t n;    // 18
+    uint8_t m;    // 19
+    uint16_t doubled;    // 23
+    uint16_t total;    // 28
+    n = 10LL;    // 18
+    m = 200LL;    // 19
+    print(tuple(n, m), str(" "), str("\n"));    // 20
+    doubled = scale(n, 2LL);    // 23
+    print(tuple(doubled), str(" "), str("\n"));    // 24
+    total = (scale(n, 2LL) + n);    // 28
+    print(tuple(total), str(" "), str("\n"));    // 29
+    print(tuple(clamp(500LL, 0LL, 100LL)), str(" "), str("\n"));    // 31
+    print(tuple(clamp((-5LL), 0LL, 100LL)), str(" "), str("\n"));    // 32
+    print(tuple(clamp(50LL, 0LL, 100LL)), str(" "), str("\n"));    // 33
+    return 0LL;    // 35
+}    // 16
 }
 
 namespace prog_fixed_width_ints {
 
-uint16_t add_u16(const uint16_t &RESTRICT a, const uint16_t &RESTRICT b);
-int run();
+uint16_t add_u16(const uint16_t &RESTRICT a, const uint16_t &RESTRICT b);    // 4
+int run();    // 8
 
-uint16_t add_u16(const uint16_t &RESTRICT a, const uint16_t &RESTRICT b) {
-    return uint16_t((a + b));
-}
+uint16_t add_u16(const uint16_t &RESTRICT a, const uint16_t &RESTRICT b) {    // 4
+    return uint16_t((a + b));    // 5
+}    // 4
 
-int run() {
-    uint8_t a;
-    int8_t b;
-    uint16_t c;
-    uint16_t d;
-    int32_t e;
-    uint32_t f;
-    int64_t g;
-    uint64_t h;
-    list<uint16_t> values;
-    dict<uint8_t, str> counts;
-    set<int32_t> seen;
-    a = uint8_t(200LL);
-    b = int8_t((-100LL));
-    print(tuple(a, b), str(" "), str("\n"));
-    c = uint16_t(1000LL);
-    d = add_u16(c, uint16_t(234LL));
-    print(tuple(d), str(" "), str("\n"));
-    e = int32_t((-70000LL));
-    f = uint32_t(70000LL);
-    print(tuple(e, f), str(" "), str("\n"));
-    g = int64_t((-5000000000LL));
-    h = uint64_t(5000000000LL);
-    print(tuple(g, h), str(" "), str("\n"));
-    print(tuple(((uint16_t(5LL) == uint16_t(5LL)))), str(" "), str("\n"));
-    print(tuple(((uint16_t(5LL) < uint16_t(10LL)))), str(" "), str("\n"));
-    values = list<uint16_t>({uint16_t(3LL), uint16_t(1LL), uint16_t(2LL)});
-    print(tuple(values), str(" "), str("\n"));
-    counts = dict<uint8_t, str>();
-    counts[uint8_t(1LL)] = str("one");
-    counts[uint8_t(2LL)] = str("two");
-    print(tuple(counts[uint8_t(1LL)], counts[uint8_t(2LL)]), str(" "), str("\n"));
-    seen = set<int32_t>({int32_t(1LL), int32_t(2LL), int32_t(2LL)});
-    print(tuple(len(seen)), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 8
+    uint8_t a;    // 9
+    int8_t b;    // 10
+    uint16_t c;    // 13
+    uint16_t d;    // 14
+    int32_t e;    // 17
+    uint32_t f;    // 18
+    int64_t g;    // 21
+    uint64_t h;    // 22
+    list<uint16_t> values;    // 28
+    dict<uint8_t, str> counts;    // 31
+    set<int32_t> seen;    // 36
+    a = uint8_t(200LL);    // 9
+    b = int8_t((-100LL));    // 10
+    print(tuple(a, b), str(" "), str("\n"));    // 11
+    c = uint16_t(1000LL);    // 13
+    d = add_u16(c, uint16_t(234LL));    // 14
+    print(tuple(d), str(" "), str("\n"));    // 15
+    e = int32_t((-70000LL));    // 17
+    f = uint32_t(70000LL);    // 18
+    print(tuple(e, f), str(" "), str("\n"));    // 19
+    g = int64_t((-5000000000LL));    // 21
+    h = uint64_t(5000000000LL);    // 22
+    print(tuple(g, h), str(" "), str("\n"));    // 23
+    print(tuple(((uint16_t(5LL) == uint16_t(5LL)))), str(" "), str("\n"));    // 25
+    print(tuple(((uint16_t(5LL) < uint16_t(10LL)))), str(" "), str("\n"));    // 26
+    values = list<uint16_t>({uint16_t(3LL), uint16_t(1LL), uint16_t(2LL)});    // 28
+    print(tuple(values), str(" "), str("\n"));    // 29
+    counts = dict<uint8_t, str>();    // 31
+    counts[uint8_t(1LL)] = str("one");    // 32
+    counts[uint8_t(2LL)] = str("two");    // 33
+    print(tuple(counts[uint8_t(1LL)], counts[uint8_t(2LL)]), str(" "), str("\n"));    // 34
+    seen = set<int32_t>({int32_t(1LL), int32_t(2LL), int32_t(2LL)});    // 36
+    print(tuple(len(seen)), str(" "), str("\n"));    // 37
+    return 0LL;    // 39
+}    // 8
 }
 
 namespace prog_global_constexpr {
@@ -1026,789 +1026,789 @@ constexpr uint8_t future2 = 2LL;
 constexpr uint32_t pair0_mask = ((1LL << future1) | (1LL << spot));
 constexpr uint32_t pair2_mask = ((1LL << future1) | (1LL << future2));
 
-int run();
+int run();    // 19
 
-int run() {
-    Array<uint8_t, 24> arr;
-    print(tuple(str("Test 1 - derived global:"), totalSlots), str(" "), str("\n"));
-    arr = Array<uint8_t, 24>();
-    print(tuple(str("Test 2 - array sized by derived global:"), len(arr)), str(" "), str("\n"));
-    print(tuple(str("Test 3 - shift masks:"), pair0_mask, pair2_mask), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 19
+    Array<uint8_t, 24> arr;    // 24
+    print(tuple(str("Test 1 - derived global:"), totalSlots), str(" "), str("\n"));    // 21
+    arr = Array<uint8_t, 24>();    // 24
+    print(tuple(str("Test 2 - array sized by derived global:"), len(arr)), str(" "), str("\n"));    // 25
+    print(tuple(str("Test 3 - shift masks:"), pair0_mask, pair2_mask), str(" "), str("\n"));    // 28
+    return 0LL;    // 30
+}    // 19
 }
 
 namespace prog_hotpath {
 
-class Vector;
+class Vector;    // 63
 
-int64_t clamp(const int64_t &RESTRICT x, const int64_t &RESTRICT low, const int64_t &RESTRICT high);
-int64_t normalize_price(const int64_t &RESTRICT raw, const int64_t &RESTRICT tick_size);
-FLATTEN int64_t process_order(const int64_t &RESTRICT bid, const int64_t &RESTRICT ask, const int64_t &RESTRICT qty, const int64_t &RESTRICT tick_size);
-int64_t square(const int64_t &RESTRICT x);
-int64_t add(const int64_t &RESTRICT a, const int64_t &RESTRICT b);
-FLATTEN int64_t distance_squared(const int64_t &RESTRICT x1, const int64_t &RESTRICT y1, const int64_t &RESTRICT x2, const int64_t &RESTRICT y2);
-FLATTEN int64_t sum_up_to(const int64_t &RESTRICT n);
-int run();
+int64_t clamp(const int64_t &RESTRICT x, const int64_t &RESTRICT low, const int64_t &RESTRICT high);    // 4
+int64_t normalize_price(const int64_t &RESTRICT raw, const int64_t &RESTRICT tick_size);    // 12
+FLATTEN int64_t process_order(const int64_t &RESTRICT bid, const int64_t &RESTRICT ask, const int64_t &RESTRICT qty, const int64_t &RESTRICT tick_size);    // 20
+int64_t square(const int64_t &RESTRICT x);    // 40
+int64_t add(const int64_t &RESTRICT a, const int64_t &RESTRICT b);    // 44
+FLATTEN int64_t distance_squared(const int64_t &RESTRICT x1, const int64_t &RESTRICT y1, const int64_t &RESTRICT x2, const int64_t &RESTRICT y2);    // 49
+FLATTEN int64_t sum_up_to(const int64_t &RESTRICT n);    // 56
+int run();    // 83
 
-class Vector {
-  public:
-    int64_t x;
-    int64_t y;
+class Vector {    // 63
+  public:    // 63
+    int64_t x;    // 63
+    int64_t y;    // 63
 
-    Vector(const int64_t &RESTRICT x, const int64_t &RESTRICT y) { __init__(x, y); }
+    Vector(const int64_t &RESTRICT x, const int64_t &RESTRICT y) { __init__(x, y); }    // 63
 
-    Vector() = default;
+    Vector() = default;    // 63
 
-    void __init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y);
-    Vector scaled(const int64_t &RESTRICT factor);
-    FLATTEN int64_t length_squared();
-    FLATTEN void move(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy);
-};
+    void __init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y);    // 64
+    Vector scaled(const int64_t &RESTRICT factor);    // 68
+    FLATTEN int64_t length_squared();    // 72
+    FLATTEN void move(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy);    // 77
+};    // 77
 
-void Vector::__init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y) {
-    this->x = x;
-    this->y = y;
-}
+void Vector::__init__(const int64_t &RESTRICT x, const int64_t &RESTRICT y) {    // 64
+    this->x = x;    // 65
+    this->y = y;    // 66
+}    // 64
 
-Vector Vector::scaled(const int64_t &RESTRICT factor) {
-    return Vector((this->x * factor), (this->y * factor));
-}
+Vector Vector::scaled(const int64_t &RESTRICT factor) {    // 68
+    return Vector((this->x * factor), (this->y * factor));    // 69
+}    // 68
 
-FLATTEN int64_t Vector::length_squared() {
-    return distance_squared(0LL, 0LL, this->x, this->y);
-}
+FLATTEN int64_t Vector::length_squared() {    // 72
+    return distance_squared(0LL, 0LL, this->x, this->y);    // 74
+}    // 72
 
-FLATTEN void Vector::move(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy) {
-    this->x = clamp((this->x + dx), (-100LL), 100LL);
-    this->y = clamp((this->y + dy), (-100LL), 100LL);
-}
+FLATTEN void Vector::move(const int64_t &RESTRICT dx, const int64_t &RESTRICT dy) {    // 77
+    this->x = clamp((this->x + dx), (-100LL), 100LL);    // 79
+    this->y = clamp((this->y + dy), (-100LL), 100LL);    // 80
+}    // 77
 
-int64_t clamp(const int64_t &RESTRICT x, const int64_t &RESTRICT low, const int64_t &RESTRICT high) {
-    if (((x < low))) {
-        return low;
-    }
-    if (((x > high))) {
-        return high;
-    }
-    return x;
-}
+int64_t clamp(const int64_t &RESTRICT x, const int64_t &RESTRICT low, const int64_t &RESTRICT high) {    // 4
+    if (((x < low))) {    // 5
+        return low;    // 6
+    }    // 5
+    if (((x > high))) {    // 7
+        return high;    // 8
+    }    // 7
+    return x;    // 9
+}    // 4
 
-int64_t normalize_price(const int64_t &RESTRICT raw, const int64_t &RESTRICT tick_size) {
-    int64_t rounded;
-    rounded = (idiv(raw, tick_size) * tick_size);
-    return clamp(rounded, 0LL, 1000000LL);
-}
+int64_t normalize_price(const int64_t &RESTRICT raw, const int64_t &RESTRICT tick_size) {    // 12
+    int64_t rounded;    // 15
+    rounded = (idiv(raw, tick_size) * tick_size);    // 15
+    return clamp(rounded, 0LL, 1000000LL);    // 16
+}    // 12
 
-FLATTEN int64_t process_order(const int64_t &RESTRICT bid, const int64_t &RESTRICT ask, const int64_t &RESTRICT qty, const int64_t &RESTRICT tick_size) {
-    int64_t norm_bid;
-    int64_t norm_ask;
-    int64_t spread;
-    int64_t total;
-    norm_bid = normalize_price(bid, tick_size);
-    norm_ask = normalize_price(ask, tick_size);
-    spread = (norm_ask - norm_bid);
-    if (((spread < 0LL))) {
-        spread = 0LL;
-    }
-    total = (spread * qty);
-    if (((qty > 0LL))) {
-        total = (total + qty);
-    } else {
-        total = (total - qty);
-    }
-    return total;
-}
+FLATTEN int64_t process_order(const int64_t &RESTRICT bid, const int64_t &RESTRICT ask, const int64_t &RESTRICT qty, const int64_t &RESTRICT tick_size) {    // 20
+    int64_t norm_bid;    // 24
+    int64_t norm_ask;    // 25
+    int64_t spread;    // 27
+    int64_t total;    // 31
+    norm_bid = normalize_price(bid, tick_size);    // 24
+    norm_ask = normalize_price(ask, tick_size);    // 25
+    spread = (norm_ask - norm_bid);    // 27
+    if (((spread < 0LL))) {    // 28
+        spread = 0LL;    // 29
+    }    // 28
+    total = (spread * qty);    // 31
+    if (((qty > 0LL))) {    // 32
+        total = (total + qty);    // 33
+    } else {    // 32
+        total = (total - qty);    // 35
+    }    // 32
+    return total;    // 37
+}    // 20
 
-int64_t square(const int64_t &RESTRICT x) {
-    return (x * x);
-}
+int64_t square(const int64_t &RESTRICT x) {    // 40
+    return (x * x);    // 41
+}    // 40
 
-int64_t add(const int64_t &RESTRICT a, const int64_t &RESTRICT b) {
-    return (a + b);
-}
+int64_t add(const int64_t &RESTRICT a, const int64_t &RESTRICT b) {    // 44
+    return (a + b);    // 45
+}    // 44
 
-FLATTEN int64_t distance_squared(const int64_t &RESTRICT x1, const int64_t &RESTRICT y1, const int64_t &RESTRICT x2, const int64_t &RESTRICT y2) {
-    int64_t dx;
-    int64_t dy;
-    dx = square((x2 - x1));
-    dy = square((y2 - y1));
-    return add(dx, dy);
-}
+FLATTEN int64_t distance_squared(const int64_t &RESTRICT x1, const int64_t &RESTRICT y1, const int64_t &RESTRICT x2, const int64_t &RESTRICT y2) {    // 49
+    int64_t dx;    // 50
+    int64_t dy;    // 51
+    dx = square((x2 - x1));    // 50
+    dy = square((y2 - y1));    // 51
+    return add(dx, dy);    // 52
+}    // 49
 
-FLATTEN int64_t sum_up_to(const int64_t &RESTRICT n) {
-    int64_t total;
-    int64_t i;
-    total = 0LL;
-    int64_t __stop_4 = n;
-    for (i = 0; i < __stop_4; ++i) {
-        total = add(total, i);
-    }
-    return total;
-}
+FLATTEN int64_t sum_up_to(const int64_t &RESTRICT n) {    // 56
+    int64_t total;    // 57
+    int64_t i;    // 58
+    total = 0LL;    // 57
+    int64_t __stop_4 = n;    // 58
+    for (i = 0; i < __stop_4; ++i) {    // 58
+        total = add(total, i);    // 59
+    }    // 58
+    return total;    // 60
+}    // 56
 
-int run() {
-    Vector v;
-    Vector scaled;
-    print(tuple(str("Test 1 - process_order:"), process_order(10007LL, 10023LL, 5LL, 5LL)), str(" "), str("\n"));
-    print(tuple(str("Test 1b - process_order (sell):"), process_order(9998LL, 10001LL, (-3LL), 5LL)), str(" "), str("\n"));
-    print(tuple(str("Test 2 - distance_squared:"), distance_squared(0LL, 0LL, 3LL, 4LL)), str(" "), str("\n"));
-    print(tuple(str("Test 3 - sum_up_to:"), sum_up_to(5LL)), str(" "), str("\n"));
-    v = Vector(3LL, 4LL);
-    print(tuple(str("Test 4 - length_squared:"), v.length_squared()), str(" "), str("\n"));
-    v.move(200LL, (-200LL));
-    print(tuple(str("Test 5 - move (clamped):"), v.x, v.y), str(" "), str("\n"));
-    scaled = v.scaled(2LL);
-    print(tuple(str("Test 6 - scaled:"), scaled.x, scaled.y), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 83
+    Vector v;    // 96
+    Vector scaled;    // 104
+    print(tuple(str("Test 1 - process_order:"), process_order(10007LL, 10023LL, 5LL, 5LL)), str(" "), str("\n"));    // 86
+    print(tuple(str("Test 1b - process_order (sell):"), process_order(9998LL, 10001LL, (-3LL), 5LL)), str(" "), str("\n"));    // 87
+    print(tuple(str("Test 2 - distance_squared:"), distance_squared(0LL, 0LL, 3LL, 4LL)), str(" "), str("\n"));    // 90
+    print(tuple(str("Test 3 - sum_up_to:"), sum_up_to(5LL)), str(" "), str("\n"));    // 93
+    v = Vector(3LL, 4LL);    // 96
+    print(tuple(str("Test 4 - length_squared:"), v.length_squared()), str(" "), str("\n"));    // 97
+    v.move(200LL, (-200LL));    // 100
+    print(tuple(str("Test 5 - move (clamped):"), v.x, v.y), str(" "), str("\n"));    // 101
+    scaled = v.scaled(2LL);    // 104
+    print(tuple(str("Test 6 - scaled:"), scaled.x, scaled.y), str(" "), str("\n"));    // 105
+    return 0LL;    // 107
+}    // 83
 }
 
 namespace prog_iter {
 
-int run();
+int run();    // 120
 
-int run() {
-    list<int64_t> nums;
-    list<int64_t> a;
-    str s;
-    list<int64_t> filtered;
-    int64_t x;
-    int64_t y;
-    int64_t i;
-    int64_t n;
-    nums = list<int64_t>({1LL, 2LL, 3LL, 4LL, 5LL});
-    a = list<int64_t>(map([](auto x) { return (x * 2LL); }, nums));
-    print(tuple(a), str(" "), str("\n"));
-    auto && __range_16 = map([](auto x) { return to_str(x); }, nums);
-    for (auto &&__item_16 : __range_16) {
-        s = __item_16;
-        print(tuple(s), str(" "), str("\n"));
-    }
-    filtered = list<int64_t>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));
-    print(tuple(filtered), str(" "), str("\n"));
-    auto && __range_17 = zip(nums, a);
-    for (auto &&__item_17 : __range_17) {
-        destructure(x, y) = __item_17;
-        print(tuple(x, y), str(" "), str("\n"));
-    }
-    nums = copy(a);
-    auto && __range_18 = enumerate(nums);
-    for (auto &&__item_18 : __range_18) {
-        destructure(i, n) = __item_18;
-        print(tuple(i, n), str(" "), str("\n"));
-    }
-    return 0LL;
-}
+int run() {    // 120
+    list<int64_t> nums;    // 121
+    list<int64_t> a;    // 122
+    str s;    // 124
+    list<int64_t> filtered;    // 126
+    int64_t x;    // 128
+    int64_t y;    // 128
+    int64_t i;    // 131
+    int64_t n;    // 131
+    nums = list<int64_t>({1LL, 2LL, 3LL, 4LL, 5LL});    // 121
+    a = list<int64_t>(map([](auto x) { return (x * 2LL); }, nums));    // 122
+    print(tuple(a), str(" "), str("\n"));    // 123
+    auto && __range_16 = map([](auto x) { return to_str(x); }, nums);    // 124
+    for (auto &&__item_16 : __range_16) {    // 124
+        s = __item_16;    // 124
+        print(tuple(s), str(" "), str("\n"));    // 125
+    }    // 124
+    filtered = list<int64_t>(filter([](auto x) { return ((mod(x, 2LL) == 0LL)); }, nums));    // 126
+    print(tuple(filtered), str(" "), str("\n"));    // 127
+    auto && __range_17 = zip(nums, a);    // 128
+    for (auto &&__item_17 : __range_17) {    // 128
+        destructure(x, y) = __item_17;    // 128
+        print(tuple(x, y), str(" "), str("\n"));    // 129
+    }    // 128
+    nums = copy(a);    // 130
+    auto && __range_18 = enumerate(nums);    // 131
+    for (auto &&__item_18 : __range_18) {    // 131
+        destructure(i, n) = __item_18;    // 131
+        print(tuple(i, n), str(" "), str("\n"));    // 132
+    }    // 131
+    return 0LL;    // 133
+}    // 120
 }
 
 namespace prog_list {
 
-list<int64_t> give_list(list<int64_t> &RESTRICT l);
-int run();
+list<int64_t> give_list(list<int64_t> &RESTRICT l);    // 4
+int run();    // 11
 
-list<int64_t> give_list(list<int64_t> &RESTRICT l) {
-    print(tuple(l), str(" "), str("\n"));
-    l.append(2LL);
-    print(tuple(l), str(" "), str("\n"));
-    return copy(l);
-}
+list<int64_t> give_list(list<int64_t> &RESTRICT l) {    // 4
+    print(tuple(l), str(" "), str("\n"));    // 5
+    l.append(2LL);    // 6
+    print(tuple(l), str(" "), str("\n"));    // 7
+    return copy(l);    // 8
+}    // 4
 
-int run() {
-    list<int64_t> l;
-    int64_t a;
-    list<int64_t> l2;
-    int64_t x;
-    int64_t y;
-    int64_t z;
-    list<int64_t> l3;
-    int64_t n;
-    list<int64_t> l4;
-    list<int64_t> l5;
-    print(tuple(list<int64_t>(list<int64_t>({1LL, 2LL, 3LL}))), str(" "), str("\n"));
-    l = list<int64_t>({1LL, 2LL, 3LL});
-    print(tuple(l), str(" "), str("\n"));
-    l = list<int64_t>({1LL, 2LL, 3LL});
-    print(tuple(l), str(" "), str("\n"));
-    l.append(4LL);
-    print(tuple(l), str(" "), str("\n"));
-    l = give_list(l);
-    print(tuple(l), str(" "), str("\n"));
-    print(tuple(l[1LL]), str(" "), str("\n"));
-    a = l[0LL];
-    print(tuple(l), str(" "), str("\n"));
-    l[0LL] = a;
-    print(tuple(l), str(" "), str("\n"));
-    l[0LL] = 2LL;
-    print(tuple(l), str(" "), str("\n"));
-    l2 = copy(l[slice(0LL, 1LL, std::nullopt)]);
-    print(tuple(l2), str(" "), str("\n"));
-    l.insert(0LL, 100LL);
-    print(tuple(l), str(" "), str("\n"));
-    l.insert(2LL, 200LL);
-    print(tuple(l), str(" "), str("\n"));
-    l.insert((-1LL), 300LL);
-    print(tuple(l), str(" "), str("\n"));
-    l.insert(100LL, 400LL);
-    print(tuple(l), str(" "), str("\n"));
-    l.insert((-100LL), 500LL);
-    print(tuple(l), str(" "), str("\n"));
-    l.remove(200LL);
-    print(tuple(l), str(" "), str("\n"));
-    x = l.pop();
-    print(tuple(x, l), str(" "), str("\n"));
-    y = l.pop(0LL);
-    print(tuple(y, l), str(" "), str("\n"));
-    z = l.pop((-2LL));
-    print(tuple(z, l), str(" "), str("\n"));
-    l.extend(list<int64_t>({7LL, 8LL}));
-    print(tuple(l), str(" "), str("\n"));
-    l3 = l.copy();
-    print(tuple(l3), str(" "), str("\n"));
-    l.clear();
-    print(tuple(l), str(" "), str("\n"));
-    l2 = list<int64_t>({5LL, 3LL, 1LL, 3LL, 9LL});
-    print(tuple(l2.index(3LL)), str(" "), str("\n"));
-    print(tuple(l2.index(3LL, 3LL)), str(" "), str("\n"));
-    print(tuple(l2.index(3LL, 0LL, 2LL)), str(" "), str("\n"));
-    print(tuple(l2.index(9LL, (-2LL))), str(" "), str("\n"));
-    print(tuple(l2.count(3LL)), str(" "), str("\n"));
-    print(tuple(l2.count(42LL)), str(" "), str("\n"));
-    l2.sort(false);
-    print(tuple(l2), str(" "), str("\n"));
-    l2.sort(true);
-    print(tuple(l2), str(" "), str("\n"));
-    l2.sort(false);
-    print(tuple(l2), str(" "), str("\n"));
-    print(tuple(sorted(l2, [](auto x) { return (-x); }, false)), str(" "), str("\n"));
-    print(tuple(sorted(l2, [](auto x) { return (-x); }, true)), str(" "), str("\n"));
-    l2.sort([](auto x) { return (-x); }, false);
-    print(tuple(l2), str(" "), str("\n"));
-    l2.sort([](auto x) { return (-x); }, true);
-    print(tuple(l2), str(" "), str("\n"));
-    l2.reverse();
-    print(tuple(l2), str(" "), str("\n"));
-    n = len(l2);
-    print(tuple(n), str(" "), str("\n"));
-    print(tuple(l2[0LL], l2.back()), str(" "), str("\n"));
-    if (!(((l2.back() == l2[(n - 1LL)])))) throw AssertionError("");
-    l4 = list<int64_t>({1LL, 2LL, 3LL});
-    print(tuple(l4.back()), str(" "), str("\n"));
-    l4.back() += 10LL;
-    if (!(((l4.back() == 13LL)))) throw AssertionError("");
-    print(tuple(l4), str(" "), str("\n"));
-    l5 = (list<int64_t>({1LL, 2LL}) * 3LL);
-    print(tuple(l5), str(" "), str("\n"));
-    l5 = (3LL * list<int64_t>({1LL, 2LL}));
-    print(tuple(l5), str(" "), str("\n"));
-    if (!(((l5 == (list<int64_t>({1LL, 2LL}) * 3LL))))) throw AssertionError("");
-    l5 *= 2LL;
-    print(tuple(l5), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 11
+    list<int64_t> l;    // 13
+    int64_t a;    // 23
+    list<int64_t> l2;    // 30
+    int64_t x;    // 47
+    int64_t y;    // 49
+    int64_t z;    // 51
+    list<int64_t> l3;    // 57
+    int64_t n;    // 89
+    list<int64_t> l4;    // 94
+    list<int64_t> l5;    // 100
+    print(tuple(list<int64_t>(list<int64_t>({1LL, 2LL, 3LL}))), str(" "), str("\n"));    // 12
+    l = list<int64_t>({1LL, 2LL, 3LL});    // 13
+    print(tuple(l), str(" "), str("\n"));    // 14
+    l = list<int64_t>({1LL, 2LL, 3LL});    // 15
+    print(tuple(l), str(" "), str("\n"));    // 16
+    l.append(4LL);    // 17
+    print(tuple(l), str(" "), str("\n"));    // 18
+    l = give_list(l);    // 19
+    print(tuple(l), str(" "), str("\n"));    // 20
+    print(tuple(l[1LL]), str(" "), str("\n"));    // 22
+    a = l[0LL];    // 23
+    print(tuple(l), str(" "), str("\n"));    // 24
+    l[0LL] = a;    // 25
+    print(tuple(l), str(" "), str("\n"));    // 26
+    l[0LL] = 2LL;    // 27
+    print(tuple(l), str(" "), str("\n"));    // 28
+    l2 = copy(l[slice(0LL, 1LL, std::nullopt)]);    // 30
+    print(tuple(l2), str(" "), str("\n"));    // 31
+    l.insert(0LL, 100LL);    // 33
+    print(tuple(l), str(" "), str("\n"));    // 34
+    l.insert(2LL, 200LL);    // 35
+    print(tuple(l), str(" "), str("\n"));    // 36
+    l.insert((-1LL), 300LL);    // 37
+    print(tuple(l), str(" "), str("\n"));    // 38
+    l.insert(100LL, 400LL);    // 39
+    print(tuple(l), str(" "), str("\n"));    // 40
+    l.insert((-100LL), 500LL);    // 41
+    print(tuple(l), str(" "), str("\n"));    // 42
+    l.remove(200LL);    // 44
+    print(tuple(l), str(" "), str("\n"));    // 45
+    x = l.pop();    // 47
+    print(tuple(x, l), str(" "), str("\n"));    // 48
+    y = l.pop(0LL);    // 49
+    print(tuple(y, l), str(" "), str("\n"));    // 50
+    z = l.pop((-2LL));    // 51
+    print(tuple(z, l), str(" "), str("\n"));    // 52
+    l.extend(list<int64_t>({7LL, 8LL}));    // 54
+    print(tuple(l), str(" "), str("\n"));    // 55
+    l3 = l.copy();    // 57
+    print(tuple(l3), str(" "), str("\n"));    // 58
+    l.clear();    // 60
+    print(tuple(l), str(" "), str("\n"));    // 61
+    l2 = list<int64_t>({5LL, 3LL, 1LL, 3LL, 9LL});    // 63
+    print(tuple(l2.index(3LL)), str(" "), str("\n"));    // 64
+    print(tuple(l2.index(3LL, 3LL)), str(" "), str("\n"));    // 65
+    print(tuple(l2.index(3LL, 0LL, 2LL)), str(" "), str("\n"));    // 66
+    print(tuple(l2.index(9LL, (-2LL))), str(" "), str("\n"));    // 67
+    print(tuple(l2.count(3LL)), str(" "), str("\n"));    // 68
+    print(tuple(l2.count(42LL)), str(" "), str("\n"));    // 69
+    l2.sort(false);    // 71
+    print(tuple(l2), str(" "), str("\n"));    // 72
+    l2.sort(true);    // 73
+    print(tuple(l2), str(" "), str("\n"));    // 74
+    l2.sort(false);    // 75
+    print(tuple(l2), str(" "), str("\n"));    // 76
+    print(tuple(sorted(l2, [](auto x) { return (-x); }, false)), str(" "), str("\n"));    // 78
+    print(tuple(sorted(l2, [](auto x) { return (-x); }, true)), str(" "), str("\n"));    // 79
+    l2.sort([](auto x) { return (-x); }, false);    // 81
+    print(tuple(l2), str(" "), str("\n"));    // 82
+    l2.sort([](auto x) { return (-x); }, true);    // 83
+    print(tuple(l2), str(" "), str("\n"));    // 84
+    l2.reverse();    // 86
+    print(tuple(l2), str(" "), str("\n"));    // 87
+    n = len(l2);    // 89
+    print(tuple(n), str(" "), str("\n"));    // 90
+    print(tuple(l2[0LL], l2.back()), str(" "), str("\n"));    // 91
+    if (!(((l2.back() == l2[(n - 1LL)])))) throw AssertionError("");    // 92
+    l4 = list<int64_t>({1LL, 2LL, 3LL});    // 94
+    print(tuple(l4.back()), str(" "), str("\n"));    // 95
+    l4.back() += 10LL;    // 96
+    if (!(((l4.back() == 13LL)))) throw AssertionError("");    // 97
+    print(tuple(l4), str(" "), str("\n"));    // 98
+    l5 = (list<int64_t>({1LL, 2LL}) * 3LL);    // 100
+    print(tuple(l5), str(" "), str("\n"));    // 101
+    l5 = (3LL * list<int64_t>({1LL, 2LL}));    // 102
+    print(tuple(l5), str(" "), str("\n"));    // 103
+    if (!(((l5 == (list<int64_t>({1LL, 2LL}) * 3LL))))) throw AssertionError("");    // 104
+    l5 *= 2LL;    // 105
+    print(tuple(l5), str(" "), str("\n"));    // 106
+    return 0LL;    // 108
+}    // 11
 }
 
 namespace prog_loops {
 
-int run();
+int run();    // 1
 
-int run() {
-    int64_t x;
-    list<int64_t> l;
-    int64_t i;
-    int64_t step;
-    int64_t n;
-    x = 2LL;
-    l = list<int64_t>({2LL, 3LL, 4LL});
-    int64_t __len_1 = len(l);
-    for (i = 0; i < __len_1; ++i) {
-        print(tuple(l), str(" "), str("\n"));
-    }
-    int64_t __stop_5 = x;
-    for (i = 0; i < __stop_5; ++i) {
-        print(tuple(str("first"), i), str(" "), str("\n"));
-    }
-    int64_t __stop_6 = (x + 5LL);
-    for (i = x; i < __stop_6; ++i) {
-        print(tuple(str("second"), i), str(" "), str("\n"));
-    }
-    int64_t __stop_7 = (x + 10LL);
-    for (i = x; i < __stop_7; i += 2) {
-        print(tuple(str("third"), i), str(" "), str("\n"));
-    }
-    int64_t __stop_8 = (x - 7LL);
-    for (i = x; i > __stop_8; i += -2) {
-        print(tuple(str("fourth"), i), str(" "), str("\n"));
-    }
-    step = x;
-    int64_t __stop_9 = (10LL * x);
-    int64_t __step_0 = step;
-    for (i = x;; i += __step_0) {
-        if ((__step_0 > 0 && i >= __stop_9) || (__step_0 < 0 && i <= __stop_9)) break;
-        print(tuple(str("fifth"), i), str(" "), str("\n"));
-    }
-    step = (-2LL);
-    int64_t __stop_10 = (10LL * x);
-    int64_t __step_1 = step;
-    for (i = (5LL * x);; i += __step_1) {
-        if ((__step_1 > 0 && i >= __stop_10) || (__step_1 < 0 && i <= __stop_10)) break;
-        print(tuple(str("sixth"), i), str(" "), str("\n"));
-    }
-    auto && __range_19 = l;
-    for (auto &&__item_19 : __range_19) {
-        n = __item_19;
-        print(tuple(str("seventh"), n), str(" "), str("\n"));
-    }
-    auto && __range_20 = l;
-    for (auto &&__item_20 : __range_20) {
-        n = __item_20;
-        print(tuple(str("eight"), n), str(" "), str("\n"));
-    }
-    return 0LL;
-}
+int run() {    // 1
+    int64_t x;    // 2
+    list<int64_t> l;    // 3
+    int64_t i;    // 4
+    int64_t step;    // 14
+    int64_t n;    // 20
+    x = 2LL;    // 2
+    l = list<int64_t>({2LL, 3LL, 4LL});    // 3
+    int64_t __len_1 = len(l);    // 4
+    for (i = 0; i < __len_1; ++i) {    // 4
+        print(tuple(l), str(" "), str("\n"));    // 5
+    }    // 4
+    int64_t __stop_5 = x;    // 6
+    for (i = 0; i < __stop_5; ++i) {    // 6
+        print(tuple(str("first"), i), str(" "), str("\n"));    // 7
+    }    // 6
+    int64_t __stop_6 = (x + 5LL);    // 8
+    for (i = x; i < __stop_6; ++i) {    // 8
+        print(tuple(str("second"), i), str(" "), str("\n"));    // 9
+    }    // 8
+    int64_t __stop_7 = (x + 10LL);    // 10
+    for (i = x; i < __stop_7; i += 2) {    // 10
+        print(tuple(str("third"), i), str(" "), str("\n"));    // 11
+    }    // 10
+    int64_t __stop_8 = (x - 7LL);    // 12
+    for (i = x; i > __stop_8; i += -2) {    // 12
+        print(tuple(str("fourth"), i), str(" "), str("\n"));    // 13
+    }    // 12
+    step = x;    // 14
+    int64_t __stop_9 = (10LL * x);    // 15
+    int64_t __step_0 = step;    // 15
+    for (i = x;; i += __step_0) {    // 15
+        if ((__step_0 > 0 && i >= __stop_9) || (__step_0 < 0 && i <= __stop_9)) break;    // 15
+        print(tuple(str("fifth"), i), str(" "), str("\n"));    // 16
+    }    // 15
+    step = (-2LL);    // 17
+    int64_t __stop_10 = (10LL * x);    // 18
+    int64_t __step_1 = step;    // 18
+    for (i = (5LL * x);; i += __step_1) {    // 18
+        if ((__step_1 > 0 && i >= __stop_10) || (__step_1 < 0 && i <= __stop_10)) break;    // 18
+        print(tuple(str("sixth"), i), str(" "), str("\n"));    // 19
+    }    // 18
+    auto && __range_19 = l;    // 20
+    for (auto &&__item_19 : __range_19) {    // 20
+        n = __item_19;    // 20
+        print(tuple(str("seventh"), n), str(" "), str("\n"));    // 21
+    }    // 20
+    auto && __range_20 = l;    // 22
+    for (auto &&__item_20 : __range_20) {    // 22
+        n = __item_20;    // 22
+        print(tuple(str("eight"), n), str(" "), str("\n"));    // 23
+    }    // 22
+    return 0LL;    // 24
+}    // 1
 }
 
 namespace prog_math {
 
-int run();
+int run();    // 1
 
-int run() {
-    int64_t a;
-    print(tuple(pow(10LL, 10LL)), str(" "), str("\n"));
-    print(tuple(idiv((-10LL), 3LL)), str(" "), str("\n"));
-    print(tuple(idiv(10LL, 3LL)), str(" "), str("\n"));
-    print(tuple(fdiv(5LL, 2LL)), str(" "), str("\n"));
-    print(tuple(pow(0.5, 4LL)), str(" "), str("\n"));
-    print(tuple((50.0 * 100LL)), str(" "), str("\n"));
-    a = pow(10LL, 10LL);
-    print(tuple((-(-5LL))), str(" "), str("\n"));
-    print(tuple((~5LL)), str(" "), str("\n"));
-    print(tuple((-(+5LL))), str(" "), str("\n"));
-    return a;
-}
+int run() {    // 1
+    int64_t a;    // 8
+    print(tuple(pow(10LL, 10LL)), str(" "), str("\n"));    // 2
+    print(tuple(idiv((-10LL), 3LL)), str(" "), str("\n"));    // 3
+    print(tuple(idiv(10LL, 3LL)), str(" "), str("\n"));    // 4
+    print(tuple(fdiv(5LL, 2LL)), str(" "), str("\n"));    // 5
+    print(tuple(pow(0.5, 4LL)), str(" "), str("\n"));    // 6
+    print(tuple((50.0 * 100LL)), str(" "), str("\n"));    // 7
+    a = pow(10LL, 10LL);    // 8
+    print(tuple((-(-5LL))), str(" "), str("\n"));    // 9
+    print(tuple((~5LL)), str(" "), str("\n"));    // 10
+    print(tuple((-(+5LL))), str(" "), str("\n"));    // 11
+    return a;    // 12
+}    // 1
 }
 
 namespace prog_membership {
 
-int run();
+int run();    // 1
 
-int run() {
-    list<int64_t> l;
-    dict<int64_t, int64_t> d;
-    set<int64_t> s;
-    str text;
-    tuple<int64_t, int64_t, int64_t> t;
-    list<tuple<int64_t, int64_t>> pairs;
-    set<tuple<int64_t, int64_t>> pair_set;
-    dict<tuple<int64_t, int64_t>, str> pair_dict;
-    tuple<tuple<int64_t, int64_t>, tuple<int64_t, int64_t>> nested;
-    list<tuple<str, int64_t>> mixed;
-    list<str> strs;
-    int64_t count;
-    int64_t x;
-    l = list<int64_t>({1LL, 2LL, 3LL});
-    print(tuple((l.__contains__(2LL)), (l.__contains__(9LL))), str(" "), str("\n"));
-    print(tuple((!l.__contains__(2LL)), (!l.__contains__(9LL))), str(" "), str("\n"));
-    d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}});
-    print(tuple((d.__contains__(1LL)), (d.__contains__(9LL))), str(" "), str("\n"));
-    print(tuple((d.values().__contains__(10LL))), str(" "), str("\n"));
-    print(tuple((!d.__contains__(1LL)), (!d.__contains__(9LL))), str(" "), str("\n"));
-    s = set<int64_t>({1LL, 2LL, 3LL});
-    print(tuple((s.__contains__(2LL)), (s.__contains__(9LL))), str(" "), str("\n"));
-    print(tuple((!s.__contains__(2LL)), (!s.__contains__(9LL))), str(" "), str("\n"));
-    text = str("hello world");
-    print(tuple((text.__contains__(str("hello"))), (text.__contains__(str("zz")))), str(" "), str("\n"));
-    print(tuple((text.__contains__(str("o w")))), str(" "), str("\n"));
-    print(tuple((!text.__contains__(str("hello"))), (!text.__contains__(str("zz")))), str(" "), str("\n"));
-    t = tuple(1LL, 2LL, 3LL);
-    print(tuple((t.__contains__(2LL)), (t.__contains__(9LL))), str(" "), str("\n"));
-    pairs = list<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
-    print(tuple((pairs.__contains__(tuple(1LL, 2LL))), (pairs.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));
-    print(tuple((!pairs.__contains__(tuple(1LL, 2LL))), (!pairs.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));
-    print(tuple((pairs.__contains__(tuple(2LL, 1LL)))), str(" "), str("\n"));
-    pair_set = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});
-    print(tuple((pair_set.__contains__(tuple(1LL, 2LL))), (pair_set.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));
-    print(tuple((pair_set.__contains__(tuple(2LL, 1LL)))), str(" "), str("\n"));
-    pair_dict = dict<tuple<int64_t, int64_t>, str>({{tuple(1LL, 2LL), str("a")}, {tuple(3LL, 4LL), str("b")}});
-    print(tuple((pair_dict.__contains__(tuple(1LL, 2LL))), (pair_dict.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));
-    nested = tuple(tuple(1LL, 2LL), tuple(3LL, 4LL));
-    print(tuple((nested.__contains__(tuple(1LL, 2LL))), (nested.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));
-    mixed = list<tuple<str, int64_t>>({tuple(str("a"), 1LL), tuple(str("b"), 2LL)});
-    print(tuple((mixed.__contains__(tuple(str("a"), 1LL))), (mixed.__contains__(tuple(str("a"), 2LL)))), str(" "), str("\n"));
-    strs = list<str>({str("a"), str("b")});
-    print(tuple((strs.__contains__(str("a"))), (strs.__contains__(str("z")))), str(" "), str("\n"));
-    if ((l.__contains__(2LL))) {
-        print(tuple(str("found")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("missing")), str(" "), str("\n"));
-    }
-    count = 0LL;
-    auto && __range_21 = list<int64_t>({1LL, 2LL, 3LL, 4LL});
-    for (auto &&__item_21 : __range_21) {
-        x = __item_21;
-        if ((s.__contains__(x))) {
-            count = (count + 1LL);
-        }
-    }
-    print(tuple(count), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    list<int64_t> l;    // 2
+    dict<int64_t, int64_t> d;    // 6
+    set<int64_t> s;    // 12
+    str text;    // 16
+    tuple<int64_t, int64_t, int64_t> t;    // 21
+    list<tuple<int64_t, int64_t>> pairs;    // 26
+    set<tuple<int64_t, int64_t>> pair_set;    // 32
+    dict<tuple<int64_t, int64_t>, str> pair_dict;    // 36
+    tuple<tuple<int64_t, int64_t>, tuple<int64_t, int64_t>> nested;    // 39
+    list<tuple<str, int64_t>> mixed;    // 42
+    list<str> strs;    // 45
+    int64_t count;    // 54
+    int64_t x;    // 55
+    l = list<int64_t>({1LL, 2LL, 3LL});    // 2
+    print(tuple((l.__contains__(2LL)), (l.__contains__(9LL))), str(" "), str("\n"));    // 3
+    print(tuple((!l.__contains__(2LL)), (!l.__contains__(9LL))), str(" "), str("\n"));    // 4
+    d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}});    // 6
+    print(tuple((d.__contains__(1LL)), (d.__contains__(9LL))), str(" "), str("\n"));    // 8
+    print(tuple((d.values().__contains__(10LL))), str(" "), str("\n"));    // 9
+    print(tuple((!d.__contains__(1LL)), (!d.__contains__(9LL))), str(" "), str("\n"));    // 10
+    s = set<int64_t>({1LL, 2LL, 3LL});    // 12
+    print(tuple((s.__contains__(2LL)), (s.__contains__(9LL))), str(" "), str("\n"));    // 13
+    print(tuple((!s.__contains__(2LL)), (!s.__contains__(9LL))), str(" "), str("\n"));    // 14
+    text = str("hello world");    // 16
+    print(tuple((text.__contains__(str("hello"))), (text.__contains__(str("zz")))), str(" "), str("\n"));    // 17
+    print(tuple((text.__contains__(str("o w")))), str(" "), str("\n"));    // 18
+    print(tuple((!text.__contains__(str("hello"))), (!text.__contains__(str("zz")))), str(" "), str("\n"));    // 19
+    t = tuple(1LL, 2LL, 3LL);    // 21
+    print(tuple((t.__contains__(2LL)), (t.__contains__(9LL))), str(" "), str("\n"));    // 22
+    pairs = list<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});    // 26
+    print(tuple((pairs.__contains__(tuple(1LL, 2LL))), (pairs.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));    // 27
+    print(tuple((!pairs.__contains__(tuple(1LL, 2LL))), (!pairs.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));    // 28
+    print(tuple((pairs.__contains__(tuple(2LL, 1LL)))), str(" "), str("\n"));    // 30
+    pair_set = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(3LL, 4LL)});    // 32
+    print(tuple((pair_set.__contains__(tuple(1LL, 2LL))), (pair_set.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));    // 33
+    print(tuple((pair_set.__contains__(tuple(2LL, 1LL)))), str(" "), str("\n"));    // 34
+    pair_dict = dict<tuple<int64_t, int64_t>, str>({{tuple(1LL, 2LL), str("a")}, {tuple(3LL, 4LL), str("b")}});    // 36
+    print(tuple((pair_dict.__contains__(tuple(1LL, 2LL))), (pair_dict.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));    // 37
+    nested = tuple(tuple(1LL, 2LL), tuple(3LL, 4LL));    // 39
+    print(tuple((nested.__contains__(tuple(1LL, 2LL))), (nested.__contains__(tuple(9LL, 9LL)))), str(" "), str("\n"));    // 40
+    mixed = list<tuple<str, int64_t>>({tuple(str("a"), 1LL), tuple(str("b"), 2LL)});    // 42
+    print(tuple((mixed.__contains__(tuple(str("a"), 1LL))), (mixed.__contains__(tuple(str("a"), 2LL)))), str(" "), str("\n"));    // 43
+    strs = list<str>({str("a"), str("b")});    // 45
+    print(tuple((strs.__contains__(str("a"))), (strs.__contains__(str("z")))), str(" "), str("\n"));    // 46
+    if ((l.__contains__(2LL))) {    // 49
+        print(tuple(str("found")), str(" "), str("\n"));    // 50
+    } else {    // 49
+        print(tuple(str("missing")), str(" "), str("\n"));    // 52
+    }    // 49
+    count = 0LL;    // 54
+    auto && __range_21 = list<int64_t>({1LL, 2LL, 3LL, 4LL});    // 55
+    for (auto &&__item_21 : __range_21) {    // 55
+        x = __item_21;    // 55
+        if ((s.__contains__(x))) {    // 56
+            count = (count + 1LL);    // 57
+        }    // 56
+    }    // 55
+    print(tuple(count), str(" "), str("\n"));    // 58
+    return 0LL;    // 60
+}    // 1
 }
 
 namespace prog_print {
 
-int run();
+int run();    // 1
 
-int run() {
-    int64_t a;
-    int64_t b;
-    int64_t c;
-    a = 1LL;
-    b = 2LL;
-    c = 3LL;
-    print(tuple(), str(" "), str("\n"));
-    print(tuple(a), str(" "), str("\n"));
-    print(tuple(a, b, c), str(" "), str("\n"));
-    print(tuple(), str(" "), str("end"));
-    print(tuple(), str("sep"), str("\n"));
-    print(tuple(a, b, c), str("-"), str("\n"));
-    print(tuple(a), str(" "), str("()"));
-    print(tuple(b), str(" "), str("()"));
-    print(tuple(c), str(" "), str("\n"));
-    print(tuple(a, b, c), str("sep"), str("end"));
-    return 0LL;
-}
+int run() {    // 1
+    int64_t a;    // 2
+    int64_t b;    // 3
+    int64_t c;    // 4
+    a = 1LL;    // 2
+    b = 2LL;    // 3
+    c = 3LL;    // 4
+    print(tuple(), str(" "), str("\n"));    // 5
+    print(tuple(a), str(" "), str("\n"));    // 6
+    print(tuple(a, b, c), str(" "), str("\n"));    // 7
+    print(tuple(), str(" "), str("end"));    // 8
+    print(tuple(), str("sep"), str("\n"));    // 9
+    print(tuple(a, b, c), str("-"), str("\n"));    // 10
+    print(tuple(a), str(" "), str("()"));    // 11
+    print(tuple(b), str(" "), str("()"));    // 12
+    print(tuple(c), str(" "), str("\n"));    // 13
+    print(tuple(a, b, c), str("sep"), str("end"));    // 15
+    return 0LL;    // 17
+}    // 1
 }
 
 namespace prog_set {
 
-int run();
+int run();    // 1
 
-int run() {
-    set<int64_t> s;
-    set<int64_t> a;
-    set<int64_t> b;
-    set<int64_t> small;
-    set<int64_t> big;
-    set<int64_t> nine;
-    set<int64_t> c;
-    set<int64_t> d;
-    set<int64_t> keep;
-    set<int64_t> drop;
-    int64_t total;
-    int64_t x;
-    set<tuple<int64_t, int64_t>> s1;
-    set<tuple<int64_t, int64_t>> s2;
-    set<str> s3;
-    s = set<int64_t>({3LL, 1LL, 2LL, 1LL});
-    print(tuple(len(s)), str(" "), str("\n"));
-    print(tuple(sorted(s, false)), str(" "), str("\n"));
-    print(tuple(sorted(s, true)), str(" "), str("\n"));
-    print(tuple(sorted(s, [](auto x) { return (-x); }, false)), str(" "), str("\n"));
-    print(tuple(sorted(s, [](auto x) { return (-x); }, true)), str(" "), str("\n"));
-    s.add(4LL);
-    print(tuple(sorted(s, false)), str(" "), str("\n"));
-    s.add(4LL);
-    print(tuple(len(s)), str(" "), str("\n"));
-    s.remove(4LL);
-    print(tuple(sorted(s, false)), str(" "), str("\n"));
-    s.discard(99LL);
-    print(tuple(sorted(s, false)), str(" "), str("\n"));
-    a = set<int64_t>({1LL, 2LL, 3LL});
-    b = set<int64_t>({3LL, 4LL});
-    print(tuple(sorted((a | b), false)), str(" "), str("\n"));
-    print(tuple(sorted((a & b), false)), str(" "), str("\n"));
-    print(tuple(sorted((a - b), false)), str(" "), str("\n"));
-    print(tuple(sorted((a ^ b), false)), str(" "), str("\n"));
-    print(tuple(sorted(a.union_(b), false)), str(" "), str("\n"));
-    print(tuple(sorted(a.intersection(b), false)), str(" "), str("\n"));
-    print(tuple(sorted(a.difference(b), false)), str(" "), str("\n"));
-    print(tuple(sorted(a.symmetric_difference(b), false)), str(" "), str("\n"));
-    print(tuple(sorted(a, false), sorted(b, false)), str(" "), str("\n"));
-    small = set<int64_t>({1LL, 2LL});
-    big = set<int64_t>({1LL, 2LL, 3LL});
-    print(tuple(small.issubset(big)), str(" "), str("\n"));
-    print(tuple(big.issuperset(small)), str(" "), str("\n"));
-    nine = set<int64_t>({9LL});
-    print(tuple(small.isdisjoint(nine)), str(" "), str("\n"));
-    print(tuple(small.isdisjoint(big)), str(" "), str("\n"));
-    print(tuple(((small <= big)), ((small < big))), str(" "), str("\n"));
-    print(tuple(((big >= small)), ((big > small))), str(" "), str("\n"));
-    print(tuple(((set<int64_t>({1LL, 2LL}) == set<int64_t>({2LL, 1LL})))), str(" "), str("\n"));
-    print(tuple(((small != big))), str(" "), str("\n"));
-    c = a.copy();
-    c.add(99LL);
-    print(tuple(sorted(a, false), sorted(c, false)), str(" "), str("\n"));
-    d = set<int64_t>({1LL, 2LL, 3LL});
-    d.update(set<int64_t>({4LL}));
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    keep = set<int64_t>({2LL, 3LL, 4LL});
-    d.intersection_update(keep);
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    drop = set<int64_t>({4LL});
-    d.difference_update(drop);
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    d.symmetric_difference_update(set<int64_t>({3LL, 5LL}));
-    print(tuple(sorted(d, false)), str(" "), str("\n"));
-    d.clear();
-    print(tuple(len(d)), str(" "), str("\n"));
-    total = 0LL;
-    auto && __range_22 = set<int64_t>({1LL, 2LL, 3LL});
-    for (auto &&__item_22 : __range_22) {
-        x = __item_22;
-        total = (total + x);
-    }
-    print(tuple(total), str(" "), str("\n"));
-    s1 = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(1LL, 3LL)});
-    print(tuple(sorted(s1, false)), str(" "), str("\n"));
-    s2 = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(1LL, 2LL)});
-    print(tuple(sorted(s2, false)), str(" "), str("\n"));
-    s3 = set<str>({str("Hello"), str("World")});
-    print(tuple(sorted(s3, false)), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    set<int64_t> s;    // 3
+    set<int64_t> a;    // 20
+    set<int64_t> b;    // 21
+    set<int64_t> small;    // 32
+    set<int64_t> big;    // 33
+    set<int64_t> nine;    // 36
+    set<int64_t> c;    // 44
+    set<int64_t> d;    // 48
+    set<int64_t> keep;    // 51
+    set<int64_t> drop;    // 54
+    int64_t total;    // 63
+    int64_t x;    // 64
+    set<tuple<int64_t, int64_t>> s1;    // 68
+    set<tuple<int64_t, int64_t>> s2;    // 70
+    set<str> s3;    // 72
+    s = set<int64_t>({3LL, 1LL, 2LL, 1LL});    // 3
+    print(tuple(len(s)), str(" "), str("\n"));    // 4
+    print(tuple(sorted(s, false)), str(" "), str("\n"));    // 5
+    print(tuple(sorted(s, true)), str(" "), str("\n"));    // 6
+    print(tuple(sorted(s, [](auto x) { return (-x); }, false)), str(" "), str("\n"));    // 7
+    print(tuple(sorted(s, [](auto x) { return (-x); }, true)), str(" "), str("\n"));    // 8
+    s.add(4LL);    // 10
+    print(tuple(sorted(s, false)), str(" "), str("\n"));    // 11
+    s.add(4LL);    // 12
+    print(tuple(len(s)), str(" "), str("\n"));    // 13
+    s.remove(4LL);    // 15
+    print(tuple(sorted(s, false)), str(" "), str("\n"));    // 16
+    s.discard(99LL);    // 17
+    print(tuple(sorted(s, false)), str(" "), str("\n"));    // 18
+    a = set<int64_t>({1LL, 2LL, 3LL});    // 20
+    b = set<int64_t>({3LL, 4LL});    // 21
+    print(tuple(sorted((a | b), false)), str(" "), str("\n"));    // 22
+    print(tuple(sorted((a & b), false)), str(" "), str("\n"));    // 23
+    print(tuple(sorted((a - b), false)), str(" "), str("\n"));    // 24
+    print(tuple(sorted((a ^ b), false)), str(" "), str("\n"));    // 25
+    print(tuple(sorted(a.union_(b), false)), str(" "), str("\n"));    // 26
+    print(tuple(sorted(a.intersection(b), false)), str(" "), str("\n"));    // 27
+    print(tuple(sorted(a.difference(b), false)), str(" "), str("\n"));    // 28
+    print(tuple(sorted(a.symmetric_difference(b), false)), str(" "), str("\n"));    // 29
+    print(tuple(sorted(a, false), sorted(b, false)), str(" "), str("\n"));    // 30
+    small = set<int64_t>({1LL, 2LL});    // 32
+    big = set<int64_t>({1LL, 2LL, 3LL});    // 33
+    print(tuple(small.issubset(big)), str(" "), str("\n"));    // 34
+    print(tuple(big.issuperset(small)), str(" "), str("\n"));    // 35
+    nine = set<int64_t>({9LL});    // 36
+    print(tuple(small.isdisjoint(nine)), str(" "), str("\n"));    // 37
+    print(tuple(small.isdisjoint(big)), str(" "), str("\n"));    // 38
+    print(tuple(((small <= big)), ((small < big))), str(" "), str("\n"));    // 39
+    print(tuple(((big >= small)), ((big > small))), str(" "), str("\n"));    // 40
+    print(tuple(((set<int64_t>({1LL, 2LL}) == set<int64_t>({2LL, 1LL})))), str(" "), str("\n"));    // 41
+    print(tuple(((small != big))), str(" "), str("\n"));    // 42
+    c = a.copy();    // 44
+    c.add(99LL);    // 45
+    print(tuple(sorted(a, false), sorted(c, false)), str(" "), str("\n"));    // 46
+    d = set<int64_t>({1LL, 2LL, 3LL});    // 48
+    d.update(set<int64_t>({4LL}));    // 49
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 50
+    keep = set<int64_t>({2LL, 3LL, 4LL});    // 51
+    d.intersection_update(keep);    // 52
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 53
+    drop = set<int64_t>({4LL});    // 54
+    d.difference_update(drop);    // 55
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 56
+    d.symmetric_difference_update(set<int64_t>({3LL, 5LL}));    // 57
+    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 58
+    d.clear();    // 60
+    print(tuple(len(d)), str(" "), str("\n"));    // 61
+    total = 0LL;    // 63
+    auto && __range_22 = set<int64_t>({1LL, 2LL, 3LL});    // 64
+    for (auto &&__item_22 : __range_22) {    // 64
+        x = __item_22;    // 64
+        total = (total + x);    // 65
+    }    // 64
+    print(tuple(total), str(" "), str("\n"));    // 66
+    s1 = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(1LL, 3LL)});    // 68
+    print(tuple(sorted(s1, false)), str(" "), str("\n"));    // 69
+    s2 = set<tuple<int64_t, int64_t>>({tuple(1LL, 2LL), tuple(1LL, 2LL)});    // 70
+    print(tuple(sorted(s2, false)), str(" "), str("\n"));    // 71
+    s3 = set<str>({str("Hello"), str("World")});    // 72
+    print(tuple(sorted(s3, false)), str(" "), str("\n"));    // 73
+    return 0LL;    // 75
+}    // 1
 }
 
 namespace prog_slice {
 
-int run();
+int run();    // 4
 
-int run() {
-    list<int64_t> l;
-    list<int64_t> empty;
-    list<int64_t> original;
-    list<int64_t> copied;
-    str s;
-    l = list<int64_t>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});
-    print(tuple(l[slice(0LL, 1LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(1LL, 4LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, 3LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(3LL, std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, std::nullopt, 2LL)]), str(" "), str("\n"));
-    print(tuple(l[slice(1LL, 5LL, 2LL)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, std::nullopt, 3LL)]), str(" "), str("\n"));
-    print(tuple(l[slice((-3LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, (-2LL), std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice((-4LL), (-1LL), std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice((-1LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, std::nullopt, (-1LL))]), str(" "), str("\n"));
-    print(tuple(l[slice(4LL, 1LL, (-1LL))]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, std::nullopt, (-2LL))]), str(" "), str("\n"));
-    print(tuple(l[slice((-1LL), (-4LL), (-1LL))]), str(" "), str("\n"));
-    print(tuple(l[slice(10LL, 20LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice((-100LL), 100LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(std::nullopt, 100LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice((-100LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(2LL, 2LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(4LL, 1LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(l[slice(1LL, 4LL, (-1LL))]), str(" "), str("\n"));
-    empty = list<int64_t>();
-    print(tuple(empty[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(empty[slice(0LL, 5LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(empty[slice(std::nullopt, std::nullopt, (-1LL))]), str(" "), str("\n"));
-    original = list<int64_t>({1LL, 2LL, 3LL});
-    copied = copy(original[slice(std::nullopt, std::nullopt, std::nullopt)]);
-    copied.append(4LL);
-    print(tuple(original, copied), str(" "), str("\n"));
-    s = str("abcdef");
-    print(tuple(s[slice(0LL, 1LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(1LL, 4LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(std::nullopt, 3LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(3LL, std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(std::nullopt, std::nullopt, 2LL)]), str(" "), str("\n"));
-    print(tuple(s[slice(1LL, 5LL, 2LL)]), str(" "), str("\n"));
-    print(tuple(s[slice((-3LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(std::nullopt, (-2LL), std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice((-4LL), (-1LL), std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(std::nullopt, std::nullopt, (-1LL))]), str(" "), str("\n"));
-    print(tuple(s[slice(4LL, 1LL, (-1LL))]), str(" "), str("\n"));
-    print(tuple(s[slice(std::nullopt, std::nullopt, (-2LL))]), str(" "), str("\n"));
-    print(tuple(s[slice(100LL, 200LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice((-100LL), 100LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(2LL, 2LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(s[slice(4LL, 1LL, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(str("")[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));
-    print(tuple(str("")[slice(0LL, 5LL, std::nullopt)]), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 4
+    list<int64_t> l;    // 5
+    list<int64_t> empty;    // 38
+    list<int64_t> original;    // 44
+    list<int64_t> copied;    // 45
+    str s;    // 49
+    l = list<int64_t>({0LL, 1LL, 2LL, 3LL, 4LL, 5LL});    // 5
+    print(tuple(l[slice(0LL, 1LL, std::nullopt)]), str(" "), str("\n"));    // 7
+    print(tuple(l[slice(1LL, 4LL, std::nullopt)]), str(" "), str("\n"));    // 8
+    print(tuple(l[slice(std::nullopt, 3LL, std::nullopt)]), str(" "), str("\n"));    // 9
+    print(tuple(l[slice(3LL, std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 10
+    print(tuple(l[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 11
+    print(tuple(l[slice(std::nullopt, std::nullopt, 2LL)]), str(" "), str("\n"));    // 13
+    print(tuple(l[slice(1LL, 5LL, 2LL)]), str(" "), str("\n"));    // 14
+    print(tuple(l[slice(std::nullopt, std::nullopt, 3LL)]), str(" "), str("\n"));    // 15
+    print(tuple(l[slice((-3LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 17
+    print(tuple(l[slice(std::nullopt, (-2LL), std::nullopt)]), str(" "), str("\n"));    // 18
+    print(tuple(l[slice((-4LL), (-1LL), std::nullopt)]), str(" "), str("\n"));    // 19
+    print(tuple(l[slice((-1LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 20
+    print(tuple(l[slice(std::nullopt, std::nullopt, (-1LL))]), str(" "), str("\n"));    // 22
+    print(tuple(l[slice(4LL, 1LL, (-1LL))]), str(" "), str("\n"));    // 23
+    print(tuple(l[slice(std::nullopt, std::nullopt, (-2LL))]), str(" "), str("\n"));    // 24
+    print(tuple(l[slice((-1LL), (-4LL), (-1LL))]), str(" "), str("\n"));    // 25
+    print(tuple(l[slice(10LL, 20LL, std::nullopt)]), str(" "), str("\n"));    // 28
+    print(tuple(l[slice((-100LL), 100LL, std::nullopt)]), str(" "), str("\n"));    // 29
+    print(tuple(l[slice(std::nullopt, 100LL, std::nullopt)]), str(" "), str("\n"));    // 30
+    print(tuple(l[slice((-100LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 31
+    print(tuple(l[slice(2LL, 2LL, std::nullopt)]), str(" "), str("\n"));    // 34
+    print(tuple(l[slice(4LL, 1LL, std::nullopt)]), str(" "), str("\n"));    // 35
+    print(tuple(l[slice(1LL, 4LL, (-1LL))]), str(" "), str("\n"));    // 36
+    empty = list<int64_t>();    // 38
+    print(tuple(empty[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 39
+    print(tuple(empty[slice(0LL, 5LL, std::nullopt)]), str(" "), str("\n"));    // 40
+    print(tuple(empty[slice(std::nullopt, std::nullopt, (-1LL))]), str(" "), str("\n"));    // 41
+    original = list<int64_t>({1LL, 2LL, 3LL});    // 44
+    copied = copy(original[slice(std::nullopt, std::nullopt, std::nullopt)]);    // 45
+    copied.append(4LL);    // 46
+    print(tuple(original, copied), str(" "), str("\n"));    // 47
+    s = str("abcdef");    // 49
+    print(tuple(s[slice(0LL, 1LL, std::nullopt)]), str(" "), str("\n"));    // 51
+    print(tuple(s[slice(1LL, 4LL, std::nullopt)]), str(" "), str("\n"));    // 52
+    print(tuple(s[slice(std::nullopt, 3LL, std::nullopt)]), str(" "), str("\n"));    // 53
+    print(tuple(s[slice(3LL, std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 54
+    print(tuple(s[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 55
+    print(tuple(s[slice(std::nullopt, std::nullopt, 2LL)]), str(" "), str("\n"));    // 57
+    print(tuple(s[slice(1LL, 5LL, 2LL)]), str(" "), str("\n"));    // 58
+    print(tuple(s[slice((-3LL), std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 60
+    print(tuple(s[slice(std::nullopt, (-2LL), std::nullopt)]), str(" "), str("\n"));    // 61
+    print(tuple(s[slice((-4LL), (-1LL), std::nullopt)]), str(" "), str("\n"));    // 62
+    print(tuple(s[slice(std::nullopt, std::nullopt, (-1LL))]), str(" "), str("\n"));    // 64
+    print(tuple(s[slice(4LL, 1LL, (-1LL))]), str(" "), str("\n"));    // 65
+    print(tuple(s[slice(std::nullopt, std::nullopt, (-2LL))]), str(" "), str("\n"));    // 66
+    print(tuple(s[slice(100LL, 200LL, std::nullopt)]), str(" "), str("\n"));    // 68
+    print(tuple(s[slice((-100LL), 100LL, std::nullopt)]), str(" "), str("\n"));    // 69
+    print(tuple(s[slice(2LL, 2LL, std::nullopt)]), str(" "), str("\n"));    // 70
+    print(tuple(s[slice(4LL, 1LL, std::nullopt)]), str(" "), str("\n"));    // 71
+    print(tuple(str("")[slice(std::nullopt, std::nullopt, std::nullopt)]), str(" "), str("\n"));    // 73
+    print(tuple(str("")[slice(0LL, 5LL, std::nullopt)]), str(" "), str("\n"));    // 74
+    return 0LL;    // 76
+}    // 4
 }
 
 namespace prog_string {
 
-int run();
+int run();    // 1
 
-int run() {
-    str s;
-    str padded;
-    str a;
-    str b;
-    str joined;
-    str c;
-    s = str("Hello World");
-    print(tuple(s), str(" "), str("\n"));
-    print(tuple(len(s)), str(" "), str("\n"));
-    print(tuple(s[0LL], s.back()), str(" "), str("\n"));
-    print(tuple(s.upper()), str(" "), str("\n"));
-    print(tuple(s.lower()), str(" "), str("\n"));
-    print(tuple(s.swapcase()), str(" "), str("\n"));
-    print(tuple(s.capitalize()), str(" "), str("\n"));
-    print(tuple(str("hello world").title()), str(" "), str("\n"));
-    print(tuple(s.casefold()), str(" "), str("\n"));
-    print(tuple(s.find(str("o"))), str(" "), str("\n"));
-    print(tuple(s.find(str("o"), 5LL)), str(" "), str("\n"));
-    print(tuple(s.rfind(str("o"))), str(" "), str("\n"));
-    print(tuple(s.find(str("zz"))), str(" "), str("\n"));
-    print(tuple(s.index(str("World"))), str(" "), str("\n"));
-    print(tuple(s.count(str("l"))), str(" "), str("\n"));
-    print(tuple(s.count(str("zz"))), str(" "), str("\n"));
-    print(tuple(s.startswith(str("Hello"))), str(" "), str("\n"));
-    print(tuple(s.startswith(str("World"))), str(" "), str("\n"));
-    print(tuple(s.endswith(str("World"))), str(" "), str("\n"));
-    print(tuple(s.replace(str("l"), str("L"))), str(" "), str("\n"));
-    print(tuple(s.replace(str("l"), str("L"), 2LL)), str(" "), str("\n"));
-    print(tuple(s.removeprefix(str("Hello "))), str(" "), str("\n"));
-    print(tuple(s.removesuffix(str(" World"))), str(" "), str("\n"));
-    padded = str("  spaced  ");
-    print(tuple(padded.strip()), str(" "), str("\n"));
-    print(tuple(padded.lstrip()), str(" "), str("\n"));
-    print(tuple(padded.rstrip()), str(" "), str("\n"));
-    print(tuple(str("xxhixx").strip(str("x"))), str(" "), str("\n"));
-    print(tuple(str("hi").ljust(5LL, str("."))), str(" "), str("\n"));
-    print(tuple(str("hi").rjust(5LL, str("."))), str(" "), str("\n"));
-    print(tuple(str("hi").center(6LL, str("."))), str(" "), str("\n"));
-    print(tuple(str("42").zfill(5LL)), str(" "), str("\n"));
-    print(tuple(str("-42").zfill(5LL)), str(" "), str("\n"));
-    print(tuple(str("abc").isalpha(), str("a1").isalpha()), str(" "), str("\n"));
-    print(tuple(str("123").isdigit(), str("12a").isdigit()), str(" "), str("\n"));
-    print(tuple(str("a1").isalnum(), str("a-1").isalnum()), str(" "), str("\n"));
-    print(tuple(str("  ").isspace(), str("a ").isspace()), str(" "), str("\n"));
-    print(tuple(str("ABC").isupper(), str("Abc").isupper()), str(" "), str("\n"));
-    print(tuple(str("abc").islower(), str("Abc").islower()), str(" "), str("\n"));
-    print(tuple(s.split()), str(" "), str("\n"));
-    print(tuple(str("a,b,c").split(str(","))), str(" "), str("\n"));
-    print(tuple(str("a,,b").split(str(","))), str(" "), str("\n"));
-    print(tuple(str("-").join(str("a,b,c").split(str(",")))), str(" "), str("\n"));
-    print(tuple(str("one\ntwo").splitlines()), str(" "), str("\n"));
-    a = str("foo");
-    b = str("bar");
-    print(tuple((a + b)), str(" "), str("\n"));
-    print(tuple((a * 3LL)), str(" "), str("\n"));
-    print(tuple(((a == str("foo"))), ((a == b))), str(" "), str("\n"));
-    print(tuple(((a < b)), ((a > b))), str(" "), str("\n"));
-    print(tuple(to_str(42LL)), str(" "), str("\n"));
-    print(tuple(to_str(3.5)), str(" "), str("\n"));
-    print(tuple(to_str(true)), str(" "), str("\n"));
-    print(tuple(to_int(str("100"))), str(" "), str("\n"));
-    print(tuple(to_float(str("0.5"))), str(" "), str("\n"));
-    joined = str("");
-    auto && __range_23 = str("abc");
-    for (auto &&__item_23 : __range_23) {
-        c = __item_23;
-        joined = ((joined + c) + str("."));
-    }
-    print(tuple(joined), str(" "), str("\n"));
-    return 0LL;
-}
+int run() {    // 1
+    str s;    // 2
+    str padded;    // 30
+    str a;    // 55
+    str b;    // 56
+    str joined;    // 68
+    str c;    // 69
+    s = str("Hello World");    // 2
+    print(tuple(s), str(" "), str("\n"));    // 3
+    print(tuple(len(s)), str(" "), str("\n"));    // 4
+    print(tuple(s[0LL], s.back()), str(" "), str("\n"));    // 5
+    print(tuple(s.upper()), str(" "), str("\n"));    // 7
+    print(tuple(s.lower()), str(" "), str("\n"));    // 8
+    print(tuple(s.swapcase()), str(" "), str("\n"));    // 9
+    print(tuple(s.capitalize()), str(" "), str("\n"));    // 10
+    print(tuple(str("hello world").title()), str(" "), str("\n"));    // 11
+    print(tuple(s.casefold()), str(" "), str("\n"));    // 12
+    print(tuple(s.find(str("o"))), str(" "), str("\n"));    // 14
+    print(tuple(s.find(str("o"), 5LL)), str(" "), str("\n"));    // 15
+    print(tuple(s.rfind(str("o"))), str(" "), str("\n"));    // 16
+    print(tuple(s.find(str("zz"))), str(" "), str("\n"));    // 17
+    print(tuple(s.index(str("World"))), str(" "), str("\n"));    // 18
+    print(tuple(s.count(str("l"))), str(" "), str("\n"));    // 19
+    print(tuple(s.count(str("zz"))), str(" "), str("\n"));    // 20
+    print(tuple(s.startswith(str("Hello"))), str(" "), str("\n"));    // 21
+    print(tuple(s.startswith(str("World"))), str(" "), str("\n"));    // 22
+    print(tuple(s.endswith(str("World"))), str(" "), str("\n"));    // 23
+    print(tuple(s.replace(str("l"), str("L"))), str(" "), str("\n"));    // 25
+    print(tuple(s.replace(str("l"), str("L"), 2LL)), str(" "), str("\n"));    // 26
+    print(tuple(s.removeprefix(str("Hello "))), str(" "), str("\n"));    // 27
+    print(tuple(s.removesuffix(str(" World"))), str(" "), str("\n"));    // 28
+    padded = str("  spaced  ");    // 30
+    print(tuple(padded.strip()), str(" "), str("\n"));    // 31
+    print(tuple(padded.lstrip()), str(" "), str("\n"));    // 32
+    print(tuple(padded.rstrip()), str(" "), str("\n"));    // 33
+    print(tuple(str("xxhixx").strip(str("x"))), str(" "), str("\n"));    // 34
+    print(tuple(str("hi").ljust(5LL, str("."))), str(" "), str("\n"));    // 36
+    print(tuple(str("hi").rjust(5LL, str("."))), str(" "), str("\n"));    // 37
+    print(tuple(str("hi").center(6LL, str("."))), str(" "), str("\n"));    // 38
+    print(tuple(str("42").zfill(5LL)), str(" "), str("\n"));    // 39
+    print(tuple(str("-42").zfill(5LL)), str(" "), str("\n"));    // 40
+    print(tuple(str("abc").isalpha(), str("a1").isalpha()), str(" "), str("\n"));    // 42
+    print(tuple(str("123").isdigit(), str("12a").isdigit()), str(" "), str("\n"));    // 43
+    print(tuple(str("a1").isalnum(), str("a-1").isalnum()), str(" "), str("\n"));    // 44
+    print(tuple(str("  ").isspace(), str("a ").isspace()), str(" "), str("\n"));    // 45
+    print(tuple(str("ABC").isupper(), str("Abc").isupper()), str(" "), str("\n"));    // 46
+    print(tuple(str("abc").islower(), str("Abc").islower()), str(" "), str("\n"));    // 47
+    print(tuple(s.split()), str(" "), str("\n"));    // 49
+    print(tuple(str("a,b,c").split(str(","))), str(" "), str("\n"));    // 50
+    print(tuple(str("a,,b").split(str(","))), str(" "), str("\n"));    // 51
+    print(tuple(str("-").join(str("a,b,c").split(str(",")))), str(" "), str("\n"));    // 52
+    print(tuple(str("one\ntwo").splitlines()), str(" "), str("\n"));    // 53
+    a = str("foo");    // 55
+    b = str("bar");    // 56
+    print(tuple((a + b)), str(" "), str("\n"));    // 57
+    print(tuple((a * 3LL)), str(" "), str("\n"));    // 58
+    print(tuple(((a == str("foo"))), ((a == b))), str(" "), str("\n"));    // 59
+    print(tuple(((a < b)), ((a > b))), str(" "), str("\n"));    // 60
+    print(tuple(to_str(42LL)), str(" "), str("\n"));    // 62
+    print(tuple(to_str(3.5)), str(" "), str("\n"));    // 63
+    print(tuple(to_str(true)), str(" "), str("\n"));    // 64
+    print(tuple(to_int(str("100"))), str(" "), str("\n"));    // 65
+    print(tuple(to_float(str("0.5"))), str(" "), str("\n"));    // 66
+    joined = str("");    // 68
+    auto && __range_23 = str("abc");    // 69
+    for (auto &&__item_23 : __range_23) {    // 69
+        c = __item_23;    // 69
+        joined = ((joined + c) + str("."));    // 70
+    }    // 69
+    print(tuple(joined), str(" "), str("\n"));    // 71
+    return 0LL;    // 73
+}    // 1
 }
 
 namespace prog_truthy {
 
-int run();
+int run();    // 1
 
-int run() {
-    int64_t a;
-    int64_t b;
-    str s1;
-    str s2;
-    list<int64_t> empty;
-    list<int64_t> full;
-    int64_t n;
-    a = 0LL;
-    b = 5LL;
-    if (a) {
-        print(tuple(str("a truthy")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("a falsy")), str(" "), str("\n"));
-    }
-    if (b) {
-        print(tuple(str("b truthy")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("b falsy")), str(" "), str("\n"));
-    }
-    s1 = str("");
-    s2 = str("hello");
-    if (to_bool(s1)) {
-        print(tuple(str("s1 truthy")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("s1 falsy")), str(" "), str("\n"));
-    }
-    if (to_bool(s2)) {
-        print(tuple(str("s2 truthy")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("s2 falsy")), str(" "), str("\n"));
-    }
-    empty = list<int64_t>();
-    full = list<int64_t>({1LL, 2LL, 3LL});
-    if (to_bool(empty)) {
-        print(tuple(str("empty truthy")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("empty falsy")), str(" "), str("\n"));
-    }
-    if (to_bool(full)) {
-        print(tuple(str("full truthy")), str(" "), str("\n"));
-    } else {
-        print(tuple(str("full falsy")), str(" "), str("\n"));
-    }
-    print(tuple((!to_bool(a))), str(" "), str("\n"));
-    print(tuple((!to_bool(b))), str(" "), str("\n"));
-    print(tuple(to_bool(a)), str(" "), str("\n"));
-    print(tuple(to_bool(b)), str(" "), str("\n"));
-    print(tuple(to_bool(0.0)), str(" "), str("\n"));
-    print(tuple(to_bool(1.5)), str(" "), str("\n"));
-    print(tuple(to_bool(true)), str(" "), str("\n"));
-    print(tuple(to_bool(false)), str(" "), str("\n"));
-    n = 3LL;
-    while (n) {
-        print(tuple(n), str(" "), str("\n"));
-        n = (n - 1LL);
-    }
-    return 0LL;
-}
+int run() {    // 1
+    int64_t a;    // 2
+    int64_t b;    // 3
+    str s1;    // 13
+    str s2;    // 14
+    list<int64_t> empty;    // 24
+    list<int64_t> full;    // 25
+    int64_t n;    // 44
+    a = 0LL;    // 2
+    b = 5LL;    // 3
+    if (a) {    // 4
+        print(tuple(str("a truthy")), str(" "), str("\n"));    // 5
+    } else {    // 4
+        print(tuple(str("a falsy")), str(" "), str("\n"));    // 7
+    }    // 4
+    if (b) {    // 8
+        print(tuple(str("b truthy")), str(" "), str("\n"));    // 9
+    } else {    // 8
+        print(tuple(str("b falsy")), str(" "), str("\n"));    // 11
+    }    // 8
+    s1 = str("");    // 13
+    s2 = str("hello");    // 14
+    if (to_bool(s1)) {    // 15
+        print(tuple(str("s1 truthy")), str(" "), str("\n"));    // 16
+    } else {    // 15
+        print(tuple(str("s1 falsy")), str(" "), str("\n"));    // 18
+    }    // 15
+    if (to_bool(s2)) {    // 19
+        print(tuple(str("s2 truthy")), str(" "), str("\n"));    // 20
+    } else {    // 19
+        print(tuple(str("s2 falsy")), str(" "), str("\n"));    // 22
+    }    // 19
+    empty = list<int64_t>();    // 24
+    full = list<int64_t>({1LL, 2LL, 3LL});    // 25
+    if (to_bool(empty)) {    // 26
+        print(tuple(str("empty truthy")), str(" "), str("\n"));    // 27
+    } else {    // 26
+        print(tuple(str("empty falsy")), str(" "), str("\n"));    // 29
+    }    // 26
+    if (to_bool(full)) {    // 30
+        print(tuple(str("full truthy")), str(" "), str("\n"));    // 31
+    } else {    // 30
+        print(tuple(str("full falsy")), str(" "), str("\n"));    // 33
+    }    // 30
+    print(tuple((!to_bool(a))), str(" "), str("\n"));    // 35
+    print(tuple((!to_bool(b))), str(" "), str("\n"));    // 36
+    print(tuple(to_bool(a)), str(" "), str("\n"));    // 37
+    print(tuple(to_bool(b)), str(" "), str("\n"));    // 38
+    print(tuple(to_bool(0.0)), str(" "), str("\n"));    // 39
+    print(tuple(to_bool(1.5)), str(" "), str("\n"));    // 40
+    print(tuple(to_bool(true)), str(" "), str("\n"));    // 41
+    print(tuple(to_bool(false)), str(" "), str("\n"));    // 42
+    n = 3LL;    // 44
+    while (n) {    // 45
+        print(tuple(n), str(" "), str("\n"));    // 46
+        n = (n - 1LL);    // 47
+    }    // 45
+    return 0LL;    // 49
+}    // 1
 }
 
 namespace prog_tuple {
 
-int run();
+int run();    // 4
 
-int run() {
-    int64_t a;
-    int64_t b;
-    int64_t x;
-    str s;
-    int64_t p;
-    int64_t q;
-    int64_t m;
-    int64_t n;
-    tuple<int64_t, int64_t> t;
-    tuple<int64_t, int64_t> t2;
-    int64_t z;
-    destructure(a, b) = tuple(1LL, 2LL);
-    print(tuple(str("Test 1 - Simple destructure:"), a, b), str(" "), str("\n"));
-    destructure(a, b) = tuple(10LL, 20LL);
-    print(tuple(str("Test 2 - Reassign:"), a, b), str(" "), str("\n"));
-    destructure(x, s) = tuple(42LL, str("hello"));
-    print(tuple(str("Test 3 - Mixed types:"), x, s), str(" "), str("\n"));
-    destructure(p, q) = tuple(100LL, 200LL);
-    destructure(m, n) = tuple(p, q);
-    print(tuple(str("Test 4 - Chained destructure:"), m, n), str(" "), str("\n"));
-    t = tuple(1LL, 2LL);
-    t2 = copy(t);
-    z = t.get<0>();
-    z = t.get<1>();
-    return 0LL;
-}
+int run() {    // 4
+    int64_t a;    // 6
+    int64_t b;    // 6
+    int64_t x;    // 14
+    str s;    // 14
+    int64_t p;    // 18
+    int64_t q;    // 18
+    int64_t m;    // 19
+    int64_t n;    // 19
+    tuple<int64_t, int64_t> t;    // 22
+    tuple<int64_t, int64_t> t2;    // 23
+    int64_t z;    // 25
+    destructure(a, b) = tuple(1LL, 2LL);    // 6
+    print(tuple(str("Test 1 - Simple destructure:"), a, b), str(" "), str("\n"));    // 7
+    destructure(a, b) = tuple(10LL, 20LL);    // 10
+    print(tuple(str("Test 2 - Reassign:"), a, b), str(" "), str("\n"));    // 11
+    destructure(x, s) = tuple(42LL, str("hello"));    // 14
+    print(tuple(str("Test 3 - Mixed types:"), x, s), str(" "), str("\n"));    // 15
+    destructure(p, q) = tuple(100LL, 200LL);    // 18
+    destructure(m, n) = tuple(p, q);    // 19
+    print(tuple(str("Test 4 - Chained destructure:"), m, n), str(" "), str("\n"));    // 20
+    t = tuple(1LL, 2LL);    // 22
+    t2 = copy(t);    // 23
+    z = t.get<0>();    // 25
+    z = t.get<1>();    // 26
+    return 0LL;    // 28
+}    // 4
 }
 
 #include <cstring>

@@ -1,0 +1,8 @@
+# serializer version: 1
+# name: test_broken_extern_call_maps_to_python_line
+  '''
+  IMPORTANT: Error likely corresponds to python line(s): 5, 6
+    5:     a = broken_function(5)
+    6:     b = broken_function(10)
+  '''
+# ---

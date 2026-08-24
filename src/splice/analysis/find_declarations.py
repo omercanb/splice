@@ -1,5 +1,7 @@
 """Save the variables that need to be declared inside each function"""
 
+from dataclasses import dataclass
+
 from mypy.nodes import (
     AssignmentStmt,
     CallExpr,
@@ -17,13 +19,21 @@ from mypy.types import CallableType, Type, get_proper_type
 from splice.visitor import Traverser
 
 
+@dataclass(frozen=True)
+class Declaration:
+    type: Type
+    # The line of the first assignment - so the declaration can be tagged
+    # with it instead of the enclosing function's own line.
+    line: int
+
+
 class _DeclarationCollector(Traverser):
     """Collect all local variable declarations in a function."""
 
     def __init__(self, types_dict: dict[Expression, Type], parameter_names: set[str]):
         self.types = types_dict
         self.parameter_names = parameter_names
-        self.declarations: dict[str, Type] = {}
+        self.declarations: dict[str, Declaration] = {}
 
     def visit_assignment_stmt(self, o: AssignmentStmt) -> None:
         """Collect variables from assignment statements."""
@@ -65,12 +75,12 @@ class _DeclarationCollector(Traverser):
             # if name.name in self.declarations:
             #     print(name.name, self.declarations)
             # assert name.name not in self.declarations
-            self.declarations[name.name] = self.types[name]
+            self.declarations[name.name] = Declaration(self.types[name], name.line)
 
 
 def get_declarations(
     func: FuncDef, types_dict: dict[Expression, Type]
-) -> dict[str, Type]:
+) -> dict[str, Declaration]:
     parameter_names = {argument.variable.name for argument in func.arguments}
     collector = _DeclarationCollector(types_dict, parameter_names)
     collector.visit(func)

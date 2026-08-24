@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
-import tempfile
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -76,6 +76,46 @@ def ensure_pch(config: BuildConfig) -> Path | None:
     return PCH_FILE
 
 
+_ERROR_LOCATION = re.compile(r"^(?P<file>.+):(?P<line>\d+):\d+: error:", re.MULTILINE)
+_LINE_MARKER = re.compile(r"//\s*(\d+)\s*$")
+
+
+def _python_lines_for_errors(path: str, stderr: str) -> set[int]:
+    """The Python source lines a compile failure's errors trace back to
+    each error's C++ line paired with the nearest `// N` marker at or above it"""
+    cpp_lines = {
+        int(m.group("line"))
+        for m in _ERROR_LOCATION.finditer(stderr)
+        if m.group("file") == path
+    }
+    if not cpp_lines:
+        return set()
+
+    source_lines = Path(path).read_text().splitlines()
+    python_lines: set[int] = set()
+    for cpp_line in cpp_lines:
+        for i in range(min(cpp_line, len(source_lines)), 0, -1):
+            marker = _LINE_MARKER.search(source_lines[i - 1])
+            if marker:
+                python_lines.add(int(marker.group(1)))
+                break
+    return python_lines
+
+
+def _format_python_lines(python_lines: set[int], python_source: str) -> str:
+    """Lines corresponding to lines in python source, formatted for user info"""
+    source_lines = python_source.splitlines()
+    parts = [
+        f"IMPORTANT: Error likely corresponds to python line(s): {', '.join(map(str, sorted(python_lines)))}"
+    ]
+    for line in sorted(python_lines):
+        if source_lines is not None and 0 < line <= len(source_lines):
+            parts.append(f"  {line}: {source_lines[line - 1]}")
+        else:
+            parts.append(f"  {line}")
+    return "\n".join(parts)
+
+
 def _is_pch_error(stderr: str) -> bool:
     """Whether a failed compile's stderr points at the pch, not the source."""
     return "PCH file" in stderr or "precompiled header" in stderr
@@ -92,6 +132,7 @@ def compile_cpp(
     exe: str | None = None,
     includes: list[str] | None = None,
     config: BuildConfig | None = None,
+    python_source: str | None = None,
 ) -> subprocess.CompletedProcess:
     """Compile `src` to `exe` using the precompiled header."""
     config = config or DEFAULT_CONFIG
@@ -119,79 +160,61 @@ def compile_cpp(
         # rather than fail outright.
         warnings.warn(
             f"precompiled header rejected, recompiling {path} without it "
-            f"(expect a ~4x slower compile):\n{compiled.stderr}",
+            f"(expect a slower compile):\n{compiled.stderr}",
             stacklevel=2,
         )
         compiled = run(None)
     if compiled.returncode != 0:
         print(compiled.stderr, end="", file=sys.stderr)
+        python_lines = _python_lines_for_errors(path, compiled.stderr)
+        if python_lines and python_source:
+            print(_format_python_lines(python_lines, python_source), file=sys.stderr)
         raise subprocess.CalledProcessError(
             compiled.returncode, compiled.args, compiled.stdout, compiled.stderr
         )
     return compiled
 
 
-def compile_proc(
+def compile(
     translated: str,
-    src="main.cpp",
-    exe=None,
+    output_cpp_path: str,
+    output_exe_path: str,
+    python_path: str,
     config: BuildConfig | None = None,
 ) -> str:
-    if exe == None:
-        exe = src[: src.rfind(".")]
-    # src/exe may live in a directory that doesn't exist yet.
-    Path(src).parent.mkdir(parents=True, exist_ok=True)
-    Path(exe).parent.mkdir(parents=True, exist_ok=True)
-    Path(src).write_text(translated)
+    """Write `translated` to `output_cpp_path` and compile it, returning the exe path."""
+    python_source = open(python_path).read()
+    # output_cpp_path/output_exe_path may live in a directory that doesn't exist yet.
+    Path(output_cpp_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(output_exe_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(output_cpp_path).write_text(translated)
 
-    compiled = compile_cpp(src, exe, config=config)
-    if compiled.returncode != 0:
-        print("--- compile FAILED ---")
-        print(compiled.stderr)
-        raise ValueError("Compilation failed")
+    compiled = compile_cpp(
+        output_cpp_path, output_exe_path, config=config, python_source=python_source
+    )
     if compiled.stderr:  # warnings still compile
         print("--- compiler warnings ---")
         print(compiled.stderr)
 
-    return exe
+    return output_exe_path
 
 
-def build_and_run(
-    translated: str, src="main.cpp", exe="main", config: BuildConfig | None = None
-):
-    """Write `translated` to a .cpp file, compile with g++, run it, print output."""
-    compile_proc(translated, src, exe, config=config)
-    run_proc = subprocess.run(["stdbuf", "-oL", str(Path(exe).resolve())])
-    # print("--- program output ---")
-    # print(run_proc.stdout, end="")
-    if run_proc.stderr:
-        print("--- stderr ---")
-        print(run_proc.stderr, end="")
-    print(f"--- exit code: {run_proc.returncode} ---")
-
-
-def build_and_run_capture(
+def compile_and_run(
     translated: str,
-    src: str | None = None,
-    exe: str | None = None,
+    output_cpp_path: str,
+    output_exe_path: str,
+    python_path: str,
     config: BuildConfig | None = None,
 ) -> subprocess.CompletedProcess:
-    """Write `translated` to a .cpp file, compile with g++, run it, print output.
+    """Write `translated` to `output_cpp_path`, compile it, run it, and
+    return the captured result."""
+    compile(translated, output_cpp_path, output_exe_path, python_path, config=config)
 
-    Defaults to a fresh directory per call, so parallel test workers don't
-    overwrite each other's main.cpp/main. Pass src/exe to write somewhere
-    specific.
-    """
-    with tempfile.TemporaryDirectory() as directory:
-        src = src or f"{directory}/main.cpp"
-        exe = exe or f"{directory}/main"
-        compile_proc(translated, src, exe, config=config)
-
-        run_proc = subprocess.run(
-            ["stdbuf", "-oL", Path(exe).resolve()], capture_output=True, text=True
-        )
-    # print("--- program output ---")
-    # print(run_proc.stdout, end="")
+    run_proc = subprocess.run(
+        ["stdbuf", "-oL", Path(output_exe_path).resolve()],
+        capture_output=True,
+        text=True,
+    )
     if run_proc.stderr:
         print("--- stderr ---")
         print(run_proc.stderr, end="")

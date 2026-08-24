@@ -29,6 +29,7 @@ INIT = "__init__"
 
 def write_class_declaration(codegen: StatementCodegen, class_def: ClassDef) -> None:
     """Emit a classes full structure, defining methods as signatures only"""
+    codegen.current_line = class_def.line
     codegen.emit(f"class {class_def.name} {{")
     codegen.emit("  public:")
     codegen.indent()
@@ -42,6 +43,7 @@ def write_class_declaration(codegen: StatementCodegen, class_def: ClassDef) -> N
             mutations=codegen.mutations,
             flatten=method in codegen.hotpath_funcs,
         )
+        codegen.current_line = method.line
         codegen.emit(f"{signature};")
 
     codegen.unindent()

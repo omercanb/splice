@@ -38,6 +38,7 @@ from splice.codegen.translation_utils import translate_func_signature
 from splice.codegen.typegen import cpp_type
 from splice.visitor import Traverser
 
+
 class StatementCodegen(Traverser):
     """Generate C++ code from mypy AST statements."""
 
@@ -47,6 +48,7 @@ class StatementCodegen(Traverser):
         types_dict: dict[MypyExpression, Type],
         mutations: MutationTable,
         extra_includes: list[str] | None = None,
+        line_markers: bool = True,
     ):
         self.tree = tree
         self.types = types_dict
@@ -56,12 +58,19 @@ class StatementCodegen(Traverser):
         self.expr_codegen = ExpressionCodegen(types_dict)
         self.indent_level = 0
         self.output: list[str] = []
+        # Whether emit() tags each line with the Python source line it came from - see current_line.
+        self.line_markers = line_markers
+        # The Python source line whatever emit() is currently called for came from - tagged onto each emitted line so a C++ compile error can be traced back to it.
+        self.current_line: int | None = None
         # Set while emitting globals, so visit_assignment_stmt declares-with-init instead of assigning into an already-declared name.
         self.constexpr_mode = False
 
     def visit_statements(self, statements):
+        outer_line = self.current_line
         for statement in statements:
+            self.current_line = statement.line
             self.visit(statement)
+        self.current_line = outer_line
 
     def indent(self):
         self.indent_level += 1
@@ -74,14 +83,19 @@ class StatementCodegen(Traverser):
         return "    " * self.indent_level
 
     def emit(self, code: str):
-        """Emit a line of code."""
-        # A blank separator stays blank rather than carrying the indent.
-        self.output.append(f"{self.indented()}{code}" if code else "")
+        """Emit a line of code, tagged with the Python source line it came from."""
+        if not code:
+            # A blank separator stays blank rather than carrying the indent or a marker.
+            self.output.append("")
+            return
+        show_marker = self.line_markers and self.current_line is not None
+        marker = f"    // {self.current_line}" if show_marker else ""
+        self.output.append(f"{self.indented()}{code}{marker}")
 
     def visit_block(self, o: Block):
         """Generate code for a block of statements."""
         self.indent()
-        super().visit_block(o)
+        self.visit_statements(o.body)
         self.unindent()
 
     def get_expr(self, expr: Expression, lvalue=False):
@@ -139,6 +153,7 @@ class StatementCodegen(Traverser):
         ]
 
         for class_def in classes:
+            self.current_line = class_def.line
             self.emit(f"class {class_def.name};")
         if classes:
             self.emit("")
@@ -152,6 +167,7 @@ class StatementCodegen(Traverser):
                 mutations=self.mutations,
                 flatten=function in self.hotpath_funcs,
             )
+            self.current_line = function.line
             self.emit(f"{signature};")
         self.emit("")
 
@@ -181,16 +197,15 @@ class StatementCodegen(Traverser):
         (see class_def.py's `write_class_bodies`).
         """
         declarations = get_declarations(o, self.types)
-        declaration_lines = [
-            self.translate_declaration(name, typ) for name, typ in declarations.items()
-        ]
 
+        self.current_line = o.line
         self.emit(header)
         self.indent()
-        for declaration in declaration_lines:
-            self.emit(declaration)
-        for stmt in o.body.body:
-            self.visit(stmt)
+        for name, declaration in declarations.items():
+            self.current_line = declaration.line
+            self.emit(self.translate_declaration(name, declaration.type))
+        self.current_line = o.line
+        self.visit_statements(o.body.body)
         self.unindent()
         self.emit("}")
         self.emit("")
