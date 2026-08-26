@@ -276,7 +276,12 @@ class PythonPrinter(Visitor[str]):
         return f"{o.op}{self.visit(o.expr)}"
 
     def visit_index_expr(self, o: IndexExpr) -> str:
-        return f"{self.visit(o.base)}[{self.visit(o.index)}]"
+        # A multi-arg subscript's index is a TupleExpr; visiting it plain would add spurious parens, e.g. Array[(int, N)].
+        if isinstance(o.index, TupleExpr):
+            index = ", ".join(self.visit(item) for item in o.index.items)
+        else:
+            index = self.visit(o.index)
+        return f"{self.visit(o.base)}[{index}]"
 
     def visit_slice_expr(self, o: SliceExpr) -> str:
         begin = self.visit(o.begin_index) if o.begin_index is not None else ""

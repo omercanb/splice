@@ -218,6 +218,11 @@ class _StructuralChecker(Traverser):
 
     def visit_call_expr(self, o: CallExpr) -> None:
         self.check_supported_call(o)
+        if isinstance(o.callee, IndexExpr) and o.callee.analyzed is not None:
+            # Array[int, N]() is a valid construction, not the bare-subscript mistake visit_index_expr reports.
+            for argument in o.args:
+                self.visit(argument)
+            return
         super().visit_call_expr(o)
 
     def check_supported_call(self, o: CallExpr) -> None:
@@ -581,6 +586,16 @@ class _StructuralChecker(Traverser):
         super().visit_set_expr(o)
 
     def visit_index_expr(self, o: IndexExpr) -> None:
+        if o.analyzed is not None:
+            # Class[args] with no call: mypy treats this as a type application, not __getitem__.
+            written = convert_to_python(o)
+            self.report(
+                o,
+                "type-application",
+                f"`{written}` names a type, it doesn't create a value",
+                f"call it to construct an instance:\n{written}()",
+            )
+            return
         base_type = get_proper_type(self.types.get(o.base))
         if isinstance(base_type, TupleType):
             value = literal_int_value(self.types.get(o.index))

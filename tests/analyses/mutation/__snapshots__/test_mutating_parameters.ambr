@@ -120,7 +120,7 @@
   class Buffer:
       data: splice.stdlib.Array[int, Literal[3]]
       def __init__(self: main.Buffer) -> None:
-          self.data = Array[(int, Literal[3])]()
+          self.data = Array[int, Literal[3]]()
   Buffer.__init__(self):
     direct: self.data
   

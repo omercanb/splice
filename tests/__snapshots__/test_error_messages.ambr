@@ -458,6 +458,18 @@
   
   '''
 # ---
+# name: test_error_message[type_application.py]
+  '''
+  type_application.py:9:9: error: `Array[int, N]` names a type, it doesn't create a value
+  
+    9 |     a = Array[int, N]
+      |         ^^^^^^^^^^^^^
+  
+    help: call it to construct an instance:
+            Array[int, N]()
+  
+  '''
+# ---
 # name: test_error_message[unsupported_builtin.py]
   '''
   unsupported_builtin.py:2:9: error: `abs` is not supported
