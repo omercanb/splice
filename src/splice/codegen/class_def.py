@@ -89,8 +89,6 @@ def methods(class_def: ClassDef) -> list[FuncDef]:
 def write_attributes(codegen: StatementCodegen, class_def: ClassDef) -> None:
     declared = attributes(class_def)
     for name, attribute_type in declared:
-        print(name, attribute_type)
-        print(codegen.translate_declaration(name, attribute_type))
         codegen.emit(codegen.translate_declaration(name, attribute_type))
     if declared:
         codegen.emit("")
