@@ -1,6 +1,6 @@
 # Value semantics
 
-Every name in Python is a reference and if a program compiled from Python would like to preserve reference semantics, they would have to wrap every value in a pointer. This leads to lots of memory allocations, prevents having a flat memory layout, and makes it very expensive to interface between Python and C++. 
+Every name in Python is a reference and if a program compiled from Python would like to preserve reference semantics, they would have to wrap every value in a pointer. This leads to lots of memory allocations, prevents having a flat memory layout, and makes it very expensive to interface between Python and C++. Splice is designed around making it impossible to observe reference semantics in Python and adds some real constraints onto Python to be able to do this. But as a result it can compile everything into C++ value types.
 
 ## Goal
 Be able to represent all user defined data as flat value types in C++.
@@ -27,54 +27,15 @@ The result of this is that all used data types,
 It's very difficult to use C++ value types here and also support these exact semantics. 
 If `arr` uses a flat layout like `std::vector`, the first append can reallocate, then the parameter `num` becomes undefined behavior, because `arr[0]` no longer points to anything. So to have the benefit of using a flat layout while also ensuring that the semantics of Python stay the same, we must prevent aliasing and use `extend(arr, copy(arr[0]))`.
 
-## The Benefits
+## Benefits
+- Python can be compiled to C++ without using any pointers and without refcounting or garbage collection.
+- Passing a value between Python and C++ doesn't require any code to convert between different representations, so a value passed from Python can be written directly to a buffer.
+- Every function parameter can be marked `restrict` for more C++ compiler optimization potential.
 
+## Model
+- When passing an object to a function you pass in a reference and functions can mutate their arguments but a function can never return a reference.
+- When assigning a value into an object field, assigning an object field into a variable, or returning one of the parameters from a function you have to `copy` to prevent aliasing.
 
-## The two obvious choices, and why both are wrong
-
-**Option one: make every object a `shared_ptr` (or similar) under the hood**, so assignment can keep meaning "point at the same thing," exactly like Python. This is correct — it reproduces Python's aliasing behavior perfectly — but it throws away the entire reason you wanted C++ in the first place. Every object is now a separate heap allocation. Every copy is an atomic refcount bump. Every field access is a pointer chase through memory the cache doesn't have. You've built a C++ program shaped like a Python interpreter's object model, not a fast C++ program.
-
-**Option two: make everything a plain value**, stack-allocated, embedded directly in its container, no indirection. This is fast — it's how you'd actually write performance-sensitive C++ by hand. But now `a = b` *copies*, silently, which is a different operation than what the Python source says. If a program actually depended on that assignment aliasing — mutating through one name and reading it back through the other — the compiled program does something quietly different from the interpreted one. That's not a slow program, it's a *wrong* one, and it's wrong in a way that's invisible at the call site.
-
-Splice takes option two, but refuses to leave the gap silent. Every spot where a plain-value translation could diverge from Python's real behavior is caught at compile time and forced to be explicit.
-
-## A concrete example
-
-```python
-class Order:
-    def __init__(self) -> None:
-        self.fills: list[int] = []
-
-def process() -> None:
-    pending = [10, 20]
-    order = Order()
-    order.fills = pending
-    pending.append(30)
-    print(order.fills)
-```
-
-In real Python, `order.fills = pending` doesn't copy the list — it makes `order.fills` and `pending` two names for the *same* list object. So `pending.append(30)` is visible through `order.fills` too, and this prints `[10, 20, 30]`.
-
-If this got compiled straight to C++ with `fills` as a plain `std::vector<int>` member, `order.fills = pending` would compile to a real copy. `pending.append(30)` would only touch `pending`'s own storage. The program would print `[10, 20]` instead — silently wrong, and nothing about reading the Python source would tell you that.
-
-Splice doesn't guess which behavior you meant. It rejects `order.fills = pending` outright:
-
-```
-error: `pending` needs an explicit copy here
-
-  8 |     order.fills = pending
-    |     ^^^^^^^^^^^^^^^^^^^^^
-
-  help: wrap it in copy():
-          copy(pending)
-```
-
-Note what this error is *not* doing: it isn't offering you a way to get the real Python aliasing behavior back. Splice doesn't support that at all — there's no pointer/reference type you can reach for here. `copy()` is the only path forward, and it gives you the independent-copy behavior: after `order.fills = copy(pending)`, appending to `pending` no longer touches `order.fills`, on purpose, because that's the only relationship a plain-value field can actually have with something assigned into it. The error exists so that decision is something you make on purpose, at the one line where it matters, instead of something the compiler makes for you silently three hundred lines away.
-
-This is the same rule everywhere a name gets handed off — assigned into a field, assigned into a fresh local, or returned. A fresh value with no other name (`[1, 2, 3]`, a function's return value, `a.method()`) never needs `copy()`, because nothing else could possibly have a reference to it to alias in the first place — the rule only fires on names that already exist and might still be read elsewhere.
-
-## What this buys you
-
-Because the compiler *proves* two mutable things can never alias — rather than hoping the programmer got it right, or paying for a runtime mechanism (refcounting, GC) to make it safe regardless — the generated code can do what hand-written fast C++ does: keep objects inline, pass by reference without fear during a call, mutate in place, and never touch the allocator except where you actually asked for a new container. The check costs you something real: some Python programs that lean on assignment-aliasing on purpose won't compile as-is, and need an explicit `copy()` (or a restructure) to say what they meant. In exchange, every program that *does* compile gets C++'s performance characteristics for free, and the one class of bug that plain-value translation would otherwise introduce silently — an aliasing assumption the source no longer honors — can't happen at all.
-
-For the full rule set (function arguments, loops, globals, lambdas) and the analysis that enforces it, see [`docs/design/value_semantics_plan.md`](design/value_semantics_plan.md).
+## Constraints
+- Globals can only be scalars and are immutable. Globals only being scalar prevents aliasing, otherwise we would have to analyze what globals each function accesses and ban an alias to that global from being passed in as an argument (This can be implemented, but I just didn't think there would be too much benefit).
+- You can't pass in multiple locations that could alias each other to functions. For example you can't pass in `f(obj, obj.field)`. The compiler requires you to call copy on one. Again this is to prevent aliasing.
