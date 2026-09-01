@@ -39,7 +39,7 @@ from splice.codegen.translation_utils import (
     translate_qualified_builtin,
     translate_tuple_access,
 )
-from splice.ast_utils import get_int_literal, literal_int_value
+from splice.ast_utils import get_int_value
 from splice.codegen.typegen import cpp_type_name, optional_inner_type
 from splice.visitor import Visitor
 
@@ -137,7 +137,7 @@ class ExpressionCodegen(Visitor[str]):
             isinstance(o.callee, MemberExpr)
             and o.callee.name in ("__getitem__", "__setitem__")
             and o.args
-            and get_int_literal(o.args[0]) == -1
+            and get_int_value(o.args[0], self.types) == -1
         ):
             base = self.visit(o.callee.expr)
             back_call = call_method(base, "back")
@@ -233,7 +233,7 @@ class ExpressionCodegen(Visitor[str]):
         base = self.visit(o.base)
         base_type = get_proper_type(self.types[o.base])
         if isinstance(base_type, TupleType):
-            i = literal_int_value(self.types[o.index])
+            i = get_int_value(o.index, self.types)
             assert i is not None  # check_structural.py already guarantees this
             return translate_tuple_access(i, base)
         index = self.visit(o.index)

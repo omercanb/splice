@@ -9,7 +9,7 @@ from mypy.nodes import CallExpr
 from mypy.nodes import Expression as MypyExpression
 from mypy.nodes import ForStmt, NameExpr
 
-from splice.ast_utils import get_int_literal
+from splice.ast_utils import get_int_value
 from splice.codegen.typegen import cpp_type
 from splice.namer import temp_name
 
@@ -107,7 +107,7 @@ def for_range(
     if len(args) in (1, 2):
         return for_range_no_step(codegen, index, args)
 
-    step = get_int_literal(args[2])
+    step = get_int_value(args[2], codegen.types)
     if step is not None:
         return for_range_constant_step(codegen, index, args, step)
     return for_range_unknown_step(codegen, index, args)

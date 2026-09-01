@@ -25,5 +25,7 @@
   no_alias_different_roots: no alias
   items.__getitem__(0), items.__getitem__(1)
   no_alias_literal_indices: no alias
+  items.__getitem__(0), items.__getitem__(N)
+  no_alias_final_index: no alias
   '''
 # ---

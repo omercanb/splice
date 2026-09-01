@@ -63,7 +63,7 @@ from mypy.types import (
     get_proper_type,
 )
 
-from splice.ast_utils import literal_int_value
+from splice.ast_utils import get_int_value, literal_int_value
 from splice.codegen.builtins import (
     EXCEPTION_TYPES,
     KNOWN_STDLIB_MODULES,
@@ -598,7 +598,7 @@ class _StructuralChecker(Traverser):
             return
         base_type = get_proper_type(self.types.get(o.base))
         if isinstance(base_type, TupleType):
-            value = literal_int_value(self.types.get(o.index))
+            value = get_int_value(o.index, self.types)
             if value is None or value < 0:
                 self.report(
                     o.index,
@@ -616,6 +616,26 @@ class _StructuralChecker(Traverser):
                     "a negative index other than -1 is not supported",
                     f"index from the front instead:\n{base}[len({base}) - {-value}]",
                 )
+            elif (
+                isinstance(base_type, Instance)
+                and base_type.type.fullname == "splice.stdlib.Array"
+                and len(base_type.args) == 2
+            ):
+                n = literal_int_value(base_type.args[1])
+                index_value = get_int_value(o.index, self.types)
+                if (
+                    n is not None
+                    and index_value is not None
+                    and index_value != -1
+                    and not (0 <= index_value < n)
+                ):
+                    base = convert_to_python(o.base)
+                    self.report(
+                        o.index,
+                        "array-index-out-of-bounds",
+                        f"index {index_value} is out of bounds for `{base}` of length {n}",
+                        f"valid indices are 0 through {n - 1}",
+                    )
         super().visit_index_expr(o)
 
     def visit_if_stmt(self, o: IfStmt) -> None:

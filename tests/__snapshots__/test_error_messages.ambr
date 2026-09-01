@@ -53,6 +53,17 @@
   
   '''
 # ---
+# name: test_error_message[array_index_out_of_bounds.py]
+  '''
+  array_index_out_of_bounds.py:10:14: error: index 3 is out of bounds for `a` of length 3
+  
+    10 |     return a[N]
+       |              ^
+  
+    help: valid indices are 0 through 2
+  
+  '''
+# ---
 # name: test_error_message[chained_assignment.py]
   '''
   chained_assignment.py:2:5: error: assigning to multiple targets in one statement is not supported

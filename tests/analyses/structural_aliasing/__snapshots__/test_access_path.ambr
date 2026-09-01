@@ -90,6 +90,11 @@
   no_alias_literal_indices:
     not an access path
   
+  def no_alias_final_index(items: list[int]) -> tuple[int, int]:
+      return (items.__getitem__(0), items.__getitem__(N))
+  no_alias_final_index:
+    not an access path
+  
   def alias_negative_index_vs_itself(items: list[int]) -> tuple[int, int]:
       return (items.__getitem__(-1), items.__getitem__(-1))
   alias_negative_index_vs_itself:

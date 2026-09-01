@@ -19,7 +19,7 @@ from typing import Optional
 from mypy.nodes import CallExpr, Expression, MemberExpr, NameExpr, Var
 
 from splice.analysis.mutation import _ALIASING_METHODS
-from splice.ast_utils import get_int_literal
+from splice.ast_utils import TypeTable, get_int_value
 
 _ITER_WRAPPING_BUILTINS = {"builtins.enumerate", "builtins.zip"}
 
@@ -60,7 +60,7 @@ def get_access_path(expr: Expression) -> Optional[AccessPath]:
 
 # A function to compare two paths and check if they could overlap
 def is_access_path_structural_alias(
-    path1: AccessPath, path2: AccessPath
+    path1: AccessPath, path2: AccessPath, types: TypeTable
 ) -> Optional[AccessPath]:
     """Checks wether two paths are structural alias and returns the common path if it exists"""
     if path1.root != path2.root:
@@ -88,8 +88,8 @@ def is_access_path_structural_alias(
             # If the indices are different literals no aliasing, otherwise aliasing.
             index1 = projection1.args[0]
             index2 = projection2.args[0]
-            index_literal1 = get_int_literal(index1)
-            index_literal2 = get_int_literal(index2)
+            index_literal1 = get_int_value(index1, types)
+            index_literal2 = get_int_value(index2, types)
             if index_literal1 is None or index_literal2 is None:
                 # Can't prove indexes are distinct
                 common_path.projections.append(projection1)

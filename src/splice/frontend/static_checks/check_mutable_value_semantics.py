@@ -347,7 +347,9 @@ class _MutableValueSemanticsChecker(Traverser):
         anything mutated inside that loop's own body."""
         for container_expr, container_path, loop_iterable in self._loop_claims:
             if (
-                is_access_path_structural_alias(mutated_path, container_path)
+                is_access_path_structural_alias(
+                    mutated_path, container_path, self.types
+                )
                 is not None
             ):
                 mutated_text = source_text(mutated_expr, self.source)
@@ -381,7 +383,7 @@ class _MutableValueSemanticsChecker(Traverser):
         ) in itertools.combinations(claims, 2):
             if not (mut1 or mut2):
                 continue
-            if is_access_path_structural_alias(path1, path2) is not None:
+            if is_access_path_structural_alias(path1, path2, self.types) is not None:
                 text1 = source_text(expr1, self.source)
                 text2 = source_text(expr2, self.source)
                 rewritten = replace_in_source(o, expr2, f"copy({text2})", self.source)

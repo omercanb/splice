@@ -1,3 +1,8 @@
+from typing import Final
+
+N: Final = 1
+
+
 class Item:
     value: int
 
@@ -90,6 +95,10 @@ def alias_same_literal_index(items: list[int]) -> tuple[int, int]:
 
 def no_alias_literal_indices(items: list[int]) -> tuple[int, int]:
     return (items[0], items[1])
+
+
+def no_alias_final_index(items: list[int]) -> tuple[int, int]:
+    return (items[0], items[N])
 
 
 def alias_negative_index_vs_itself(items: list[int]) -> tuple[int, int]:

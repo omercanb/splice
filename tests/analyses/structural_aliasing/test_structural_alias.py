@@ -28,6 +28,7 @@ NO_ALIAS_CASES = [
     "no_alias_different_fields",
     "no_alias_different_roots",
     "no_alias_literal_indices",
+    "no_alias_final_index",
 ]
 
 
@@ -52,7 +53,7 @@ def test_structural_alias(snapshot):
 
     def alias(name: str) -> AccessPath | None:
         p1, p2 = paths(name)
-        return is_access_path_structural_alias(p1, p2)
+        return is_access_path_structural_alias(p1, p2, program.types)
 
     for name in ALIAS_CASES:
         assert alias(name) is not None, f"{name} should alias"
@@ -61,12 +62,12 @@ def test_structural_alias(snapshot):
 
     # Order shouldn't change the verdict, for both a conflict and a clean case.
     p1, p2 = paths("alias_field_vs_root")
-    assert (is_access_path_structural_alias(p1, p2) is None) == (
-        is_access_path_structural_alias(p2, p1) is None
+    assert (is_access_path_structural_alias(p1, p2, program.types) is None) == (
+        is_access_path_structural_alias(p2, p1, program.types) is None
     )
     p1, p2 = paths("no_alias_different_fields")
-    assert (is_access_path_structural_alias(p1, p2) is None) == (
-        is_access_path_structural_alias(p2, p1) is None
+    assert (is_access_path_structural_alias(p1, p2, program.types) is None) == (
+        is_access_path_structural_alias(p2, p1, program.types) is None
     )
 
     lines: list[str] = []

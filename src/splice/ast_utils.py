@@ -6,6 +6,18 @@ from mypy.types import Instance, LiteralType, Type, get_proper_type
 type TypeTable = dict[Expression, Type]
 
 
+def get_int_value(expr: Expression, types: TypeTable) -> int | None:
+    """Return a value of an integer if its available at compile time"""
+    n = get_int_literal(expr)
+    if n is not None:
+        return n
+    if expr in types:
+        n = literal_int_value(types[expr])
+        if n is not None:
+            return n
+    return None
+
+
 def get_int_literal(expr: Expression) -> int | None:
     """Extract a compile-time int from a literal, incl. unary +/-.
 
@@ -24,14 +36,7 @@ def get_int_literal(expr: Expression) -> int | None:
 
 def literal_int_value(t: Type) -> int | None:
     """A compile time integer. Stored as a type in mypys type system"""
-    """The int a type resolves to, eg. N in Array[T, N] or the index in t[i].
-
-    A literal shows up as one of two different shapes depending on where it
-    was resolved: a bare LiteralType in type-annotation position (Array[T, N],
-    including a Final int constant - the mypy fork resolves that to a
-    LiteralType too, see typeanal.py), or an Instance with last_known_value
-    set for an ordinary value expression's inferred type (eg. t[0]'s index).
-    """
+    # This can be a Literal[N] or a Final variable
     proper = get_proper_type(t)
     if isinstance(proper, LiteralType) and isinstance(
         proper.value, int
@@ -47,15 +52,7 @@ def literal_int_value(t: Type) -> int | None:
 
 
 def source_text(node: Context, source: str) -> str:
-    """The original source text a node's position covers.
-
-    Use this instead of convert_to_python for a node that may have been
-    changed by an AST transform - convert_to_python rebuilds text from the
-    node itself, so it would print the transformed code (eg. `a.__getitem__(0)`
-    instead of `a[0]`). A transform keeps the position pointing at the
-    original text even when it changes the node, so reading the source
-    directly gives back what the user actually wrote.
-    """
+    """The original source text a node's position covers."""
     lines = source.splitlines()
     end_line = node.end_line if node.end_line is not None else node.line
     end_column = node.end_column if node.end_column is not None else node.column
