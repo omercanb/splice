@@ -1,11 +1,16 @@
 def main() -> int:
     d = {1: 10, 2: 20, 3: 30}
 
-    # Iteration order is unspecified, so order-dependent output goes
-    # through sorted().
+    # dict is insertion-ordered here (unordered_dense), matching CPython, as
+    # long as nothing's been erased - erasing does swap-and-pop rather than
+    # CPython's tombstone-and-compact, so it only stays order-preserving if
+    # whatever's erased was the most-recently-inserted survivor at the time
+    # (true below: d.pop(4) removes the last key added). Don't rely on this
+    # in general - .keys()/.values() below still need sorted() regardless,
+    # since they come back as a plain list rather than a dict_view.
     print(len(d))
     print(d[1], d[2], d[3])
-    print(sorted(d))
+    print(d)
     print(sorted(d, reverse=True))
     print(sorted(d, key=lambda k: -k))
     print(sorted(d, key=lambda k: -k, reverse=True))
@@ -24,14 +29,14 @@ def main() -> int:
 
     print(d.setdefault(2, 999))
     print(d.setdefault(9, 90))
-    print(sorted(d))
+    print(d)
 
     print(sorted(d.keys()))
     print(sorted(d.values()))
 
     e = {5: 50}
     d.update(e)
-    print(sorted(d))
+    print(d)
 
     c = d.copy()
     print(len(c))
@@ -39,7 +44,7 @@ def main() -> int:
     print(len(c), len(d))
 
     s = {"b": 2, "a": 1}
-    print(sorted(s))
+    print(s)
     print(s["a"], s["b"])
 
     return 0

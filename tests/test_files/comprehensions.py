@@ -24,7 +24,7 @@ def main() -> int:
     print(sorted(squares))
     lookup = {v: v * v for v in numbers if v > 1}
     print(len(lookup), lookup[2], lookup[4])
-    print(sorted(lookup))
+    print(lookup)
 
     # two generators, the second reading the first's index
     print([x * y for x in numbers for y in numbers if x < y])

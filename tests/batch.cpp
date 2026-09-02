@@ -608,7 +608,7 @@ int run() {    // 7
     print(tuple(sorted(squares, false)), str(" "), str("\n"));    // 24
     lookup = __dict_comprehension_0(numbers);    // 25
     print(tuple(len(lookup), lookup[2LL], lookup[4LL]), str(" "), str("\n"));    // 26
-    print(tuple(sorted(lookup, false)), str(" "), str("\n"));    // 27
+    print(tuple(lookup), str(" "), str("\n"));    // 27
     print(tuple(__list_comprehension_7(numbers)), str(" "), str("\n"));    // 30
     print(tuple(__list_comprehension_8(numbers)), str(" "), str("\n"));    // 33
     doubled = __list_comprehension_9(numbers);    // 36
@@ -623,41 +623,41 @@ int run();    // 1
 
 int run() {    // 1
     dict<int64_t, int64_t> d;    // 2
-    dict<int64_t, int64_t> e;    // 32
-    dict<int64_t, int64_t> c;    // 36
-    dict<str, int64_t> s;    // 41
+    dict<int64_t, int64_t> e;    // 37
+    dict<int64_t, int64_t> c;    // 41
+    dict<str, int64_t> s;    // 46
     d = dict<int64_t, int64_t>({{1LL, 10LL}, {2LL, 20LL}, {3LL, 30LL}});    // 2
-    print(tuple(len(d)), str(" "), str("\n"));    // 6
-    print(tuple(d[1LL], d[2LL], d[3LL]), str(" "), str("\n"));    // 7
-    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 8
-    print(tuple(sorted(d, true)), str(" "), str("\n"));    // 9
-    print(tuple(sorted(d, [](auto k) { return (-k); }, false)), str(" "), str("\n"));    // 10
-    print(tuple(sorted(d, [](auto k) { return (-k); }, true)), str(" "), str("\n"));    // 11
-    d[4LL] = 40LL;    // 13
-    print(tuple(len(d), d[4LL]), str(" "), str("\n"));    // 14
-    d[1LL] = 11LL;    // 15
-    print(tuple(len(d), d[1LL]), str(" "), str("\n"));    // 16
-    print(tuple(d.get(1LL)), str(" "), str("\n"));    // 18
-    print(tuple(d.get(99LL, (-1LL))), str(" "), str("\n"));    // 19
-    print(tuple(d.pop(4LL)), str(" "), str("\n"));    // 21
-    print(tuple(d.pop(99LL, (-1LL))), str(" "), str("\n"));    // 22
-    print(tuple(len(d)), str(" "), str("\n"));    // 23
-    print(tuple(d.setdefault(2LL, 999LL)), str(" "), str("\n"));    // 25
-    print(tuple(d.setdefault(9LL, 90LL)), str(" "), str("\n"));    // 26
-    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 27
-    print(tuple(sorted(d.keys(), false)), str(" "), str("\n"));    // 29
-    print(tuple(sorted(d.values(), false)), str(" "), str("\n"));    // 30
-    e = dict<int64_t, int64_t>({{5LL, 50LL}});    // 32
-    d.update(e);    // 33
-    print(tuple(sorted(d, false)), str(" "), str("\n"));    // 34
-    c = d.copy();    // 36
-    print(tuple(len(c)), str(" "), str("\n"));    // 37
-    c.clear();    // 38
-    print(tuple(len(c), len(d)), str(" "), str("\n"));    // 39
-    s = dict<str, int64_t>({{str("b"), 2LL}, {str("a"), 1LL}});    // 41
-    print(tuple(sorted(s, false)), str(" "), str("\n"));    // 42
-    print(tuple(s[str("a")], s[str("b")]), str(" "), str("\n"));    // 43
-    return 0LL;    // 45
+    print(tuple(len(d)), str(" "), str("\n"));    // 11
+    print(tuple(d[1LL], d[2LL], d[3LL]), str(" "), str("\n"));    // 12
+    print(tuple(d), str(" "), str("\n"));    // 13
+    print(tuple(sorted(d, true)), str(" "), str("\n"));    // 14
+    print(tuple(sorted(d, [](auto k) { return (-k); }, false)), str(" "), str("\n"));    // 15
+    print(tuple(sorted(d, [](auto k) { return (-k); }, true)), str(" "), str("\n"));    // 16
+    d[4LL] = 40LL;    // 18
+    print(tuple(len(d), d[4LL]), str(" "), str("\n"));    // 19
+    d[1LL] = 11LL;    // 20
+    print(tuple(len(d), d[1LL]), str(" "), str("\n"));    // 21
+    print(tuple(d.get(1LL)), str(" "), str("\n"));    // 23
+    print(tuple(d.get(99LL, (-1LL))), str(" "), str("\n"));    // 24
+    print(tuple(d.pop(4LL)), str(" "), str("\n"));    // 26
+    print(tuple(d.pop(99LL, (-1LL))), str(" "), str("\n"));    // 27
+    print(tuple(len(d)), str(" "), str("\n"));    // 28
+    print(tuple(d.setdefault(2LL, 999LL)), str(" "), str("\n"));    // 30
+    print(tuple(d.setdefault(9LL, 90LL)), str(" "), str("\n"));    // 31
+    print(tuple(d), str(" "), str("\n"));    // 32
+    print(tuple(sorted(d.keys(), false)), str(" "), str("\n"));    // 34
+    print(tuple(sorted(d.values(), false)), str(" "), str("\n"));    // 35
+    e = dict<int64_t, int64_t>({{5LL, 50LL}});    // 37
+    d.update(e);    // 38
+    print(tuple(d), str(" "), str("\n"));    // 39
+    c = d.copy();    // 41
+    print(tuple(len(c)), str(" "), str("\n"));    // 42
+    c.clear();    // 43
+    print(tuple(len(c), len(d)), str(" "), str("\n"));    // 44
+    s = dict<str, int64_t>({{str("b"), 2LL}, {str("a"), 1LL}});    // 46
+    print(tuple(s), str(" "), str("\n"));    // 47
+    print(tuple(s[str("a")], s[str("b")]), str(" "), str("\n"));    // 48
+    return 0LL;    // 50
 }    // 1
 }
 

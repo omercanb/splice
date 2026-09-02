@@ -1,9 +1,13 @@
 #pragma once
 
-// Python set semantics on top of std::unordered_set.
+// Python set semantics on top of ankerl::unordered_dense::set (flat,
+// open-addressing - see dict.h and docs/value_semantics.md for why this is
+// safe; set has even less surface for the concern than dict since nothing
+// here ever returns a mutable reference into the container at all).
 // Python guarantees no ordering here either, so programs must sort before
 // comparing. frozenset is not implemented.
 
+#include "ankerl/unordered_dense.h"
 #include "exceptions.h"
 #include "hash.h"
 #include "list.h"
@@ -12,7 +16,6 @@
 #include <initializer_list>
 #include <string>
 #include <type_traits>
-#include <unordered_set>
 
 namespace py {
 
@@ -71,7 +74,7 @@ template <typename T> class set {
             data_.insert(v);
     }
     void intersection_update(const set<T> &other) {
-        std::unordered_set<T, hasher<T>> kept;
+        ankerl::unordered_dense::set<T, hasher<T>> kept;
         for (const auto &v : data_)
             if (other.__contains__(v))
                 kept.insert(v);
@@ -151,11 +154,11 @@ template <typename T> class set {
     bool operator>=(const set<T> &o) const { return o <= *this; }
     bool operator>(const set<T> &o) const { return o < *this; }
 
-    using const_iterator = typename std::unordered_set<T, hasher<T>>::const_iterator;
+    using const_iterator = typename ankerl::unordered_dense::set<T, hasher<T>>::const_iterator;
     ALWAYS_INLINE const_iterator begin() const { return data_.begin(); }
     ALWAYS_INLINE const_iterator end() const { return data_.end(); }
 
-    ALWAYS_INLINE const std::unordered_set<T, hasher<T>> &raw() const noexcept {
+    ALWAYS_INLINE const ankerl::unordered_dense::set<T, hasher<T>> &raw() const noexcept {
         return data_;
     }
 
@@ -174,7 +177,7 @@ template <typename T> class set {
     }
 
   private:
-    std::unordered_set<T, hasher<T>> data_;
+    ankerl::unordered_dense::set<T, hasher<T>> data_;
 };
 
 template <typename T> ALWAYS_INLINE _int len(const set<T> &s) { return s.__len__(); }
