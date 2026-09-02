@@ -1,5 +1,6 @@
 from typing import Optional
 
+from mypy.nodes import Var
 from mypy.types import (
     AnyType,
     Instance,
@@ -40,6 +41,60 @@ def optional_inner_type(t: Type) -> Optional[Type]:
     return next(item for item in proper.items if not isinstance(item, NoneType))
 
 
+def allocates_on_copy(t: Type) -> bool:
+    """Whether copy()ing a value of this type allocates on the heap."""
+    t = get_proper_type(t)
+    match t:
+        case Instance(type=type_info) if (
+            type_info.fullname
+            in (
+                "builtins.int",
+                "builtins.float",
+                "builtins.bool",
+                "typing.SupportsIndex",
+            )
+            or type_info.fullname in FIXED_WIDTH_INT_TYPES
+        ):
+            return False
+
+        case Instance(type=type_info) if type_info.fullname in (
+            "builtins.list",
+            "builtins.dict",
+            "builtins.set",
+            "builtins.str",
+            "builtins.bytes",
+        ):
+            return True
+
+        case Instance(type=type_info, args=args) if (
+            type_info.fullname == "splice.stdlib.Array" and args
+        ):
+            return allocates_on_copy(args[0])
+
+        case TupleType(items=items):
+            return any(allocates_on_copy(item) for item in items)
+
+        case UnionType() if optional_inner_type(t) is not None:
+            return allocates_on_copy(optional_inner_type(t))
+
+        case LiteralType(fallback=fallback):
+            return allocates_on_copy(fallback)
+
+        case NoneType():
+            return False
+
+        # A user-defined class: allocates if any field does.
+        case Instance(type=type_info):
+            return any(
+                allocates_on_copy(symbol.type)
+                for symbol in type_info.names.values()
+                if isinstance(symbol.node, Var) and symbol.type is not None
+            )
+
+        case _:
+            return True
+
+
 def cpp_type(t: Type) -> str:
     return cpp_type_name(t)
 
@@ -70,7 +125,9 @@ def cpp_type_name(t: Type) -> str:
                 return "int64_t"
             case Instance(type=type_info) if type_info.fullname == "builtins.bool":
                 return "bool"
-            case Instance(type=type_info) if type_info.fullname in FIXED_WIDTH_INT_TYPES:
+            case Instance(type=type_info) if (
+                type_info.fullname in FIXED_WIDTH_INT_TYPES
+            ):
                 return FIXED_WIDTH_INT_TYPES[type_info.fullname]
 
             # Container types

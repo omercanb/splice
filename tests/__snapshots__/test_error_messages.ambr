@@ -236,6 +236,28 @@
   
   '''
 # ---
+# name: test_error_message[hotpath_allocation_copy.py]
+  '''
+  hotpath_allocation_copy.py:6:12: warning: `copies_a_list` is @hotpath but allocates here
+  
+    6 |     return copy(a)
+      |            ^^^^^^^
+  
+    help: allocation will be too slow for a hot path, please consider another option
+  
+  '''
+# ---
+# name: test_error_message[hotpath_allocation_copy_field.py]
+  '''
+  hotpath_allocation_copy_field.py:11:12: warning: `copies_a_class_with_a_list_field` is @hotpath but allocates here
+  
+    11 |     return copy(h)
+       |            ^^^^^^^
+  
+    help: allocation will be too slow for a hot path, please consider another option
+  
+  '''
+# ---
 # name: test_error_message[hotpath_allocation_transitive.py]
   '''
   hotpath_allocation_transitive.py:13:1: warning: `level0_alloc` is @hotpath but allocates transitively

@@ -36,10 +36,12 @@ from splice.analysis.builtin_effects import (
     type_name,
 )
 from splice.codegen.class_def import methods as class_methods
+from splice.codegen.typegen import allocates_on_copy
 from splice.ast_utils import TypeTable
 from splice.visitor import Traverser
 
 _ALLOCATING_CONSTRUCTORS = {"list", "dict", "set"}
+_COPY_FULLNAME = "splice.stdlib.copy"
 
 
 @dataclass(frozen=True)
@@ -66,6 +68,14 @@ class _StatementWalker(Traverser):
             isinstance(o.callee, NameExpr) and o.callee.name in _ALLOCATING_CONSTRUCTORS
         ):
             self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
+        elif (
+            isinstance(o.callee, NameExpr)
+            and o.callee.fullname == _COPY_FULLNAME
+            and o.args
+        ):
+            arg_type = self.types.get(o.args[0])
+            if arg_type is not None and allocates_on_copy(arg_type):
+                self.findings.append(ExpressionEffect(o, ALLOCATES_ONLY))
         super().visit_call_expr(o)
 
     def visit_assignment_stmt(self, o: AssignmentStmt) -> None:
