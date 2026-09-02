@@ -82,11 +82,19 @@ BUILTIN_OPERATION_EFFECTS: dict[tuple[str, str], OperationEffect] = {
     ("set", "intersection"): ALLOCATES_ONLY,
     ("set", "difference"): ALLOCATES_ONLY,
     ("set", "symmetric_difference"): ALLOCATES_ONLY,
-    # Array - fixed-size, so never allocates
+    # Array - fixed-size, so never allocates (__getslice__ returns a new
+    # list<T>, but list's own __getslice__ is classified READS too - matched
+    # for consistency, not because it's actually allocation-free).
     ("Array", "__getitem__"): READS,
     ("Array", "__len__"): READS,
+    ("Array", "__contains__"): READS,
+    ("Array", "index"): READS,
+    ("Array", "count"): READS,
+    ("Array", "__getslice__"): READS,
     ("Array", "__setitem__"): MUTATES_ONLY,
     ("Array", "fill"): MUTATES_ONLY,
+    ("Array", "sort"): MUTATES_ONLY,
+    ("Array", "reverse"): MUTATES_ONLY,
 }
 
 

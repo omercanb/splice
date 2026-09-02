@@ -48,7 +48,7 @@ class CallGraphProducer(Traverser):
         self.current_function = None
 
     def visit_call_expr(self, o: CallExpr):
-        if not is_call_builtin(o, self.types) and not is_call_splice_intrinsic(o):
+        if not is_call_builtin_or_intrinsic(o, self.types):
             callee = resolve_funcdef(o, self.types)
             if callee is not None:
                 bindings = match_call_arguments(o, self.types)
@@ -107,7 +107,7 @@ def resolve_funcdef(o: CallExpr, types: TypeTable) -> Optional[FuncDef]:
     constructor takes zero arguments), or for anything _usable_funcdef
     rejects.
     """
-    assert not is_call_builtin(o, types)
+    assert not is_call_builtin_or_intrinsic(o, types)
 
     if isinstance(o.callee, NameExpr):
         node = o.callee.node
@@ -136,12 +136,17 @@ def resolve_funcdef(o: CallExpr, types: TypeTable) -> Optional[FuncDef]:
 
 
 def is_call_builtin(o: CallExpr, types: TypeTable):
+    """A call defined in builtins"""
     if isinstance(o.callee, NameExpr):
         return o.callee.fullname.startswith("builtins.")
     if isinstance(o.callee, MemberExpr):
         t = types[o.callee.expr]
         assert isinstance(t, Instance)
-        return t.type.fullname.startswith("builtins.")
+        # We define methods like index() on Array in splice.stdlib, we need those methods handled here
+        # So we can have those methods piped through argument reordering etc
+        return t.type.fullname.startswith("builtins.") or t.type.fullname.startswith(
+            "splice.stdlib."
+        )
     return False
 
 
@@ -152,3 +157,8 @@ def is_call_splice_intrinsic(o: CallExpr) -> bool:
     if isinstance(o.callee, IndexExpr) and isinstance(o.callee.base, NameExpr):
         return o.callee.base.fullname.startswith("splice.stdlib.")
     return False
+
+
+def is_call_builtin_or_intrinsic(o: CallExpr, types: TypeTable) -> bool:
+    """Wether the function call has nothing to trace into"""
+    return is_call_builtin(o, types) or is_call_splice_intrinsic(o)

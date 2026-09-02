@@ -18,8 +18,7 @@ from splice.analysis.builtin_effects import builtin_operation_effect
 from splice.analysis.call_graph import (
     CallEdge,
     CallGraph,
-    is_call_builtin,
-    is_call_splice_intrinsic,
+    is_call_builtin_or_intrinsic,
     match_call_arguments,
 )
 from splice.analysis.statement_effects import ExpressionEffect, compute_statment_effects
@@ -64,7 +63,7 @@ def call_mutates_argument(
 ) -> bool:
     """Does `call`, when given `arg_expr` as one of its arguments (self included,
     for a method call), mutate it."""
-    if is_call_splice_intrinsic(call) or is_call_builtin(call, types):
+    if is_call_builtin_or_intrinsic(call, types):
         if not isinstance(call.callee, MemberExpr):
             return False
         effect = builtin_operation_effect(types[call.callee.expr], call.callee.name)
@@ -107,7 +106,7 @@ def find_mutations(
     for call in collector.calls:
         # Already covered above, via compute_statment_effects - checking again
         # here would double-report the same builtin method call.
-        if is_call_splice_intrinsic(call) or is_call_builtin(call, types):
+        if is_call_builtin_or_intrinsic(call, types):
             continue
         for arg_expr, _ in match_call_arguments(call, types):
             base = get_structural_base(arg_expr)

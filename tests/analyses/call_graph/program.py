@@ -1,3 +1,8 @@
+from typing import Literal
+
+from splice.stdlib import Array
+
+
 class D:
     def __init__(self) -> None:
         pass
@@ -62,5 +67,10 @@ def main() -> int:
     mul(num1)
     mul(num2, num3)
     fact(num1)
+
+    arr = Array[int, Literal[3]]()
+    arr.fill(1)
+    arr.sort()
+    arr.index(1)
 
     return 0

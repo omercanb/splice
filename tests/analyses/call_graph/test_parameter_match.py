@@ -2,7 +2,7 @@ from pathlib import Path
 
 from mypy.nodes import CallExpr, Expression, Var
 
-from splice.analysis.call_graph import is_call_builtin, match_call_arguments
+from splice.analysis.call_graph import is_call_builtin_or_intrinsic, match_call_arguments
 from splice.convert_to_python import convert_to_python
 from splice.ast_utils import TypeTable
 from splice.pipeline import analyse
@@ -17,7 +17,7 @@ class TestCallGraphVisitor(Traverser):
         self.calls: list[tuple[CallExpr, list[tuple[Expression, Var]]]] = []
 
     def visit_call_expr(self, o: CallExpr) -> None:
-        if not is_call_builtin(o, self.types):
+        if not is_call_builtin_or_intrinsic(o, self.types):
             self.calls.append((o, match_call_arguments(o, self.types)))
         return super().visit_call_expr(o)
 

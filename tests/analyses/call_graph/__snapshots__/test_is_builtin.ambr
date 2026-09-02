@@ -1,6 +1,11 @@
 # serializer version: 1
 # name: test_is_builtin
   '''
+  from typing import Literal
+  
+  from splice.stdlib import Array
+  
+  
   class D:
       def __init__(self) -> None:
           pass
@@ -66,6 +71,11 @@
       mul(num2, num3)
       fact(num1)
   
+      arr = Array[int, Literal[3]]()
+      arr.fill(1)
+      arr.sort()
+      arr.index(1)
+  
       return 0
   
   ("print(('wave',), ' ', '\\n')", 'builtin')
@@ -89,5 +99,9 @@
   ('mul(num1, 2)', 'user-defined')
   ('mul(num2, num3)', 'user-defined')
   ('fact(num1)', 'user-defined')
+  ('Array[int, Literal[3]]()', 'user-defined')
+  ('arr.fill(1)', 'builtin')
+  ('arr.sort(False)', 'builtin')
+  ('arr.index(1)', 'builtin')
   '''
 # ---
