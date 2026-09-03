@@ -76,16 +76,25 @@ def ensure_pch(config: BuildConfig) -> Path | None:
     return PCH_FILE
 
 
-_ERROR_LOCATION = re.compile(r"^(?P<file>.+):(?P<line>\d+):\d+: error:", re.MULTILINE)
+_DIAGNOSTIC_LOCATION = re.compile(
+    r"^(?P<file>.+):(?P<line>\d+):\d+: (?:error|note):", re.MULTILINE
+)
 _LINE_MARKER = re.compile(r"//\s*(\d+)\s*$")
 
 
 def _python_lines_for_errors(path: str, stderr: str) -> set[int]:
-    """The Python source lines a compile failure's errors trace back to
-    each error's C++ line paired with the nearest `// N` marker at or above it"""
+    """The Python source lines a compile failure's errors trace back to.
+
+    Most real errors here happen inside a runtime template (to_str, sort,
+    print, ...), so the primary `error:` location is almost always some
+    runtime header, never `path` itself - the line that's actually in
+    `path` only shows up as a "note: in instantiation of ... requested
+    here" a few lines later. So this matches both error: and note: for
+    `path`, not just error:, and pairs each with the nearest `// N` marker
+    at or above it."""
     cpp_lines = {
         int(m.group("line"))
-        for m in _ERROR_LOCATION.finditer(stderr)
+        for m in _DIAGNOSTIC_LOCATION.finditer(stderr)
         if m.group("file") == path
     }
     if not cpp_lines:
@@ -102,11 +111,16 @@ def _python_lines_for_errors(path: str, stderr: str) -> set[int]:
     return python_lines
 
 
+_RED = "\033[31m"
+_RESET = "\033[0m"
+
+
 def _format_python_lines(python_lines: set[int], python_source: str) -> str:
     """Lines corresponding to lines in python source, formatted for user info"""
     source_lines = python_source.splitlines()
     parts = [
-        f"IMPORTANT: Error likely corresponds to python line(s): {', '.join(map(str, sorted(python_lines)))}"
+        f"{_RED}IMPORTANT: Error likely corresponds to python line(s): "
+        f"{', '.join(map(str, sorted(python_lines)))}{_RESET}"
     ]
     for line in sorted(python_lines):
         if source_lines is not None and 0 < line <= len(source_lines):

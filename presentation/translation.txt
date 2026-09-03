@@ -1,0 +1,19 @@
+Python Code
+total = p.x + y
+
+Tree Representation
+AssignmentStmt
+|
+|---- lvalues : [ NameExpr "total" ]
+|
+|---- rvalue  : OpExpr (+)
+                 |
+                 |---- MemberExpr
+                 |       |---- expr : NameExpr "p"
+                 |       |---- name : "x"
+                 |
+                 |---- NameExpr "y"
+
+C++ Code
+total = (p.x + y);
+

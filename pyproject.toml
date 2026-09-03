@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "splice"
 version = "0.1.0"
 description = "Compiles a typed subset of Python straight to native C++"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     # A fork of mypy 2.3.0 that supports more fixed-width int types
     # Normaly mypy can be compiled with mypyc but this uses the Python version by default (2x speed difference between compiled and interpreted but 5 minute compile time)
@@ -28,4 +28,4 @@ test = [
 ]
 
 [tool.setuptools.package-data]
-splice = ["runtime/*.h", "py.typed"]
+splice = ["runtime/*.h", "runtime/ankerl/*.h", "py.typed"]
